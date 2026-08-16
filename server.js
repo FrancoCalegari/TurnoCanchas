@@ -25,6 +25,10 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Algo salió mal en el servidor.' });
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor de TurnoCanchas corriendo en el puerto ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Servidor de TurnoCanchas corriendo en el puerto ${PORT}`);
+    });
+}
+
+module.exports = app;
