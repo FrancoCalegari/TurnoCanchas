@@ -78,14 +78,15 @@
               Complejo Deportivo.</span
             >
           </div>
-          <div class="flex items-center space-x-2">
-            <button
+          <div class="flex items-center space-x-2" id="client-auth-section">
+            <a
+              href="/loginuser.html"
               class="px-3 py-1 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-xs flex items-center gap-1.5 transition-all shadow-md shadow-blue-500/20 cursor-pointer"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
+                width="14"
+                height="14"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -98,8 +99,8 @@
                 <path d="m10 17 5-5-5-5"></path>
                 <path d="M15 12H3"></path>
                 <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path></svg
-              ><span>Iniciar Sesión / Google</span>
-            </button>
+              ><span>Ingresar / Registrarse</span>
+            </a>
           </div>
         </div>
         <div class="max-w-5xl mx-auto px-4 py-6 space-y-6">
@@ -122,6 +123,7 @@
                   class="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-slate-600 dark:text-slate-300 mt-2 font-medium"
                 >
                   <a
+                    id="btn-whatsapp-header"
                     href="https://api.whatsapp.com/send?phone=5491140008888&amp;text=Hola%20*Complejo%20Deportivo*!%20%F0%9F%91%8B%20Quisiera%20hacer%20una%20consulta%20sobre%20las%20canchas.%20%F0%9F%8F%9F%EF%B8%8F%E2%9A%BD%F0%9F%8E%BE"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -163,6 +165,7 @@
                         d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
                       ></path></svg></a
                   ><a
+                    id="btn-ubicacion-header"
                     href="https://maps.google.com/?q=-34.5453,-58.4497"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -388,16 +391,18 @@
             class="flex bg-slate-200/80 dark:bg-slate-900 p-1 rounded-2xl max-w-xs mx-auto border border-slate-300/60 dark:border-slate-800"
           >
             <button
+              id="btn-tab-reservar"
               class="flex-1 py-2 px-3 rounded-xl text-xs font-extrabold transition-all cursor-pointer bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm"
             >
-              Reservar Turno</button
-            ><button
-              class="flex-1 py-2 px-3 rounded-xl text-xs font-extrabold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900"
+              Reservar Turno</button>
+            <button
+              id="btn-tab-buscar"
+              class="flex-1 py-2 px-3 rounded-xl text-xs font-extrabold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             >
               Buscar Mi Reserva
             </button>
           </div>
-          <div class="space-y-6">
+          <div id="section-reservar" class="space-y-6">
             <div
               class="flex items-center justify-between max-w-xl mx-auto px-2"
             >
@@ -601,7 +606,7 @@
                       <path d="M3 15h18"></path>
                       <path d="M9 3v18"></path>
                       <path d="M15 3v18"></path></svg
-                    ><span>Parrilla de Horarios</span></button
+                    ><span>Parrilla de Horarios</span></button>
                   <button
                     id="btn-view-grid"
                     class="px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer bg-blue-600 text-white shadow-xs"
@@ -673,6 +678,25 @@
                   <!-- Courts will be dynamically injected here by app.js -->
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- SECCION BUSCAR MI RESERVA -->
+          <div id="section-buscar" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm max-w-xl mx-auto">
+              <h2 class="text-xl font-black text-slate-900 dark:text-white mb-2 text-center">Mis Reservas</h2>
+              <p class="text-sm text-slate-500 dark:text-slate-400 text-center mb-6 font-medium">Ingresá el Nombre y Apellido o Teléfono con el que realizaste la reserva para consultarla.</p>
+              
+              <div class="flex gap-2">
+                <input type="text" id="input-buscar-reserva" placeholder="Ej: Juan Perez" class="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <button id="btn-buscar-reserva" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-extrabold text-sm shadow-lg shadow-blue-500/30 transition-all active:scale-95 flex items-center justify-center gap-2 min-w-[120px]">
+                  Buscar
+                </button>
+              </div>
+            </div>
+
+            <div id="resultados-buscar" class="space-y-4 max-w-2xl mx-auto">
+              <!-- Resultados inyectados por app.js -->
             </div>
           </div>
         </div>

@@ -57,6 +57,21 @@ window.API = {
     },
 
     /**
+     * Obtiene las reservas de un cliente específico
+     */
+    getReservasByUser: async (userId) => {
+        try {
+            const res = await fetch(`${API_BASE}/reservas/usuario/${encodeURIComponent(userId)}`);
+            if (!res.ok) throw new Error('Error fetching reservas by user');
+            const result = await res.json();
+            return result.data || [];
+        } catch (error) {
+            console.error(error);
+            return [];
+        }
+    },
+
+    /**
      * Obtiene las reservas para una fecha específica
      * @param {string} date YYYY-MM-DD
      * @returns {Promise<Array>} Array de reservas
@@ -71,6 +86,46 @@ window.API = {
             console.error(error);
             return [];
         }
+    },
+
+    /**
+     * Inicia sesión como cliente
+     */
+    clientLogin: async (email, password) => {
+        const res = await fetch(`${API_BASE}/auth/cliente/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error en login');
+        
+        localStorage.setItem('clientToken', data.token);
+        localStorage.setItem('clientData', JSON.stringify(data.user));
+        return data;
+    },
+
+    /**
+     * Registra a un nuevo cliente
+     */
+    clientRegister: async (userData) => {
+        const res = await fetch(`${API_BASE}/auth/cliente/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error en registro');
+        return data;
+    },
+
+    /**
+     * Cierra sesión del cliente
+     */
+    clientLogout: () => {
+        localStorage.removeItem('clientToken');
+        localStorage.removeItem('clientData');
+        window.location.reload();
     },
 
     /**

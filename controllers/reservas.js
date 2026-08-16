@@ -18,7 +18,16 @@ const getAll = async (req, res) => {
 const getByUser = async (req, res) => {
     try {
         const { userId } = req.params;
-        const result = await executeQuery(`SELECT * FROM reservas WHERE cliente = '${String(userId).replace(/'/g, "''")}'`);
+        const safeUserId = String(userId).replace(/'/g, "''");
+        
+        let query;
+        if (!isNaN(userId) && userId.trim() !== '') {
+            query = `SELECT * FROM reservas WHERE cliente = '${safeUserId}' OR cliente_id = ${parseInt(userId)}`;
+        } else {
+            query = `SELECT * FROM reservas WHERE cliente = '${safeUserId}'`;
+        }
+        
+        const result = await executeQuery(query);
         res.json({ message: `Reservas del usuario ${userId}`, data: result });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -27,7 +36,7 @@ const getByUser = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-        const { canchaId, fecha, hora, cliente, duracion, precio } = req.body;
+        const { canchaId, fecha, hora, cliente, cliente_id, duracion, precio } = req.body;
         
         // Generate a random ID like 'RES-XYZ123'
         const id = 'RES-' + Math.random().toString(36).substr(2, 6).toUpperCase();
@@ -38,10 +47,12 @@ const create = async (req, res) => {
         const safeCliente = String(cliente).replace(/'/g, "''");
         const safeDuracion = parseInt(duracion) || 60;
         const safePrecio = parseInt(precio) || 0;
+        
+        const safeClienteId = cliente_id ? parseInt(cliente_id) : 'NULL';
 
         const query = `
-            INSERT INTO reservas (id, canchaId, fecha, hora, cliente, duracion, precio, estado) 
-            VALUES ('${id}', ${safeCanchaId}, '${safeFecha}', '${safeHora}', '${safeCliente}', ${safeDuracion}, ${safePrecio}, 'confirmada')
+            INSERT INTO reservas (id, canchaId, fecha, hora, cliente, cliente_id, duracion, precio, estado) 
+            VALUES ('${id}', ${safeCanchaId}, '${safeFecha}', '${safeHora}', '${safeCliente}', ${safeClienteId}, ${safeDuracion}, ${safePrecio}, 'confirmada')
         `;
         
         await executeQuery(query);
@@ -49,7 +60,7 @@ const create = async (req, res) => {
         // Return the created ID as frontend expects it
         res.status(201).json({ 
             message: 'Reserva creada con éxito', 
-            data: { id, canchaId: safeCanchaId, fecha: safeFecha, hora: safeHora, cliente: safeCliente, duracion: safeDuracion, precio: safePrecio }
+            data: { id, canchaId: safeCanchaId, fecha: safeFecha, hora: safeHora, cliente: safeCliente, cliente_id: safeClienteId !== 'NULL' ? safeClienteId : null, duracion: safeDuracion, precio: safePrecio }
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

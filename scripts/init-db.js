@@ -23,9 +23,21 @@ async function initDB() {
             fecha VARCHAR(20) NOT NULL,
             hora VARCHAR(10) NOT NULL,
             cliente VARCHAR(100) NOT NULL,
+            cliente_id INT,
             duracion INT NOT NULL,
             precio INT NOT NULL,
             estado VARCHAR(50) DEFAULT 'confirmada',
+            createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+
+    const createClientes = `
+        CREATE TABLE IF NOT EXISTS clientes (
+            id SERIAL PRIMARY KEY,
+            nombre VARCHAR(100) NOT NULL,
+            email VARCHAR(100) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            telefono VARCHAR(50),
             createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     `;
@@ -53,7 +65,8 @@ async function initDB() {
             nombre_complejo VARCHAR(100),
             open_time VARCHAR(10),
             close_time VARCHAR(10),
-            wpp_contacto VARCHAR(20)
+            wpp_contacto VARCHAR(20),
+            ubicacion_maps VARCHAR(500)
         )
     `;
 
@@ -66,6 +79,10 @@ async function initDB() {
         await executeQuery(createReservas);
         console.log("Tabla 'reservas' lista.");
 
+        console.log("Creando tabla 'clientes'...");
+        await executeQuery(createClientes);
+        console.log("Tabla 'clientes' lista.");
+
         console.log("Creando tabla 'plataforma_config'...");
         await executeQuery(createPlataforma);
         console.log("Tabla 'plataforma_config' lista.");
@@ -76,6 +93,15 @@ async function initDB() {
 
         console.log("Creando tabla 'ajustes_complejo'...");
         await executeQuery(createAjustes);
+        
+        // Intentar agregar la columna por si ya existía la tabla
+        try {
+            await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN ubicacion_maps VARCHAR(500)");
+            console.log("Columna ubicacion_maps agregada.");
+        } catch (e) {
+            // Seguramente ya existe, ignoramos.
+        }
+        
         console.log("Tabla 'ajustes_complejo' lista.");
 
         // Poblar algunas canchas mock si la tabla está vacía
@@ -119,8 +145,8 @@ async function initDB() {
         if (countAjustes === 0) {
             console.log("Inyectando configuración inicial de ajustes...");
             await executeQuery(`
-                INSERT INTO ajustes_complejo (id, nombre_complejo, open_time, close_time, wpp_contacto) 
-                VALUES (1, 'Complejo Deportivo TurnoCanchas', '09:00', '23:00', '5491100000000')
+                INSERT INTO ajustes_complejo (id, nombre_complejo, open_time, close_time, wpp_contacto, ubicacion_maps) 
+                VALUES (1, 'Complejo Deportivo TurnoCanchas', '09:00', '23:00', '5491100000000', 'https://maps.app.goo.gl/placeholder')
             `);
         }
 

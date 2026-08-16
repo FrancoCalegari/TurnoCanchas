@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
             sport: 'ALL',
             duration: '60'
         },
-        viewMode: 'grid'
+        viewMode: 'grid',
+        clientData: null
     };
 
     // DOM Elements
@@ -21,10 +22,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnViewList = document.getElementById('btn-view-list');
     const btnViewGrid = document.getElementById('btn-view-grid');
 
+    // Tab Elements
+    const btnTabReservar = document.getElementById('btn-tab-reservar');
+    const btnTabBuscar = document.getElementById('btn-tab-buscar');
+    const sectionReservar = document.getElementById('section-reservar');
+    const sectionBuscar = document.getElementById('section-buscar');
+
+    // Search Elements
+    const inputBuscarReserva = document.getElementById('input-buscar-reserva');
+    const btnBuscarReserva = document.getElementById('btn-buscar-reserva');
+    const resultadosBuscar = document.getElementById('resultados-buscar');
+
     // Init
     async function init() {
         if (!datesContainer || !courtsGrid) return; // Ensure we are on the index page
         
+        // Load client auth state
+        const storedClient = localStorage.getItem('clientData');
+        if (storedClient) {
+            try {
+                state.clientData = JSON.parse(storedClient);
+                updateHeaderAuth();
+            } catch (e) {
+                console.error('Error parsing clientData', e);
+            }
+        }
+
         // Comprobar Paywall / Suscripción
         const plat = await window.API.getPlataforma();
         if (plat && (plat.estado === 'inactivo' || new Date(plat.fecha_vencimiento) < new Date())) {
@@ -36,6 +59,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             return;
+        }
+
+        // Fetch Ajustes para encabezado
+        const ajustes = await window.API.getAjustes();
+        if (ajustes) {
+            if (ajustes.wpp_contacto) {
+                const wppLink = document.getElementById('btn-whatsapp-header');
+                if (wppLink) {
+                    wppLink.href = `https://api.whatsapp.com/send?phone=${ajustes.wpp_contacto}&text=Hola!`;
+                }
+            }
+            if (ajustes.ubicacion_maps) {
+                const mapsLink = document.getElementById('btn-ubicacion-header');
+                if (mapsLink) {
+                    mapsLink.href = ajustes.ubicacion_maps;
+                }
+            }
         }
 
         renderCalendar();
@@ -145,6 +185,130 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderCourts();
             });
         }
+
+        if(btnTabReservar && btnTabBuscar) {
+            btnTabReservar.addEventListener('click', () => {
+                sectionReservar.classList.remove('hidden');
+                sectionBuscar.classList.add('hidden');
+                
+                btnTabReservar.className = 'flex-1 py-2 px-3 rounded-xl text-xs font-extrabold transition-all cursor-pointer bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm';
+                btnTabBuscar.className = 'flex-1 py-2 px-3 rounded-xl text-xs font-extrabold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+            });
+
+            btnTabBuscar.addEventListener('click', () => {
+                sectionBuscar.classList.remove('hidden');
+                sectionReservar.classList.add('hidden');
+                
+                btnTabBuscar.className = 'flex-1 py-2 px-3 rounded-xl text-xs font-extrabold transition-all cursor-pointer bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm';
+                btnTabReservar.className = 'flex-1 py-2 px-3 rounded-xl text-xs font-extrabold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+            
+                // Auto-fill and search if logged in
+                if (state.clientData && inputBuscarReserva.value === '') {
+                    inputBuscarReserva.value = state.clientData.nombre;
+                    handleBuscarReserva();
+                }
+            });
+        }
+
+        if(btnBuscarReserva) {
+            btnBuscarReserva.addEventListener('click', handleBuscarReserva);
+        }
+        if(inputBuscarReserva) {
+            inputBuscarReserva.addEventListener('keypress', (e) => {
+                if(e.key === 'Enter') handleBuscarReserva();
+            });
+        }
+    }
+
+    async function handleBuscarReserva() {
+        let searchQuery = inputBuscarReserva.value.trim();
+        if(!searchQuery) {
+            showAlertModal('Atención', 'Ingresá un nombre o teléfono para buscar.', 'error');
+            return;
+        }
+
+        let apiParam = searchQuery;
+        // Si el usuario está logueado y busca su propio nombre/email, usamos su ID interno para mayor precisión
+        if (state.clientData && (searchQuery === state.clientData.nombre || searchQuery === state.clientData.email || searchQuery === state.clientData.telefono)) {
+            apiParam = state.clientData.id;
+        }
+
+        btnBuscarReserva.disabled = true;
+        btnBuscarReserva.innerHTML = '<svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+        
+        try {
+            const reservas = await window.API.getReservasByUser(apiParam);
+            renderResultadosBuscar(reservas);
+        } catch (error) {
+            resultadosBuscar.innerHTML = '<div class="p-6 text-center text-rose-500 font-bold bg-rose-50 dark:bg-rose-900/20 rounded-2xl">Error al buscar reservas.</div>';
+        } finally {
+            btnBuscarReserva.disabled = false;
+            btnBuscarReserva.innerText = 'Buscar';
+        }
+    }
+
+    function renderResultadosBuscar(reservas) {
+        if (!reservas || reservas.length === 0) {
+            resultadosBuscar.innerHTML = `
+                <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-center flex flex-col items-center">
+                    <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-x w-8 h-8"><path d="m13.5 8.5-5 5"/><path d="m8.5 8.5 5 5"/><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    </div>
+                    <h3 class="text-lg font-black text-slate-900 dark:text-white mb-2">No se encontraron reservas</h3>
+                    <p class="text-sm text-slate-500 max-w-sm">No encontramos turnos asociados a este nombre/teléfono. Si creés que es un error, contactá al complejo.</p>
+                </div>`;
+            return;
+        }
+
+        resultadosBuscar.innerHTML = '';
+        
+        // Sort by date/time (newest/future first)
+        reservas.sort((a, b) => new Date(`${b.fecha}T${b.hora}`) - new Date(`${a.fecha}T${a.hora}`));
+
+        reservas.forEach(res => {
+            const cancha = state.canchas.find(c => c.id === res.canchaId) || { nombre: 'Cancha Desconocida' };
+            const statusColors = {
+                confirmada: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400',
+                pendiente: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400',
+                cancelada: 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400'
+            };
+            const colorClass = statusColors[res.estado] || 'bg-slate-100 text-slate-700';
+
+            const card = document.createElement('div');
+            card.className = 'bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-md transition-shadow';
+            card.innerHTML = `
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${colorClass}">${res.estado}</span>
+                            <span class="text-xs font-bold text-slate-400">ID: ${res.id}</span>
+                        </div>
+                        <h4 class="text-lg font-black text-slate-900 dark:text-white">${cancha.nombre}</h4>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Total</p>
+                        <p class="text-lg font-black text-blue-600 dark:text-blue-400">$${(res.precio || 0).toLocaleString('es-AR')}</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days text-slate-400 w-4 h-4"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 leading-none mb-1 mt-0.5">Fecha</p>
+                            <p class="text-xs font-bold text-slate-700 dark:text-slate-300">${res.fecha.split('T')[0]}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock text-slate-400 w-4 h-4"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 leading-none mb-1 mt-0.5">Horario</p>
+                            <p class="text-xs font-bold text-slate-700 dark:text-slate-300">${res.hora} hs <span class="font-normal text-slate-400">(${res.duracion} min)</span></p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            resultadosBuscar.appendChild(card);
+        });
     }
 
     function updateViewButtons() {
@@ -445,7 +609,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reservation Handler
     function handleReserva(btn, cancha, hour, duration, price) {
-        const text = `¿Confirmar reserva en ${cancha.nombre} el ${formatDateToYMD(state.selectedDate)} a las ${hour} hs por ${duration} minutos?\n\nCosto total: $${price.toLocaleString('es-AR')}`;
+        let nombreCliente = 'Cliente Web';
+        let clienteId = null;
+
+        if (state.clientData) {
+            nombreCliente = state.clientData.nombre;
+            clienteId = state.clientData.id;
+        } else {
+            const input = prompt('Por favor, ingresá tu nombre completo o teléfono para identificar la reserva:');
+            if (!input) return; // User cancelled
+            nombreCliente = input;
+        }
+
+        const text = `¿Confirmar reserva en ${cancha.nombre} el ${formatDateToYMD(state.selectedDate)} a las ${hour} hs por ${duration} minutos?\n\nA nombre de: ${nombreCliente}\nCosto total: $${price.toLocaleString('es-AR')}`;
         
         showConfirmModal(text, () => {
             // Show loading state
@@ -453,12 +629,12 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = '<span class="text-xs font-bold">Procesando...</span>';
             btn.disabled = true;
 
-            // Call API
             window.API.crearReserva({
                 canchaId: cancha.id,
                 fecha: formatDateToYMD(state.selectedDate),
                 hora: hour,
-                cliente: 'Cliente Web',
+                cliente: nombreCliente,
+                cliente_id: clienteId,
                 duracion: duration,
                 precio: price
             }).then(res => {
@@ -471,6 +647,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.disabled = false;
             });
         });
+    }
+
+    function updateHeaderAuth() {
+        const authSection = document.getElementById('client-auth-section');
+        if (!authSection) return;
+
+        if (state.clientData) {
+            authSection.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-[10px] font-bold text-slate-400 leading-none">Bienvenido,</p>
+                        <p class="text-xs font-black text-white">${state.clientData.nombre}</p>
+                    </div>
+                    <button onclick="window.API.clientLogout()" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1.5 transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                        <span class="hidden sm:inline">Salir</span>
+                    </button>
+                </div>
+            `;
+        }
     }
 
     // Start

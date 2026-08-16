@@ -14,7 +14,7 @@ const getAjustes = async (req, res) => {
 
 const updateAjustes = async (req, res) => {
     try {
-        const { nombre_complejo, open_time, close_time, wpp_contacto } = req.body;
+        const { nombre_complejo, open_time, close_time, wpp_contacto, ubicacion_maps } = req.body;
         
         let updates = [];
         if (nombre_complejo !== undefined) {
@@ -32,6 +32,10 @@ const updateAjustes = async (req, res) => {
         if (wpp_contacto !== undefined) {
             const safe = String(wpp_contacto).replace(/'/g, "''");
             updates.push(`wpp_contacto = '${safe}'`);
+        }
+        if (ubicacion_maps !== undefined) {
+            const safe = String(ubicacion_maps).replace(/'/g, "''");
+            updates.push(`ubicacion_maps = '${safe}'`);
         }
 
         if (updates.length === 0) {

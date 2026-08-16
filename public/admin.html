@@ -531,6 +531,7 @@
                 </h2>
                 <div class="grid grid-cols-2 gap-3">
                   <button
+                    id="btn-qa-bloquear"
                     class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 hover:bg-blue-50 hover:border-blue-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 dark:hover:border-blue-500/50 transition-all cursor-pointer group"
                   >
                     <div
@@ -564,6 +565,7 @@
                     >
                   </button>
                   <button
+                    id="btn-qa-cliente"
                     class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 dark:hover:border-emerald-500/50 transition-all cursor-pointer group"
                   >
                     <div
@@ -595,6 +597,7 @@
                     >
                   </button>
                   <button
+                    id="btn-qa-precios"
                     class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 hover:bg-amber-50 hover:border-amber-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 dark:hover:border-amber-500/50 transition-all cursor-pointer group"
                   >
                     <div
@@ -629,6 +632,7 @@
                     >
                   </button>
                   <button
+                    id="btn-qa-avisos"
                     class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 hover:bg-purple-50 hover:border-purple-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 dark:hover:border-purple-500/50 transition-all cursor-pointer group"
                   >
                     <div
@@ -837,12 +841,140 @@
                         <label class="text-xs font-bold text-slate-600 dark:text-slate-400">WhatsApp de Contacto (Ej: 5491100000000)</label>
                         <input type="text" id="ajustes-wpp" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
                     </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Link de Google Maps (Ubicación)</label>
+                        <input type="url" id="ajustes-maps" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold" placeholder="https://maps.app.goo.gl/...">
+                    </div>
                     <button type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all mt-4">Guardar Ajustes</button>
                 </form>
             </div>
         </div>
 
       </div>
+    </div>
+
+    <!-- Quick Action Modals -->
+    
+    <!-- Modal: Bloquear Horario -->
+    <div id="qa-bloquear-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl w-full max-w-sm overflow-hidden scale-95 opacity-0 transition-all duration-300 transform" id="qa-bloquear-modal-content">
+            <div class="p-6 space-y-4">
+                <h3 class="text-xl font-black text-slate-900 dark:text-white">Bloquear Horario</h3>
+                <form id="qa-bloquear-form" class="space-y-3">
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-600">Cancha</label>
+                        <select id="qa-bloquear-cancha" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm"></select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-600">Fecha</label>
+                        <input type="date" id="qa-bloquear-fecha" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-600">Hora</label>
+                        <input type="time" id="qa-bloquear-hora" required step="3600" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-600">Duración (Minutos)</label>
+                        <select id="qa-bloquear-duracion" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm">
+                            <option value="60">60 Minutos (1 Hora)</option>
+                            <option value="90">90 Minutos (1.5 Horas)</option>
+                            <option value="120">120 Minutos (2 Horas)</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="flex border-t border-slate-100">
+                <button type="button" class="qa-cancel-btn flex-1 py-4 text-sm font-bold text-slate-500 hover:bg-slate-50">Cancelar</button>
+                <div class="w-px bg-slate-100"></div>
+                <button type="submit" form="qa-bloquear-form" class="flex-1 py-4 text-sm font-black text-blue-600 hover:bg-blue-50">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Nuevo Cliente -->
+    <div id="qa-cliente-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl w-full max-w-sm overflow-hidden scale-95 opacity-0 transition-all duration-300 transform" id="qa-cliente-modal-content">
+            <div class="p-6 space-y-4">
+                <h3 class="text-xl font-black text-slate-900 dark:text-white">Nuevo Cliente</h3>
+                <form id="qa-cliente-form" class="space-y-3">
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-600">Nombre Completo</label>
+                        <input type="text" id="qa-cliente-nombre" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-600">Email</label>
+                        <input type="email" id="qa-cliente-email" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-600">Teléfono</label>
+                        <input type="tel" id="qa-cliente-telefono" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-600">Contraseña Provisional</label>
+                        <input type="text" id="qa-cliente-pass" required value="123456" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm font-mono">
+                    </div>
+                </form>
+            </div>
+            <div class="flex border-t border-slate-100">
+                <button type="button" class="qa-cancel-btn flex-1 py-4 text-sm font-bold text-slate-500 hover:bg-slate-50">Cancelar</button>
+                <div class="w-px bg-slate-100"></div>
+                <button type="submit" form="qa-cliente-form" class="flex-1 py-4 text-sm font-black text-emerald-600 hover:bg-emerald-50">Crear</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Cambiar Precios -->
+    <div id="qa-precios-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl w-full max-w-sm overflow-hidden scale-95 opacity-0 transition-all duration-300 transform" id="qa-precios-modal-content">
+            <div class="p-6 space-y-4">
+                <h3 class="text-xl font-black text-slate-900 dark:text-white">Cambiar Precio</h3>
+                <form id="qa-precios-form" class="space-y-3">
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-600">Cancha</label>
+                        <select id="qa-precios-cancha" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm"></select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-600">Nuevo Precio (1 Hora)</label>
+                        <input type="number" id="qa-precios-valor" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm">
+                    </div>
+                </form>
+            </div>
+            <div class="flex border-t border-slate-100">
+                <button type="button" class="qa-cancel-btn flex-1 py-4 text-sm font-bold text-slate-500 hover:bg-slate-50">Cancelar</button>
+                <div class="w-px bg-slate-100"></div>
+                <button type="submit" form="qa-precios-form" class="flex-1 py-4 text-sm font-black text-amber-600 hover:bg-amber-50">Actualizar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Enviar Avisos -->
+    <div id="qa-avisos-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl w-full max-w-sm overflow-hidden scale-95 opacity-0 transition-all duration-300 transform" id="qa-avisos-modal-content">
+            <div class="p-6 space-y-4">
+                <h3 class="text-xl font-black text-slate-900 dark:text-white">Enviar Aviso a Clientes</h3>
+                <form id="qa-avisos-form" class="space-y-3">
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-600">Mensaje Masivo</label>
+                        <textarea id="qa-avisos-texto" required rows="3" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm" placeholder="Las canchas estarán cerradas el feriado..."></textarea>
+                    </div>
+                    <div class="flex gap-4 items-center">
+                        <label class="flex items-center gap-2 text-sm font-bold text-slate-600">
+                            <input type="checkbox" id="qa-avisos-wpp" checked class="rounded text-blue-600">
+                            WhatsApp
+                        </label>
+                        <label class="flex items-center gap-2 text-sm font-bold text-slate-600">
+                            <input type="checkbox" id="qa-avisos-email" checked class="rounded text-blue-600">
+                            Email
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="flex border-t border-slate-100">
+                <button type="button" class="qa-cancel-btn flex-1 py-4 text-sm font-bold text-slate-500 hover:bg-slate-50">Cancelar</button>
+                <div class="w-px bg-slate-100"></div>
+                <button type="submit" form="qa-avisos-form" class="flex-1 py-4 text-sm font-black text-purple-600 hover:bg-purple-50">Enviar Avisos</button>
+            </div>
+        </div>
     </div>
 
     <!-- Modal Form (Hidden) -->

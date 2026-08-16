@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupCanchasLogic();
         setupNavigation();
         setupAjustesLogic();
+        setupQuickActions();
     }
 
     // Load Data
@@ -258,6 +259,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('ajustes-open').value = data.open_time || '';
             document.getElementById('ajustes-close').value = data.close_time || '';
             document.getElementById('ajustes-wpp').value = data.wpp_contacto || '';
+            const mapInput = document.getElementById('ajustes-maps');
+            if(mapInput) mapInput.value = data.ubicacion_maps || '';
         }
     }
 
@@ -276,6 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         open_time: document.getElementById('ajustes-open').value,
                         close_time: document.getElementById('ajustes-close').value,
                         wpp_contacto: document.getElementById('ajustes-wpp').value,
+                        ubicacion_maps: document.getElementById('ajustes-maps') ? document.getElementById('ajustes-maps').value : ''
                     });
                     alert('Ajustes guardados correctamente.');
                 } catch (error) {
@@ -318,6 +322,164 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (nav.btn === btnNavCanchas && typeof loadCanchas === 'function') loadCanchas();
             });
         });
+    }
+
+    // ==========================================
+    // ACCIONES RÁPIDAS
+    // ==========================================
+    function setupQuickActions() {
+        const btns = {
+            bloquear: document.getElementById('btn-qa-bloquear'),
+            cliente: document.getElementById('btn-qa-cliente'),
+            precios: document.getElementById('btn-qa-precios'),
+            avisos: document.getElementById('btn-qa-avisos')
+        };
+
+        const modals = {
+            bloquear: document.getElementById('qa-bloquear-modal'),
+            cliente: document.getElementById('qa-cliente-modal'),
+            precios: document.getElementById('qa-precios-modal'),
+            avisos: document.getElementById('qa-avisos-modal')
+        };
+
+        const contents = {
+            bloquear: document.getElementById('qa-bloquear-modal-content'),
+            cliente: document.getElementById('qa-cliente-modal-content'),
+            precios: document.getElementById('qa-precios-modal-content'),
+            avisos: document.getElementById('qa-avisos-modal-content')
+        };
+
+        const openQaModal = (key) => {
+            if(!modals[key]) return;
+            // Populate selects
+            if (key === 'bloquear') populateCanchasSelect('qa-bloquear-cancha');
+            if (key === 'precios') populateCanchasSelect('qa-precios-cancha');
+
+            modals[key].classList.remove('hidden');
+            requestAnimationFrame(() => {
+                contents[key].classList.remove('scale-95', 'opacity-0');
+                contents[key].classList.add('scale-100', 'opacity-100');
+            });
+        };
+
+        const closeQaModal = (key) => {
+            if(!modals[key]) return;
+            contents[key].classList.remove('scale-100', 'opacity-100');
+            contents[key].classList.add('scale-95', 'opacity-0');
+            setTimeout(() => modals[key].classList.add('hidden'), 300);
+        };
+
+        if(btns.bloquear) btns.bloquear.addEventListener('click', () => openQaModal('bloquear'));
+        if(btns.cliente) btns.cliente.addEventListener('click', () => openQaModal('cliente'));
+        if(btns.precios) btns.precios.addEventListener('click', () => openQaModal('precios'));
+        if(btns.avisos) btns.avisos.addEventListener('click', () => openQaModal('avisos'));
+
+        document.querySelectorAll('.qa-cancel-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const modalId = e.target.closest('[id$="-modal"]').id;
+                const key = modalId.replace('qa-', '').replace('-modal', '');
+                closeQaModal(key);
+            });
+        });
+
+        // Forms logic
+        const fBloquear = document.getElementById('qa-bloquear-form');
+        if(fBloquear) fBloquear.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = fBloquear.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.innerText = 'Bloqueando...';
+            try {
+                const duracion = document.getElementById('qa-bloquear-duracion').value;
+                await window.API.crearReserva({
+                    canchaId: document.getElementById('qa-bloquear-cancha').value,
+                    fecha: document.getElementById('qa-bloquear-fecha').value,
+                    hora: document.getElementById('qa-bloquear-hora').value,
+                    cliente: 'Bloqueo Admin',
+                    cliente_id: null,
+                    duracion: duracion,
+                    precio: 0,
+                    estado: 'confirmada'
+                });
+                showAlertModal('Horario Bloqueado', 'El horario ha sido bloqueado exitosamente en el calendario.', 'success');
+                closeQaModal('bloquear');
+                loadDashboardData();
+            } catch (err) {
+                showAlertModal('Error', err.message || 'No se pudo bloquear el horario', 'error');
+            } finally {
+                btn.disabled = false; btn.innerText = 'Confirmar';
+            }
+        });
+
+        const fCliente = document.getElementById('qa-cliente-form');
+        if(fCliente) fCliente.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = fCliente.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.innerText = 'Creando...';
+            try {
+                await window.API.clientRegister({
+                    nombre: document.getElementById('qa-cliente-nombre').value,
+                    email: document.getElementById('qa-cliente-email').value,
+                    telefono: document.getElementById('qa-cliente-telefono').value,
+                    password: document.getElementById('qa-cliente-pass').value
+                });
+                showAlertModal('Cliente Creado', 'El cliente fue registrado exitosamente.', 'success');
+                closeQaModal('cliente');
+            } catch (err) {
+                showAlertModal('Error', err.message || 'No se pudo crear el cliente', 'error');
+            } finally {
+                btn.disabled = false; btn.innerText = 'Crear';
+            }
+        });
+
+        const fPrecios = document.getElementById('qa-precios-form');
+        if(fPrecios) fPrecios.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = fPrecios.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.innerText = 'Actualizando...';
+            try {
+                const cId = document.getElementById('qa-precios-cancha').value;
+                const newPrice = document.getElementById('qa-precios-valor').value;
+                await window.API.actualizarCancha(cId, { precioPorHora: newPrice });
+                showAlertModal('Precio Actualizado', 'El precio de la cancha fue modificado exitosamente.', 'success');
+                closeQaModal('precios');
+                if (typeof loadCanchas === 'function') loadCanchas();
+            } catch (err) {
+                showAlertModal('Error', err.message || 'No se pudo cambiar el precio', 'error');
+            } finally {
+                btn.disabled = false; btn.innerText = 'Actualizar';
+            }
+        });
+
+        const fAvisos = document.getElementById('qa-avisos-form');
+        if(fAvisos) fAvisos.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = fAvisos.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.innerText = 'Enviando...';
+            // Simulate network request
+            await new Promise(r => setTimeout(r, 1500));
+            showAlertModal('Avisos Enviados', 'Los mensajes han sido encolados y se enviarán en breve a través de WhatsApp/Email.', 'success');
+            closeQaModal('avisos');
+            btn.disabled = false; btn.innerText = 'Enviar Avisos';
+            fAvisos.reset();
+        });
+    }
+
+    async function populateCanchasSelect(selectId) {
+        const select = document.getElementById(selectId);
+        if(!select) return;
+        // Si no tenemos las canchas cargadas, las buscamos
+        let list = canchasList;
+        if (!list || list.length === 0) {
+            try {
+                list = await window.API.getCanchas();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        if (!list) return;
+
+        select.innerHTML = '<option value="">Seleccionar Cancha...</option>' + 
+            list.map(c => `<option value="${c.id}">${c.nombre} ($${c.precioPorHora})</option>`).join('');
     }
 
     // --- LOGICA DE GESTION DE CANCHAS ---

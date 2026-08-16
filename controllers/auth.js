@@ -54,7 +54,75 @@ const masterLogin = async (req, res) => {
     }
 };
 
+const registerClient = async (req, res) => {
+    try {
+        const { nombre, email, password, telefono } = req.body;
+        
+        if (!nombre || !email || !password) {
+            return res.status(400).json({ error: 'Faltan campos obligatorios (nombre, email, password)' });
+        }
+
+        const safeNombre = String(nombre).replace(/'/g, "''");
+        const safeEmail = String(email).replace(/'/g, "''").toLowerCase();
+        const safePassword = String(password).replace(/'/g, "''"); // In a real app, hash this!
+        const safeTelefono = telefono ? String(telefono).replace(/'/g, "''") : '';
+
+        // Check if email exists
+        const existing = await executeQuery(`SELECT id FROM clientes WHERE email = '${safeEmail}'`);
+        if (existing && existing.length > 0) {
+            return res.status(400).json({ error: 'El email ya está registrado' });
+        }
+
+        const query = `
+            INSERT INTO clientes (nombre, email, password, telefono) 
+            VALUES ('${safeNombre}', '${safeEmail}', '${safePassword}', '${safeTelefono}')
+            RETURNING id, nombre, email, telefono
+        `;
+        
+        const result = await executeQuery(query);
+        // Sometimes RETURNING might not work perfectly with custom drivers, so we just assume success if it doesn't throw
+        
+        res.status(201).json({ message: 'Usuario registrado con éxito' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const loginClient = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Faltan credenciales' });
+        }
+
+        const safeEmail = String(email).replace(/'/g, "''").toLowerCase();
+        const query = `SELECT * FROM clientes WHERE email = '${safeEmail}'`;
+        
+        const result = await executeQuery(query);
+        
+        if (!result || result.length === 0) {
+            return res.status(401).json({ error: 'Usuario no encontrado' });
+        }
+
+        const user = result[0];
+        
+        if (user.password === password) {
+            const token = Buffer.from(`client:${user.id}:${Date.now()}`).toString('base64');
+            // Remove password before sending to client
+            delete user.password;
+            res.json({ token, user });
+        } else {
+            res.status(401).json({ error: 'Contraseña incorrecta' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     login,
-    masterLogin
+    masterLogin,
+    registerClient,
+    loginClient
 };
