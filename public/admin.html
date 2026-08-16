@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="es" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel de Administración - Complejo Deportivo</title>
+    <meta
+      name="description"
+      content="Panel de control para administradores del Complejo Deportivo."
+    />
+    <link
+      rel="icon"
+      type="image/jpeg"
+      href="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="h-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased font-sans"
+  >
+    <div id="root" class="h-full">
+      <div
+        class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col"
+      >
+        <!-- Barra superior Administrativa -->
+        <div
+          class="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white px-4 py-2.5 text-xs flex flex-wrap items-center justify-between gap-2 shadow-md relative z-20"
+        >
+          <div class="flex items-center space-x-2">
+            <span
+              class="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 font-extrabold"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-shield-check w-3.5 h-3.5 mr-1 text-emerald-400"
+              >
+                <path
+                  d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2-1 4-2 7-2 2.5 0 4.5 1 6.5 2a1 1 0 0 1 1 1z"
+                ></path>
+                <path d="m9 12 2 2 4-4"></path>
+              </svg>
+              Panel de Administrador
+            </span>
+            <span class="text-slate-300 hidden md:inline font-medium"
+              >Gestión integral de canchas, reservas y usuarios.</span
+            >
+          </div>
+          <div class="flex items-center space-x-3">
+            <div
+              class="flex items-center gap-2 px-3 py-1 rounded-lg bg-white/10 border border-white/20"
+            >
+              <div
+                class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"
+              ></div>
+              <span id="admin-username-display" class="font-bold">Admin</span>
+            </div>
+            <button
+              id="btn-logout"
+              class="px-3 py-1 rounded-lg bg-rose-600/80 hover:bg-rose-500 text-white font-black text-xs flex items-center gap-1.5 transition-all shadow-md shadow-rose-500/20 cursor-pointer border border-rose-400/30"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-log-out w-3.5 h-3.5"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" x2="9" y1="12" y2="12"></line>
+              </svg>
+              <span>Cerrar Sesión</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Navegación Principal -->
+        <nav
+          class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm sticky top-0 z-10"
+        >
+          <div
+            class="max-w-7xl mx-auto px-4 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700"
+          >
+            <div class="flex items-center space-x-1 py-3 min-w-max">
+              <button
+                id="nav-dashboard"
+                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 shadow-sm flex items-center gap-2"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-layout-dashboard w-4 h-4"
+                >
+                  <rect width="7" height="9" x="3" y="3" rx="1"></rect>
+                  <rect width="7" height="5" x="14" y="3" rx="1"></rect>
+                  <rect width="7" height="9" x="14" y="12" rx="1"></rect>
+                  <rect width="7" height="5" x="3" y="16" rx="1"></rect>
+                </svg>
+                Dashboard General
+              </button>
+              <button
+                id="nav-reservas"
+                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days w-4 h-4"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path><path d="M8 14h.01"></path><path d="M12 14h.01"></path><path d="M16 14h.01"></path><path d="M8 18h.01"></path><path d="M12 18h.01"></path><path d="M16 18h.01"></path></svg>
+                Gestión de Reservas
+              </button>
+              <button
+                id="nav-canchas"
+                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map w-4 h-4"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" x2="9" y1="3" y2="18"></line><line x1="15" x2="15" y1="6" y2="21"></line></svg>
+                Configuración de Canchas
+              </button>
+              <button
+                id="nav-reportes"
+                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                Reportes
+              </button>
+              <button
+                id="nav-ajustes"
+                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Ajustes
+              </button>
+            </div>
+          </div>
+        </nav>
+
+        <div id="view-dashboard" class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+          <!-- Header del Dashboard -->
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+          >
+            <div>
+              <h1
+                class="text-2xl font-black text-slate-900 dark:text-white tracking-tight"
+              >
+                Dashboard General
+              </h1>
+              <p
+                class="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1"
+              >
+                Resumen de actividad y estado actual del complejo.
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button
+                class="px-4 py-2 rounded-xl text-sm font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm flex items-center gap-2 cursor-pointer transition-all"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-calendar w-4 h-4"
+                >
+                  <path d="M8 2v4"></path>
+                  <path d="M16 2v4"></path>
+                  <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                  <path d="M3 10h18"></path>
+                </svg>
+                Hoy, 16 Ago 2026
+              </button>
+              <button
+                class="px-4 py-2 rounded-xl text-sm font-black bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-500/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-plus w-4 h-4"
+                >
+                  <path d="M5 12h14"></path>
+                  <path d="M12 5v14"></path>
+                </svg>
+                Nueva Reserva Manual
+              </button>
+            </div>
+          </div>
+
+          <!-- KPIs -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- KPI 1 -->
+            <div
+              class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm"
+            >
+              <div class="flex items-center justify-between">
+                <h3
+                  class="text-xs font-bold text-slate-500 uppercase tracking-wider"
+                >
+                  Reservas Hoy
+                </h3>
+                <div
+                  class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-calendar-check w-4 h-4"
+                  >
+                    <path d="M8 2v4"></path>
+                    <path d="M16 2v4"></path>
+                    <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                    <path d="M3 10h18"></path>
+                    <path d="m9 16 2 2 4-4"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="mt-4 flex items-end justify-between">
+                <p id="kpi-reservas-hoy" class="text-3xl font-black text-slate-900 dark:text-white">
+                  0
+                </p>
+                <span
+                  class="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md flex items-center gap-1"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-trending-up w-3 h-3"
+                  >
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                    <polyline points="16 7 22 7 22 13"></polyline>
+                  </svg>
+                  12%
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">
+                18 confirmadas, 6 pendientes
+              </p>
+            </div>
+
+            <!-- KPI 2 -->
+            <div
+              class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm"
+            >
+              <div class="flex items-center justify-between">
+                <h3
+                  class="text-xs font-bold text-slate-500 uppercase tracking-wider"
+                >
+                  Ingresos del Día
+                </h3>
+                <div
+                  class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-circle-dollar-sign w-4 h-4"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+                    <path d="M12 18V6"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="mt-4 flex items-end justify-between">
+                <p id="kpi-ingresos" class="text-3xl font-black text-slate-900 dark:text-white">
+                  $0
+                </p>
+                <span
+                  class="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md flex items-center gap-1"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-trending-up w-3 h-3"
+                  >
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                    <polyline points="16 7 22 7 22 13"></polyline>
+                  </svg>
+                  5%
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">
+                Ingresos estimados por reservas
+              </p>
+            </div>
+
+            <!-- KPI 3 -->
+            <div
+              class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm"
+            >
+              <div class="flex items-center justify-between">
+                <h3
+                  class="text-xs font-bold text-slate-500 uppercase tracking-wider"
+                >
+                  Ocupación
+                </h3>
+                <div
+                  class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-bar-chart w-4 h-4"
+                  >
+                    <line x1="12" x2="12" y1="20" y2="10"></line>
+                    <line x1="18" x2="18" y1="20" y2="4"></line>
+                    <line x1="6" x2="6" y1="20" y2="16"></line>
+                  </svg>
+                </div>
+              </div>
+              <div class="mt-4 flex items-end justify-between">
+                <p id="kpi-ocupacion" class="text-3xl font-black text-slate-900 dark:text-white">
+                  0%
+                </p>
+                <span
+                  class="text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md flex items-center gap-1"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-minus w-3 h-3"
+                  >
+                    <path d="M5 12h14"></path>
+                  </svg>
+                  0%
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">
+                Horarios pico (18h-23h): 95%
+              </p>
+              <div
+                class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-3"
+              >
+                <div
+                  class="bg-indigo-500 h-1.5 rounded-full"
+                  style="width: 68%"
+                ></div>
+              </div>
+            </div>
+
+            <!-- KPI 4 -->
+            <div
+              class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm"
+            >
+              <div class="flex items-center justify-between">
+                <h3
+                  class="text-xs font-bold text-slate-500 uppercase tracking-wider"
+                >
+                  Canchas Activas
+                </h3>
+                <div
+                  class="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-map-pin w-4 h-4"
+                  >
+                    <path
+                      d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
+                    ></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                </div>
+              </div>
+              <div class="mt-4 flex items-end justify-between">
+                <p id="kpi-canchas-activas" class="text-3xl font-black text-slate-900 dark:text-white">
+                  0<span class="text-lg text-slate-400 font-medium">/0</span>
+                </p>
+                <span
+                  class="text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-2 py-0.5 rounded-md flex items-center gap-1"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-alert-circle w-3 h-3"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" x2="12" y1="8" y2="12"></line>
+                    <line x1="12" x2="12.01" y1="16" y2="16"></line>
+                  </svg>
+                  1 Mantenimiento
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">
+                Cancha 3 (Fútbol 5) inactiva
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Tabla de Reservas Recientes -->
+            <div
+              class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-sm flex flex-col h-full overflow-hidden"
+            >
+              <div
+                class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between"
+              >
+                <div>
+                  <h2 class="text-lg font-black text-slate-900 dark:text-white">
+                    Reservas Próximas
+                  </h2>
+                  <p class="text-xs text-slate-500 font-medium">
+                    Turnos de las próximas horas
+                  </p>
+                </div>
+                <button
+                  class="text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 cursor-pointer transition-colors"
+                >
+                  Ver todas &rarr;
+                </button>
+              </div>
+              <div class="overflow-x-auto flex-1">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr
+                      class="bg-slate-50 dark:bg-slate-800/50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700"
+                    >
+                      <th class="p-4">Hora</th>
+                      <th class="p-4">Cancha</th>
+                      <th class="p-4">Cliente</th>
+                      <th class="p-4">Estado</th>
+                      <th class="p-4 text-right">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-reservas-table" class="divide-y divide-slate-100 dark:divide-slate-800/60 text-sm">
+                    <!-- Dynamically populated by admin.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Panel lateral de Acciones Rápidas -->
+            <div class="space-y-6">
+              <div
+                class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-sm p-5"
+              >
+                <h2
+                  class="text-base font-black text-slate-900 dark:text-white mb-4"
+                >
+                  Acciones Rápidas
+                </h2>
+                <div class="grid grid-cols-2 gap-3">
+                  <button
+                    class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 hover:bg-blue-50 hover:border-blue-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 dark:hover:border-blue-500/50 transition-all cursor-pointer group"
+                  >
+                    <div
+                      class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-calendar-plus w-5 h-5"
+                      >
+                        <path d="M8 2v4"></path>
+                        <path d="M16 2v4"></path>
+                        <path
+                          d="M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"
+                        ></path>
+                        <path d="M3 10h18"></path>
+                        <path d="M16 19h6"></path>
+                        <path d="M19 16v6"></path>
+                      </svg>
+                    </div>
+                    <span
+                      class="text-xs font-bold text-slate-700 dark:text-slate-300 text-center"
+                      >Bloquear<br />Horario</span
+                    >
+                  </button>
+                  <button
+                    class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 dark:hover:border-emerald-500/50 transition-all cursor-pointer group"
+                  >
+                    <div
+                      class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-user-plus w-5 h-5"
+                      >
+                        <path
+                          d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                        ></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <line x1="19" x2="19" y1="8" y2="14"></line>
+                        <line x1="22" x2="16" y1="11" y2="11"></line>
+                      </svg>
+                    </div>
+                    <span
+                      class="text-xs font-bold text-slate-700 dark:text-slate-300 text-center"
+                      >Nuevo<br />Cliente</span
+                    >
+                  </button>
+                  <button
+                    class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 hover:bg-amber-50 hover:border-amber-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 dark:hover:border-amber-500/50 transition-all cursor-pointer group"
+                  >
+                    <div
+                      class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-tag w-5 h-5"
+                      >
+                        <path
+                          d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"
+                        ></path>
+                        <circle
+                          cx="7.5"
+                          cy="7.5"
+                          r=".5"
+                          fill="currentColor"
+                        ></circle>
+                      </svg>
+                    </div>
+                    <span
+                      class="text-xs font-bold text-slate-700 dark:text-slate-300 text-center"
+                      >Cambiar<br />Precios</span
+                    >
+                  </button>
+                  <button
+                    class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 hover:bg-purple-50 hover:border-purple-200 dark:bg-slate-800/50 dark:hover:bg-slate-800 dark:hover:border-purple-500/50 transition-all cursor-pointer group"
+                  >
+                    <div
+                      class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-megaphone w-5 h-5"
+                      >
+                        <path d="m3 11 18-5v12L3 14v-3z"></path>
+                        <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path>
+                      </svg>
+                    </div>
+                    <span
+                      class="text-xs font-bold text-slate-700 dark:text-slate-300 text-center"
+                      >Enviar<br />Avisos</span
+                    >
+                  </button>
+                </div>
+              </div>
+
+              <!-- Estado del Sistema -->
+              <div
+                class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-sm p-5"
+              >
+                <h2
+                  class="text-base font-black text-slate-900 dark:text-white mb-4"
+                >
+                  Integraciones
+                </h2>
+                <ul class="space-y-3">
+                  <li class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-message-circle w-4 h-4 text-emerald-600"
+                        >
+                          <path
+                            d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"
+                          ></path>
+                        </svg>
+                      </div>
+                      <div>
+                        <p
+                          class="text-sm font-bold text-slate-900 dark:text-white"
+                        >
+                          WhatsApp Bot
+                        </p>
+                        <p class="text-xs text-slate-500">
+                          Respondiendo activo
+                        </p>
+                      </div>
+                    </div>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  </li>
+                  <li class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-credit-card w-4 h-4 text-blue-600"
+                        >
+                          <rect
+                            width="20"
+                            height="14"
+                            x="2"
+                            y="5"
+                            rx="2"
+                          ></rect>
+                          <line x1="2" x2="22" y1="10" y2="10"></line>
+                        </svg>
+                      </div>
+                      <div>
+                        <p
+                          class="text-sm font-bold text-slate-900 dark:text-white"
+                        >
+                          MercadoPago
+                        </p>
+                        <p class="text-xs text-slate-500">Cobros automáticos</p>
+                      </div>
+                    </div>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div> <!-- Cierra view-dashboard -->
+
+        <!-- Vista de Configuración de Canchas (Oculta por defecto) -->
+        <div id="view-canchas" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Gestión de Canchas</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Administra el inventario de canchas y sus propiedades principales.</p>
+                </div>
+                <button id="btn-add-cancha" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/30 hover:-translate-y-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus w-4 h-4"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                    Nueva Cancha
+                </button>
+            </div>
+            
+            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 dark:bg-slate-800/50 text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase">
+                                <th class="p-4 pl-6 border-b border-slate-200 dark:border-slate-800">ID</th>
+                                <th class="p-4 border-b border-slate-200 dark:border-slate-800">Cancha</th>
+                                <th class="p-4 border-b border-slate-200 dark:border-slate-800">Deporte</th>
+                                <th class="p-4 border-b border-slate-200 dark:border-slate-800">Precio/Hr</th>
+                                <th class="p-4 border-b border-slate-200 dark:border-slate-800">Estado</th>
+                                <th class="p-4 pr-6 border-b border-slate-200 dark:border-slate-800 text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="masteradmin-canchas-table" class="divide-y divide-slate-100 dark:divide-slate-800/60 text-sm">
+                            <tr>
+                                <td colspan="6" class="p-8 text-center text-slate-500">
+                                    <svg class="animate-spin h-6 w-6 mx-auto mb-2 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Cargando canchas...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de Gestión de Reservas -->
+        <div id="view-reservas" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Gestión de Reservas</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Busca, edita o cancela turnos agendados.</p>
+                </div>
+                <button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-lg shadow-blue-600/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                    Reserva Manual
+                </button>
+            </div>
+            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 text-center text-slate-500 font-bold">
+                Módulo en desarrollo...
+            </div>
+        </div>
+
+        <!-- Vista de Reportes -->
+        <div id="view-reportes" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+            <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Reportes</h2>
+            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 text-center text-slate-500 font-bold">
+                Módulo en desarrollo...
+            </div>
+        </div>
+
+        <!-- Vista de Ajustes -->
+        <div id="view-ajustes" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+            <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Ajustes del Complejo</h2>
+            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 max-w-2xl">
+                <form id="ajustes-form" class="space-y-4">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Nombre del Complejo</label>
+                        <input type="text" id="ajustes-nombre" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Hora de Apertura</label>
+                            <input type="time" id="ajustes-open" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Hora de Cierre</label>
+                            <input type="time" id="ajustes-close" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">WhatsApp de Contacto (Ej: 5491100000000)</label>
+                        <input type="text" id="ajustes-wpp" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
+                    </div>
+                    <button type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all mt-4">Guardar Ajustes</button>
+                </form>
+            </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Modal Form (Hidden) -->
+    <div id="cancha-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden scale-95 opacity-0 transition-all duration-300 transform" id="cancha-modal-content">
+            <div class="p-6">
+                <h3 id="modal-title" class="text-xl font-black text-slate-900 dark:text-white mb-6">Agregar Cancha</h3>
+                <form id="cancha-form" class="space-y-4">
+                    <input type="hidden" id="form-id">
+                    
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Nombre de la Cancha</label>
+                        <input type="text" id="form-nombre" required class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-semibold">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Deporte</label>
+                            <input type="text" id="form-deporte" required class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-semibold">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Precio por Hora ($)</label>
+                            <input type="number" id="form-precio" required class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-semibold">
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Descripción</label>
+                        <input type="text" id="form-descripcion" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-semibold">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Estado</label>
+                            <select id="form-estado" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-semibold appearance-none">
+                                <option value="disponible">Disponible</option>
+                                <option value="mantenimiento">Mantenimiento</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Color Tag (Clases Tailwind)</label>
+                            <input type="text" id="form-color" value="bg-blue-100 text-blue-700" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-semibold">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="flex border-t border-slate-100 dark:border-slate-800">
+                <button id="modal-btn-cancel" class="flex-1 py-4 text-sm font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Cancelar</button>
+                <div class="w-px bg-slate-100 dark:border-slate-800"></div>
+                <button id="modal-btn-save" class="flex-1 py-4 text-sm font-black text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal (Reused Logic) -->
+    <div id="alert-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl w-full max-w-sm overflow-hidden scale-95 opacity-0 transition-all duration-300 transform" id="alert-modal-content">
+            <div class="p-6">
+                <div id="alert-modal-icon" class="w-12 h-12 rounded-full mb-4 mx-auto flex items-center justify-center"></div>
+                <h3 id="alert-modal-title" class="text-xl font-black text-center text-slate-900 dark:text-white mb-2"></h3>
+                <p id="alert-modal-text" class="text-sm text-center text-slate-500 dark:text-slate-400 font-medium"></p>
+            </div>
+            <div class="border-t border-slate-100 dark:border-slate-800">
+                <button id="alert-btn-accept" class="w-full py-4 text-sm font-black text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/admin.js"></script>
+  </body>
+</html>
