@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const path = require('path');
 const routes = require('./routes');
 
 const app = express();
@@ -14,7 +15,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 // Servir archivos estáticos (Frontend)
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Rutas explícitas para Vercel
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+app.get('/masteradmin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'masteradmin.html'));
+});
 
 // Rutas de la API
 app.use('/api', routes);
