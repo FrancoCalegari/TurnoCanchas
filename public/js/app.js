@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
         filters: {
             sport: 'ALL',
             duration: '60'
-        }
+        },
+        viewMode: 'grid'
     };
 
     // DOM Elements
@@ -17,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const courtsGrid = document.getElementById('courts-grid');
     const sportFilter = document.getElementById('sport-filter');
     const durationFilter = document.getElementById('duration-filter');
+    const btnViewList = document.getElementById('btn-view-list');
+    const btnViewGrid = document.getElementById('btn-view-grid');
 
     // Init
     async function init() {
@@ -126,6 +129,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderCourts();
             });
         }
+
+        if(btnViewList) {
+            btnViewList.addEventListener('click', () => {
+                state.viewMode = 'list';
+                updateViewButtons();
+                renderCourts();
+            });
+        }
+
+        if(btnViewGrid) {
+            btnViewGrid.addEventListener('click', () => {
+                state.viewMode = 'grid';
+                updateViewButtons();
+                renderCourts();
+            });
+        }
+    }
+
+    function updateViewButtons() {
+        if (state.viewMode === 'grid') {
+            btnViewGrid.className = 'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer bg-blue-600 text-white shadow-xs';
+            btnViewList.className = 'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+        } else {
+            btnViewList.className = 'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer bg-blue-600 text-white shadow-xs';
+            btnViewGrid.className = 'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+        }
     }
 
     // Render Courts
@@ -139,6 +168,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (filteredCanchas.length === 0) {
             courtsGrid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-500 font-bold bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">No hay canchas disponibles para los filtros seleccionados.</div>';
+            return;
+        }
+
+        if (state.viewMode === 'list') {
+            renderCourtsList(filteredCanchas);
             return;
         }
 
@@ -241,6 +275,83 @@ document.addEventListener('DOMContentLoaded', () => {
                 hoursContainer.appendChild(btn);
             }
         });
+    }
+
+    function renderCourtsList(filteredCanchas) {
+        const tableWrapper = document.createElement('div');
+        tableWrapper.className = 'col-span-full overflow-x-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm';
+        
+        const table = document.createElement('table');
+        table.className = 'w-full text-left border-collapse min-w-[900px]';
+        
+        // Header
+        const thead = document.createElement('thead');
+        let headerHTML = `<tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200/80 dark:border-slate-800"><th class="p-3 text-xs font-bold text-slate-500 sticky left-0 bg-slate-50 dark:bg-slate-800/90 z-10 w-48 border-r border-slate-200/80 dark:border-slate-700">Cancha</th>`;
+        for (let h = 8; h <= 22; h++) {
+            headerHTML += `<th class="p-3 text-xs font-bold text-slate-500 text-center min-w-[70px]">${formatTime(h)}</th>`;
+        }
+        headerHTML += `</tr>`;
+        thead.innerHTML = headerHTML;
+        table.appendChild(thead);
+        
+        const tbody = document.createElement('tbody');
+        const duration = parseInt(state.filters.duration);
+        const now = new Date();
+        const isToday = formatDateToYMD(now) === formatDateToYMD(state.selectedDate);
+        const currentHour = now.getHours();
+
+        filteredCanchas.forEach(cancha => {
+            const canchaReservas = state.reservas.filter(r => r.canchaId === cancha.id);
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-slate-50/30 dark:hover:bg-slate-800/20 group';
+            
+            const tdName = document.createElement('td');
+            tdName.className = 'p-3 text-sm font-bold text-slate-900 dark:text-white sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/80 border-r border-slate-100 dark:border-slate-800 z-10 transition-colors shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] dark:shadow-[2px_0_5px_-2px_rgba(0,0,0,0.5)]';
+            tdName.innerHTML = `<div class="truncate w-44" title="${cancha.nombre}">${cancha.nombre}</div><div class="text-[10px] text-slate-500 font-normal truncate">${cancha.deporte}</div>`;
+            tr.appendChild(tdName);
+            
+            for (let h = 8; h <= 22; h++) {
+                const hourStr = formatTime(h);
+                let isReserved = canchaReservas.some(r => r.hora === hourStr);
+                
+                if (duration === 120 && h < 22) {
+                    const nextHourStr = formatTime(h + 1);
+                    if (canchaReservas.some(r => r.hora === nextHourStr)) {
+                        isReserved = true; 
+                    }
+                } else if (duration === 120 && h === 22) {
+                    isReserved = true;
+                }
+                
+                const isPast = isToday && h <= currentHour;
+                const price = (cancha.precioPorHora * (duration / 60));
+
+                const td = document.createElement('td');
+                td.className = 'p-1.5 align-middle';
+                
+                if (isPast) {
+                    td.innerHTML = `<div class="h-11 rounded-lg bg-slate-50 dark:bg-slate-800/30 border border-slate-200/50 dark:border-slate-800 flex items-center justify-center opacity-40 cursor-not-allowed"><span class="text-[10px] text-slate-400 font-semibold line-through">${hourStr}</span></div>`;
+                } else if (isReserved) {
+                    td.innerHTML = `<div class="h-11 rounded-lg bg-rose-50/50 dark:bg-rose-900/10 border border-rose-200/50 dark:border-rose-800/30 flex flex-col items-center justify-center cursor-not-allowed"><span class="text-[9px] text-rose-400 font-semibold uppercase tracking-wider">Ocupado</span></div>`;
+                } else {
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full h-11 rounded-lg bg-emerald-50/80 dark:bg-emerald-900/20 hover:bg-emerald-500 hover:text-white text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/50 flex flex-col items-center justify-center transition-all cursor-pointer shadow-xs hover:shadow-md hover:scale-[1.02] active:scale-95';
+                    btn.innerHTML = `<span class="text-[10px] font-bold block group-hover/btn:hidden">Libre</span><span class="text-[11px] font-black hidden group-hover/btn:block">Reservar</span>`;
+                    // Fix hover scope by adding group/btn to button
+                    btn.classList.add('group/btn');
+                    btn.addEventListener('click', (e) => handleReserva(e.currentTarget, cancha, hourStr, duration, price));
+                    td.appendChild(btn);
+                }
+                
+                tr.appendChild(td);
+            }
+            
+            tbody.appendChild(tr);
+        });
+        
+        table.appendChild(tbody);
+        tableWrapper.appendChild(table);
+        courtsGrid.appendChild(tableWrapper);
     }
 
     // Modal Helpers
