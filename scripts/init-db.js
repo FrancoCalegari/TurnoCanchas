@@ -66,7 +66,12 @@ async function initDB() {
             open_time VARCHAR(10),
             close_time VARCHAR(10),
             wpp_contacto VARCHAR(20),
-            ubicacion_maps VARCHAR(500)
+            ubicacion_maps VARCHAR(500),
+            logo_url VARCHAR(500),
+            hero_image_url VARCHAR(500),
+            hero_title VARCHAR(200),
+            canchas_title VARCHAR(100),
+            nosotros_title VARCHAR(100)
         )
     `;
 
@@ -94,13 +99,25 @@ async function initDB() {
         console.log("Creando tabla 'ajustes_complejo'...");
         await executeQuery(createAjustes);
         
-        // Intentar agregar la columna por si ya existía la tabla
+        // Intentar agregar las columnas por si ya existía la tabla
         try {
             await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN ubicacion_maps VARCHAR(500)");
-            console.log("Columna ubicacion_maps agregada.");
-        } catch (e) {
-            // Seguramente ya existe, ignoramos.
-        }
+        } catch (e) {}
+        try {
+            await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN logo_url VARCHAR(500)");
+        } catch (e) {}
+        try {
+            await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN hero_image_url VARCHAR(500)");
+        } catch (e) {}
+        try {
+            await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN hero_title VARCHAR(200)");
+        } catch (e) {}
+        try {
+            await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN canchas_title VARCHAR(100)");
+        } catch (e) {}
+        try {
+            await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN nosotros_title VARCHAR(100)");
+        } catch (e) {}
         
         console.log("Tabla 'ajustes_complejo' lista.");
 

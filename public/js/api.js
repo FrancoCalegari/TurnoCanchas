@@ -148,6 +148,22 @@ window.API = {
     },
 
     /**
+     * Actualiza el estado de una reserva
+     */
+    updateReservaStatus: async (id, status) => {
+        const res = await fetch(`${API_BASE}/reservas/${id}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        });
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || 'Error al actualizar reserva');
+        }
+        return await res.json();
+    },
+
+    /**
      * Obtiene las reservas recientes para el Dashboard de Administración
      * @returns {Promise<Array>} Array de reservas recientes
      */
@@ -155,6 +171,28 @@ window.API = {
         try {
             const res = await fetch(`${API_BASE}/reservas/recientes`);
             if (!res.ok) throw new Error('Error fetching recent reservas');
+            const result = await res.json();
+            return result.data || [];
+        } catch (error) {
+            console.error(error);
+            return [];
+        }
+    },
+
+    /**
+     * Obtiene todas las reservas para gestion admin con filtros
+     * @param {Object} filtros { search, estado, desde, hasta }
+     * @returns {Promise<Array>} Array de reservas
+     */
+    getAdminReservas: async (filtros = {}) => {
+        try {
+            const params = new URLSearchParams();
+            if (filtros.search) params.set('search', filtros.search);
+            if (filtros.estado) params.set('estado', filtros.estado);
+            if (filtros.desde) params.set('desde', filtros.desde);
+            if (filtros.hasta) params.set('hasta', filtros.hasta);
+            const res = await fetch(`${API_BASE}/reservas/admin?${params.toString()}`);
+            if (!res.ok) throw new Error('Error fetching admin reservas');
             const result = await res.json();
             return result.data || [];
         } catch (error) {

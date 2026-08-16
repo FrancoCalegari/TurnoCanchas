@@ -14,7 +14,7 @@ const getAjustes = async (req, res) => {
 
 const updateAjustes = async (req, res) => {
     try {
-        const { nombre_complejo, open_time, close_time, wpp_contacto, ubicacion_maps } = req.body;
+        const { nombre_complejo, open_time, close_time, wpp_contacto, ubicacion_maps, logo_url, hero_image_url, hero_title, canchas_title, nosotros_title } = req.body;
         
         let updates = [];
         if (nombre_complejo !== undefined) {
@@ -36,6 +36,26 @@ const updateAjustes = async (req, res) => {
         if (ubicacion_maps !== undefined) {
             const safe = String(ubicacion_maps).replace(/'/g, "''");
             updates.push(`ubicacion_maps = '${safe}'`);
+        }
+        if (logo_url !== undefined) {
+            const safe = String(logo_url).replace(/'/g, "''");
+            updates.push(`logo_url = '${safe}'`);
+        }
+        if (hero_image_url !== undefined) {
+            const safe = String(hero_image_url).replace(/'/g, "''");
+            updates.push(`hero_image_url = '${safe}'`);
+        }
+        if (hero_title !== undefined) {
+            const safe = String(hero_title).replace(/'/g, "''");
+            updates.push(`hero_title = '${safe}'`);
+        }
+        if (canchas_title !== undefined) {
+            const safe = String(canchas_title).replace(/'/g, "''");
+            updates.push(`canchas_title = '${safe}'`);
+        }
+        if (nosotros_title !== undefined) {
+            const safe = String(nosotros_title).replace(/'/g, "''");
+            updates.push(`nosotros_title = '${safe}'`);
         }
 
         if (updates.length === 0) {

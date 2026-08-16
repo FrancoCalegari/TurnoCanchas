@@ -15,6 +15,53 @@ const getAll = async (req, res) => {
     }
 };
 
+// Admin: todas las reservas con filtros opcionales
+const getAdminReservas = async (req, res) => {
+    try {
+        const { search, estado, desde, hasta, limit = 100 } = req.query;
+        let conditions = [];
+
+        if (search) {
+            const s = String(search).replace(/'/g, "''");
+            conditions.push(`(r.cliente ILIKE '%${s}%' OR r.id ILIKE '%${s}%' OR CAST(r.canchaId AS TEXT) ILIKE '%${s}%')`);
+        }
+        if (estado && estado !== 'todos') {
+            const safeEstado = String(estado).replace(/'/g, "''");
+            conditions.push(`r.estado = '${safeEstado}'`);
+        }
+        if (desde) {
+            const safeDesde = String(desde).replace(/'/g, "''");
+            conditions.push(`r.fecha >= '${safeDesde}'`);
+        }
+        if (hasta) {
+            const safeHasta = String(hasta).replace(/'/g, "''");
+            conditions.push(`r.fecha <= '${safeHasta}'`);
+        }
+
+        const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+        const safeLimit = parseInt(limit) || 100;
+
+        const query = `
+            SELECT r.*, 
+                   c.nombre AS canchaName,
+                   cl.nombre AS clienteNombre,
+                   cl.telefono AS clienteTelefono,
+                   cl.email AS clienteEmail
+            FROM reservas r
+            LEFT JOIN canchas c ON r.canchaId = c.id
+            LEFT JOIN clientes cl ON r.cliente_id = cl.id
+            ${where}
+            ORDER BY r.fecha DESC, r.hora DESC
+            LIMIT ${safeLimit}
+        `;
+
+        const result = await executeQuery(query);
+        res.json({ message: 'Reservas admin', data: result });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 const getByUser = async (req, res) => {
     try {
         const { userId } = req.params;
@@ -36,7 +83,7 @@ const getByUser = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-        const { canchaId, fecha, hora, cliente, cliente_id, duracion, precio } = req.body;
+        const { canchaId, fecha, hora, cliente, cliente_id, duracion, precio, estado } = req.body;
         
         // Generate a random ID like 'RES-XYZ123'
         const id = 'RES-' + Math.random().toString(36).substr(2, 6).toUpperCase();
@@ -49,10 +96,11 @@ const create = async (req, res) => {
         const safePrecio = parseInt(precio) || 0;
         
         const safeClienteId = cliente_id ? parseInt(cliente_id) : 'NULL';
+        const finalEstado = estado ? String(estado).replace(/'/g, "''") : 'por confirmar';
 
         const query = `
             INSERT INTO reservas (id, canchaId, fecha, hora, cliente, cliente_id, duracion, precio, estado) 
-            VALUES ('${id}', ${safeCanchaId}, '${safeFecha}', '${safeHora}', '${safeCliente}', ${safeClienteId}, ${safeDuracion}, ${safePrecio}, 'confirmada')
+            VALUES ('${id}', ${safeCanchaId}, '${safeFecha}', '${safeHora}', '${safeCliente}', ${safeClienteId}, ${safeDuracion}, ${safePrecio}, '${finalEstado}')
         `;
         
         await executeQuery(query);
@@ -94,6 +142,7 @@ const getRecent = async (req, res) => {
 
 module.exports = {
     getAll,
+    getAdminReservas,
     getByUser,
     create,
     updateStatus,

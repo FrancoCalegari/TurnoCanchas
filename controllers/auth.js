@@ -1,4 +1,7 @@
 const { executeQuery } = require('../config/db');
+const bcrypt = require('bcryptjs');
+
+const SALT_ROUNDS = 10;
 
 const login = async (req, res) => {
     try {
@@ -19,9 +22,8 @@ const login = async (req, res) => {
 
         const user = result[0];
         
-        // Comparación simple para el demo. En prod usar bcrypt.compare
+        // Comparación simple para admin (sin bcrypt por compatibilidad con datos existentes)
         if (user.password_hash === password) {
-            // Retornamos un token simple para uso en el frontend
             const fakeToken = Buffer.from(`${user.username}:${Date.now()}`).toString('base64');
             res.json({ token: fakeToken, username: user.username });
         } else {
@@ -56,31 +58,36 @@ const masterLogin = async (req, res) => {
 
 const registerClient = async (req, res) => {
     try {
-        const { nombre, email, password, telefono } = req.body;
+        const { nombre, email, password, telefono, acepta_terminos } = req.body;
         
         if (!nombre || !email || !password) {
             return res.status(400).json({ error: 'Faltan campos obligatorios (nombre, email, password)' });
         }
 
+        if (!acepta_terminos) {
+            return res.status(400).json({ error: 'Debes aceptar los Términos y Condiciones para registrarte.' });
+        }
+
         const safeNombre = String(nombre).replace(/'/g, "''");
         const safeEmail = String(email).replace(/'/g, "''").toLowerCase();
-        const safePassword = String(password).replace(/'/g, "''"); // In a real app, hash this!
         const safeTelefono = telefono ? String(telefono).replace(/'/g, "''") : '';
 
-        // Check if email exists
+        // Verificar si el email ya existe
         const existing = await executeQuery(`SELECT id FROM clientes WHERE email = '${safeEmail}'`);
         if (existing && existing.length > 0) {
             return res.status(400).json({ error: 'El email ya está registrado' });
         }
 
+        // Hashear la contraseña con bcryptjs
+        const hashedPassword = await bcrypt.hash(String(password), SALT_ROUNDS);
+        const safeHash = hashedPassword.replace(/'/g, "''");
+
         const query = `
             INSERT INTO clientes (nombre, email, password, telefono) 
-            VALUES ('${safeNombre}', '${safeEmail}', '${safePassword}', '${safeTelefono}')
-            RETURNING id, nombre, email, telefono
+            VALUES ('${safeNombre}', '${safeEmail}', '${safeHash}', '${safeTelefono}')
         `;
         
-        const result = await executeQuery(query);
-        // Sometimes RETURNING might not work perfectly with custom drivers, so we just assume success if it doesn't throw
+        await executeQuery(query);
         
         res.status(201).json({ message: 'Usuario registrado con éxito' });
     } catch (error) {
@@ -106,10 +113,26 @@ const loginClient = async (req, res) => {
         }
 
         const user = result[0];
-        
-        if (user.password === password) {
+        const storedPassword = user.password;
+
+        // Soporte para contraseñas antiguas (plain text) y nuevas (bcrypt hash)
+        let passwordMatch = false;
+        if (storedPassword && storedPassword.startsWith('$2')) {
+            // Es un hash bcrypt
+            passwordMatch = await bcrypt.compare(String(password), storedPassword);
+        } else {
+            // Contraseña en plain text (legacy) — comparación directa
+            passwordMatch = (storedPassword === password);
+            // Aprovechar para migrar a hash
+            if (passwordMatch) {
+                const newHash = await bcrypt.hash(String(password), SALT_ROUNDS);
+                const safeHash = newHash.replace(/'/g, "''");
+                await executeQuery(`UPDATE clientes SET password = '${safeHash}' WHERE id = ${user.id}`);
+            }
+        }
+
+        if (passwordMatch) {
             const token = Buffer.from(`client:${user.id}:${Date.now()}`).toString('base64');
-            // Remove password before sending to client
             delete user.password;
             res.json({ token, user });
         } else {

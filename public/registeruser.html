@@ -3,85 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrarse - Turnos</title>
+    <title>Crear Cuenta - Turnos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/js/api.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        @media (prefers-color-scheme: dark) {
+            body { background: #020617; color: #f1f5f9; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 p-8">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-black text-blue-600 dark:text-blue-400 mb-2">Crear Cuenta</h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400">Registrate para reservar más rápido y ver tu historial.</p>
+
+    <div class="w-full max-w-md">
+        <!-- Card -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-8">
+            <!-- Header -->
+            <div class="text-center mb-7">
+                <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-600/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-black text-slate-900 dark:text-white">Crear Cuenta</h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">Reservá más rápido y consultá tu historial</p>
+            </div>
+
+            <!-- Form -->
+            <form id="register-form" class="space-y-4" novalidate>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Nombre Completo *</label>
+                    <input type="text" id="nombre" required placeholder="Ej: Juan Pérez"
+                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:font-normal placeholder:text-slate-400">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Correo Electrónico *</label>
+                    <input type="email" id="email" required placeholder="tu@email.com"
+                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:font-normal placeholder:text-slate-400">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Teléfono (WhatsApp)</label>
+                    <input type="tel" id="telefono" placeholder="Ej: 1122334455"
+                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:font-normal placeholder:text-slate-400">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Contraseña *</label>
+                    <div class="relative">
+                        <input type="password" id="password" required placeholder="Mínimo 8 caracteres"
+                            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all pr-11 placeholder:font-normal placeholder:text-slate-400">
+                        <button type="button" id="toggle-pw" tabindex="-1" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer">
+                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-1">Tu contraseña se guarda de forma segura y encriptada.</p>
+                </div>
+
+                <!-- Términos y Condiciones -->
+                <div class="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-3.5 border border-slate-200 dark:border-slate-700">
+                    <label class="flex items-start gap-3 cursor-pointer group">
+                        <input type="checkbox" id="acepta-terminos" required
+                            class="mt-0.5 w-4 h-4 accent-blue-600 shrink-0 cursor-pointer">
+                        <span class="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                            He leído y acepto los
+                            <button type="button" id="btn-ver-terminos" class="font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">Términos y Condiciones</button>
+                            y la
+                            <button type="button" id="btn-ver-privacidad" class="font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">Política de Privacidad</button>
+                            del servicio.
+                        </span>
+                    </label>
+                </div>
+
+                <div id="error-msg" class="text-rose-500 text-xs font-bold hidden text-center bg-rose-50 dark:bg-rose-900/20 rounded-xl p-3"></div>
+                <div id="success-msg" class="text-emerald-600 text-xs font-bold hidden text-center bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-3"></div>
+
+                <button type="submit" id="btn-submit"
+                    class="w-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-extrabold text-sm py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/30 mt-1">
+                    Crear Cuenta
+                </button>
+            </form>
+
+            <div class="mt-5 text-center text-sm font-bold text-slate-500">
+                ¿Ya tenés cuenta? <a href="/loginuser.html" class="text-blue-600 hover:underline">Iniciá sesión</a>
+            </div>
+            <div class="mt-3 text-center">
+                <a href="/" class="text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">← Volver al inicio</a>
+            </div>
         </div>
-        
-        <form id="register-form" class="space-y-4">
-            <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Nombre Completo</label>
-                <input type="text" id="nombre" required placeholder="Ej: Juan Pérez" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-            </div>
+    </div>
 
-            <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Correo Electrónico</label>
-                <input type="email" id="email" required placeholder="tu@email.com" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+    <!-- Modal Términos y Condiciones -->
+    <div id="modal-terminos" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div id="modal-terminos-content" class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col scale-95 opacity-0 transition-all duration-300">
+            <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+                <h2 id="modal-terminos-titulo" class="text-base font-black text-slate-900 dark:text-white">Términos y Condiciones</h2>
+                <button id="btn-close-terminos" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-all cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
-
-            <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Teléfono</label>
-                <input type="tel" id="telefono" required placeholder="Ej: 1122334455" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            <div id="modal-terminos-body" class="overflow-y-auto p-5 text-sm text-slate-600 dark:text-slate-300 space-y-4 leading-relaxed">
+                <!-- Contenido inyectado por JS -->
             </div>
-            
-            <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Contraseña</label>
-                <input type="password" id="password" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            <div class="p-4 border-t border-slate-100 dark:border-slate-800 shrink-0 flex gap-3">
+                <button id="btn-aceptar-terminos" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-all cursor-pointer">
+                    Aceptar y Cerrar
+                </button>
+                <button id="btn-cerrar-terminos" class="px-5 py-3 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-xl text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer">
+                    Cerrar
+                </button>
             </div>
-
-            <div id="error-msg" class="text-rose-500 text-xs font-bold hidden text-center"></div>
-
-            <button type="submit" id="btn-submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-sm py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/30 mt-2">
-                Registrarme
-            </button>
-        </form>
-        
-        <div class="mt-6 text-center text-sm font-bold text-slate-500">
-            ¿Ya tenés cuenta? <a href="/loginuser.html" class="text-blue-600 hover:underline">Iniciá sesión acá</a>
-        </div>
-        <div class="mt-4 text-center">
-            <a href="/" class="text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">← Volver al inicio</a>
         </div>
     </div>
 
     <script>
+        const TERMINOS_CONTENT = `
+            <h3 class="font-black text-slate-900 dark:text-white text-sm">1. Aceptación de los Términos</h3>
+            <p>Al registrarte en esta plataforma, aceptás los presentes Términos y Condiciones. Si no estás de acuerdo con alguna de estas condiciones, no deberías utilizar el servicio.</p>
+
+            <h3 class="font-black text-slate-900 dark:text-white text-sm">2. Registro y Cuenta</h3>
+            <p>Al crear una cuenta sos responsable de mantener la confidencialidad de tus credenciales. La información proporcionada debe ser veraz y actualizada. Nos reservamos el derecho de suspender cuentas con información falsa.</p>
+
+            <h3 class="font-black text-slate-900 dark:text-white text-sm">3. Uso del Servicio</h3>
+            <p>La plataforma permite reservar turnos para el uso de instalaciones deportivas. Las reservas están sujetas a disponibilidad y pueden ser canceladas con al menos 2 horas de anticipación. Reservas no canceladas dentro del plazo podrán ser penalizadas.</p>
+
+            <h3 class="font-black text-slate-900 dark:text-white text-sm">4. Pagos y Cancelaciones</h3>
+            <p>El pago de turnos podrá realizarse en el establecimiento o mediante los métodos habilitados. Las cancelaciones tardías o ausencias reiteradas pueden resultar en la suspensión temporal del acceso al servicio de reservas.</p>
+
+            <h3 class="font-black text-slate-900 dark:text-white text-sm">5. Privacidad</h3>
+            <p>Tu información personal (nombre, email, teléfono) se utilizará exclusivamente para gestionar tus reservas y enviarte notificaciones relacionadas al servicio. No se comparte con terceros sin tu consentimiento. Las contraseñas se almacenan encriptadas.</p>
+
+            <h3 class="font-black text-slate-900 dark:text-white text-sm">6. Modificaciones</h3>
+            <p>Podemos actualizar estos términos en cualquier momento. Te notificaremos sobre cambios significativos mediante el email registrado. El uso continuado del servicio implica la aceptación de los términos actualizados.</p>
+
+            <h3 class="font-black text-slate-900 dark:text-white text-sm">7. Contacto</h3>
+            <p>Para cualquier consulta sobre estos términos, podés contactarnos a través de los medios disponibles en la página principal del sitio.</p>
+        `;
+
+        const PRIVACIDAD_CONTENT = `
+            <h3 class="font-black text-slate-900 dark:text-white text-sm">Política de Privacidad</h3>
+            <p>Esta política describe cómo recopilamos y usamos tu información personal.</p>
+
+            <h3 class="font-black text-slate-900 dark:text-white text-sm">Datos que recopilamos</h3>
+            <ul class="list-disc pl-5 space-y-1">
+                <li>Nombre completo</li>
+                <li>Correo electrónico</li>
+                <li>Número de teléfono (opcional)</li>
+                <li>Historial de reservas</li>
+            </ul>
+
+            <h3 class="font-black text-slate-900 dark:text-white text-sm">Cómo usamos tus datos</h3>
+            <p>Usamos tus datos únicamente para gestionar tus reservas, enviarte confirmaciones y recordatorios, y mejorar la experiencia del servicio.</p>
+
+            <h3 class="font-black text-slate-900 dark:text-white text-sm">Seguridad</h3>
+            <p>Tus contraseñas se almacenan con encriptación <strong>bcrypt</strong>. Nunca guardamos contraseñas en texto plano. Aplicamos medidas de seguridad estándar para proteger tu información.</p>
+
+            <h3 class="font-black text-slate-900 dark:text-white text-sm">Tus derechos</h3>
+            <p>Podés solicitar la eliminación de tu cuenta y datos en cualquier momento contactándonos directamente.</p>
+        `;
+
+        // Modal logic
+        const modal = document.getElementById('modal-terminos');
+        const modalContent = document.getElementById('modal-terminos-content');
+        const modalTitulo = document.getElementById('modal-terminos-titulo');
+        const modalBody = document.getElementById('modal-terminos-body');
+
+        function openModal(titulo, contenido) {
+            modalTitulo.innerText = titulo;
+            modalBody.innerHTML = contenido;
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            });
+        }
+
+        function closeModal() {
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        document.getElementById('btn-ver-terminos').addEventListener('click', () => openModal('Términos y Condiciones', TERMINOS_CONTENT));
+        document.getElementById('btn-ver-privacidad').addEventListener('click', () => openModal('Política de Privacidad', PRIVACIDAD_CONTENT));
+        document.getElementById('btn-close-terminos').addEventListener('click', closeModal);
+        document.getElementById('btn-cerrar-terminos').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        document.getElementById('btn-aceptar-terminos').addEventListener('click', () => {
+            document.getElementById('acepta-terminos').checked = true;
+            closeModal();
+        });
+
+        // Toggle password visibility
+        document.getElementById('toggle-pw').addEventListener('click', () => {
+            const pw = document.getElementById('password');
+            pw.type = pw.type === 'password' ? 'text' : 'password';
+        });
+
+        // Form submit
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-submit');
             const errorMsg = document.getElementById('error-msg');
-            const nombre = document.getElementById('nombre').value;
-            const email = document.getElementById('email').value;
-            const telefono = document.getElementById('telefono').value;
+            const successMsg = document.getElementById('success-msg');
+
+            const nombre = document.getElementById('nombre').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const telefono = document.getElementById('telefono').value.trim();
             const password = document.getElementById('password').value;
-            
-            btn.disabled = true;
-            btn.innerText = 'Registrando...';
+            const aceptaTerminos = document.getElementById('acepta-terminos').checked;
+
             errorMsg.classList.add('hidden');
-            
+            successMsg.classList.add('hidden');
+
+            // Validaciones frontend
+            if (!nombre || !email || !password) {
+                errorMsg.innerText = 'Por favor completá todos los campos obligatorios.';
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            if (password.length < 6) {
+                errorMsg.innerText = 'La contraseña debe tener al menos 6 caracteres.';
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            if (!aceptaTerminos) {
+                errorMsg.innerText = 'Debés aceptar los Términos y Condiciones para continuar.';
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Creando cuenta...';
+
             try {
-                // Registrar
-                await window.API.clientRegister({ nombre, email, telefono, password });
-                
-                // Hacer auto-login después de registrar exitosamente
+                await window.API.clientRegister({ nombre, email, telefono, password, acepta_terminos: true });
+
+                // Auto-login
                 await window.API.clientLogin(email, password);
-                
-                // Redirigir al home
-                window.location.href = '/';
+
+                successMsg.innerText = '¡Cuenta creada exitosamente! Redirigiendo...';
+                successMsg.classList.remove('hidden');
+
+                setTimeout(() => { window.location.href = '/'; }, 1200);
             } catch (err) {
-                errorMsg.innerText = err.message;
+                errorMsg.innerText = err.message || 'Error al registrarse. Intentá de nuevo.';
                 errorMsg.classList.remove('hidden');
             } finally {
                 btn.disabled = false;
-                btn.innerText = 'Registrarme';
+                btn.innerText = 'Crear Cuenta';
             }
         });
     </script>

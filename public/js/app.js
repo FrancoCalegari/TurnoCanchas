@@ -76,6 +76,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     mapsLink.href = ajustes.ubicacion_maps;
                 }
             }
+            if (ajustes.logo_url) {
+                const logoImg = document.getElementById('header-logo');
+                if (logoImg) logoImg.src = ajustes.logo_url;
+            }
+            if (ajustes.hero_image_url) {
+                const heroImg = document.getElementById('hero-image');
+                if (heroImg) heroImg.src = ajustes.hero_image_url;
+            }
+            if (ajustes.hero_title) {
+                const heroTitle = document.getElementById('header-title');
+                if (heroTitle) heroTitle.innerText = ajustes.hero_title;
+                document.title = ajustes.hero_title + ' - Reservas';
+            }
+            if (ajustes.nosotros_title) {
+                const infoTitle = document.getElementById('info-title');
+                if (infoTitle) infoTitle.innerText = ajustes.nosotros_title;
+            }
+            if (ajustes.canchas_title) {
+                const canchasTitle = document.getElementById('canchas-title');
+                if (canchasTitle) canchasTitle.innerText = ajustes.canchas_title;
+            }
         }
 
         renderCalendar();
@@ -344,8 +365,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = 'bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col transition-all hover:border-blue-500/50';
             
-            // Filter reservas for this cancha
-            const canchaReservas = state.reservas.filter(r => r.canchaId === cancha.id);
+            // Filter reservas for this cancha — exclude cancelled ones
+            const canchaReservas = state.reservas.filter(r =>
+                r.canchaId === cancha.id &&
+                (r.estado || '').toLowerCase() !== 'cancelada'
+            );
             
             card.innerHTML = `
                 <div class="p-5 bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between gap-3">
@@ -465,7 +489,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentHour = now.getHours();
 
         filteredCanchas.forEach(cancha => {
-            const canchaReservas = state.reservas.filter(r => r.canchaId === cancha.id);
+            const canchaReservas = state.reservas.filter(r =>
+                r.canchaId === cancha.id &&
+                (r.estado || '').toLowerCase() !== 'cancelada'
+            );
             const tr = document.createElement('tr');
             tr.className = 'border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-slate-50/30 dark:hover:bg-slate-800/20 group';
             

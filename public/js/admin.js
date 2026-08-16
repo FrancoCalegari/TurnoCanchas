@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupNavigation();
         setupAjustesLogic();
         setupQuickActions();
+        setupReservasLogic();
     }
 
     // Load Data
@@ -202,15 +203,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 ];
                 stateObj = states[Math.floor(Math.random() * states.length)];
             } else {
-                // Real DB states mapping
                 const realEstado = (r.estado || 'confirmada').toLowerCase();
                 if (realEstado === 'confirmada') {
                     stateObj = { class: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50', dot: 'bg-emerald-500', text: 'Confirmada' };
-                } else if (realEstado === 'seña_pendiente' || realEstado === 'pendiente') {
-                    stateObj = { class: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400 border-amber-200 dark:border-amber-800/50', dot: 'bg-amber-500', text: 'Seña Pendiente' };
+                } else if (realEstado === 'seña_pendiente' || realEstado === 'pendiente' || realEstado === 'por confirmar') {
+                    stateObj = { class: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400 border-amber-200 dark:border-amber-800/50', dot: 'bg-amber-500', text: 'Por Confirmar' };
+                } else if (realEstado === 'cancelada') {
+                    stateObj = { class: 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-400 border-rose-200 dark:border-rose-800/50', dot: 'bg-rose-500', text: 'Cancelada' };
                 } else {
                     stateObj = { class: 'bg-slate-100 text-slate-700 dark:bg-slate-800/50 dark:text-slate-400 border-slate-200 dark:border-slate-700/50', dot: 'bg-slate-500', text: 'Finalizada' };
                 }
+            }
+
+            let actionsHtml = '';
+            const estadoActual = (r.estado || 'confirmada').toLowerCase();
+            if (estadoActual === 'por confirmar') {
+                actionsHtml = `
+                    <div class="flex items-center justify-end gap-1">
+                        <button class="btn-action-accept p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all cursor-pointer" data-id="${r.id}" title="Aceptar Reserva">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </button>
+                        <button class="btn-action-cancel p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all cursor-pointer" data-id="${r.id}" title="Cancelar Reserva">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                `;
+            } else if (estadoActual === 'confirmada') {
+                actionsHtml = `
+                    <div class="flex items-center justify-end gap-1">
+                        <button class="btn-action-cancel p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all cursor-pointer" data-id="${r.id}" title="Cancelar Reserva">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                `;
+            } else {
+                 actionsHtml = `<span class="text-xs text-slate-400 font-medium">---</span>`;
             }
 
             const tr = document.createElement('tr');
@@ -239,13 +266,42 @@ document.addEventListener('DOMContentLoaded', () => {
                     </span>
                 </td>
                 <td class="p-4 text-right">
-                    <button class="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-all cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-more-vertical w-4 h-4"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-                    </button>
+                    ${actionsHtml}
                 </td>
             `;
 
             tableBody.appendChild(tr);
+        });
+
+        // Add action listeners
+        document.querySelectorAll('.btn-action-accept').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                showConfirmModal('Confirmar Reserva', '¿Estás seguro de aceptar esta reserva?', async () => {
+                    try {
+                        await window.API.updateReservaStatus(id, 'confirmada');
+                        showAlertModal('Reserva Confirmada', 'La reserva ha sido aceptada.', 'success');
+                        loadDashboardData();
+                    } catch(err) {
+                        showAlertModal('Error', err.message, 'error');
+                    }
+                });
+            });
+        });
+
+        document.querySelectorAll('.btn-action-cancel').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                showConfirmModal('Cancelar Reserva', '¿Estás seguro de cancelar esta reserva? Esta acción no se puede deshacer.', async () => {
+                    try {
+                        await window.API.updateReservaStatus(id, 'cancelada');
+                        showAlertModal('Reserva Cancelada', 'La reserva ha sido cancelada.', 'success');
+                        loadDashboardData();
+                    } catch(err) {
+                        showAlertModal('Error', err.message, 'error');
+                    }
+                });
+            });
         });
     }
 
@@ -261,6 +317,16 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('ajustes-wpp').value = data.wpp_contacto || '';
             const mapInput = document.getElementById('ajustes-maps');
             if(mapInput) mapInput.value = data.ubicacion_maps || '';
+            const logoInput = document.getElementById('ajustes-logo');
+            if(logoInput) logoInput.value = data.logo_url || '';
+            const heroImageInput = document.getElementById('ajustes-hero-image');
+            if(heroImageInput) heroImageInput.value = data.hero_image_url || '';
+            const heroTitleInput = document.getElementById('ajustes-hero-title');
+            if(heroTitleInput) heroTitleInput.value = data.hero_title || '';
+            const canchasTitleInput = document.getElementById('ajustes-canchas-title');
+            if(canchasTitleInput) canchasTitleInput.value = data.canchas_title || '';
+            const nosotrosTitleInput = document.getElementById('ajustes-nosotros-title');
+            if(nosotrosTitleInput) nosotrosTitleInput.value = data.nosotros_title || '';
         }
     }
 
@@ -279,11 +345,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         open_time: document.getElementById('ajustes-open').value,
                         close_time: document.getElementById('ajustes-close').value,
                         wpp_contacto: document.getElementById('ajustes-wpp').value,
-                        ubicacion_maps: document.getElementById('ajustes-maps') ? document.getElementById('ajustes-maps').value : ''
+                        ubicacion_maps: document.getElementById('ajustes-maps') ? document.getElementById('ajustes-maps').value : '',
+                        logo_url: document.getElementById('ajustes-logo') ? document.getElementById('ajustes-logo').value : '',
+                        hero_image_url: document.getElementById('ajustes-hero-image') ? document.getElementById('ajustes-hero-image').value : '',
+                        hero_title: document.getElementById('ajustes-hero-title') ? document.getElementById('ajustes-hero-title').value : '',
+                        canchas_title: document.getElementById('ajustes-canchas-title') ? document.getElementById('ajustes-canchas-title').value : '',
+                        nosotros_title: document.getElementById('ajustes-nosotros-title') ? document.getElementById('ajustes-nosotros-title').value : ''
                     });
-                    alert('Ajustes guardados correctamente.');
+                    showAlertModal('Éxito', 'Ajustes guardados correctamente.', 'success');
                 } catch (error) {
-                    alert('Error guardando ajustes.');
+                    showAlertModal('Error', 'Error guardando ajustes.', 'error');
                 }
                 
                 btn.disabled = false;
@@ -320,7 +391,213 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (nav.btn === btnNavDashboard) loadDashboardData();
                 if (nav.btn === btnNavCanchas && typeof loadCanchas === 'function') loadCanchas();
+                if (nav.btn === btnNavReservas) loadReservasAdmin();
             });
+        });
+    }
+
+    // ==========================================
+    // GESTIÓN DE RESERVAS
+    // ==========================================
+    let _canchasCache = [];
+
+    async function loadReservasAdmin(filtros = {}) {
+        const tbody = document.getElementById('res-table-body');
+        const countEl = document.getElementById('res-count');
+        if (!tbody) return;
+
+        tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-slate-400"><svg class="animate-spin h-5 w-5 mx-auto mb-2 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Buscando...</td></tr>`;
+
+        const reservas = await window.API.getAdminReservas(filtros);
+        if (countEl) countEl.innerText = reservas.length;
+
+        if (!reservas.length) {
+            tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-slate-400 font-medium">Sin resultados para los filtros aplicados.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = '';
+        const today = new Date().toISOString().split('T')[0];
+
+        reservas.forEach(r => {
+            const canchaNombre = r.canchaname || r.canchaName || r.canchaId || '—';
+            const clienteDisplay = r.clientenombre || r.clienteNombre || r.cliente || 'Sin nombre';
+            const clienteInfo = r.clientetelefono || r.clienteTelefono ? `<span class="text-[11px] text-slate-400">${r.clientetelefono || r.clienteTelefono}</span>` : `<span class="text-[11px] text-slate-400">ID: ${r.id}</span>`;
+
+            const esPasada = r.fecha < today;
+
+            let stateObj;
+            const est = (r.estado || 'por confirmar').toLowerCase();
+            if (est === 'confirmada') stateObj = { cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50', dot: 'bg-emerald-500', text: 'Confirmada' };
+            else if (est === 'cancelada') stateObj = { cls: 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-400 border-rose-200 dark:border-rose-800/50', dot: 'bg-rose-500', text: 'Cancelada' };
+            else stateObj = { cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400 border-amber-200 dark:border-amber-800/50', dot: 'bg-amber-500', text: 'Por Confirmar' };
+
+            let actionsHtml = '';
+            if (!esPasada && est !== 'cancelada') {
+                if (est === 'por confirmar') {
+                    actionsHtml = `
+                        <div class="flex items-center justify-end gap-1">
+                            <button class="res-btn-accept p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all cursor-pointer" data-id="${r.id}" title="Aceptar">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </button>
+                            <button class="res-btn-cancel p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all cursor-pointer" data-id="${r.id}" title="Cancelar">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>`;
+                } else {
+                    actionsHtml = `
+                        <div class="flex items-center justify-end gap-1">
+                            <button class="res-btn-cancel p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all cursor-pointer" data-id="${r.id}" title="Cancelar">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>`;
+                }
+            } else {
+                actionsHtml = `<span class="text-xs text-slate-300 dark:text-slate-600">—</span>`;
+            }
+
+            const tr = document.createElement('tr');
+            tr.className = `hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors border-b border-slate-100 dark:border-slate-800/60 last:border-0 ${esPasada ? 'opacity-60' : ''}`;
+            tr.innerHTML = `
+                <td class="p-4 font-mono text-xs text-slate-500 dark:text-slate-400">${r.id}</td>
+                <td class="p-4">
+                    <p class="font-bold text-slate-900 dark:text-white">${r.fecha}</p>
+                    <p class="text-xs text-slate-500">${(r.hora || '').substring(0,5)}</p>
+                </td>
+                <td class="p-4">
+                    <span class="inline-flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                        ${canchaNombre}
+                    </span>
+                </td>
+                <td class="p-4">
+                    <p class="font-bold text-slate-900 dark:text-slate-100">${clienteDisplay}</p>
+                    ${clienteInfo}
+                </td>
+                <td class="p-4">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full ${stateObj.cls} text-[11px] font-extrabold border">
+                        <span class="w-1.5 h-1.5 rounded-full ${stateObj.dot}"></span>
+                        ${stateObj.text}
+                    </span>
+                </td>
+                <td class="p-4 text-right">${actionsHtml}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Listeners
+        tbody.querySelectorAll('.res-btn-accept').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                showConfirmModal('Confirmar Reserva', '¿Aceptar esta reserva?', async () => {
+                    try {
+                        await window.API.updateReservaStatus(id, 'confirmada');
+                        showAlertModal('Éxito', 'Reserva aceptada.', 'success');
+                        loadReservasAdmin(getCurrentFiltros());
+                    } catch(e) { showAlertModal('Error', e.message, 'error'); }
+                });
+            });
+        });
+        tbody.querySelectorAll('.res-btn-cancel').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                showConfirmModal('Cancelar Reserva', '¿Estás seguro? Esta acción no se puede deshacer.', async () => {
+                    try {
+                        await window.API.updateReservaStatus(id, 'cancelada');
+                        showAlertModal('Cancelada', 'La reserva fue cancelada.', 'success');
+                        loadReservasAdmin(getCurrentFiltros());
+                    } catch(e) { showAlertModal('Error', e.message, 'error'); }
+                });
+            });
+        });
+    }
+
+    function getCurrentFiltros() {
+        return {
+            search: document.getElementById('res-search')?.value || '',
+            estado: document.getElementById('res-estado')?.value || 'todos',
+            desde: document.getElementById('res-desde')?.value || '',
+            hasta: document.getElementById('res-hasta')?.value || ''
+        };
+    }
+
+    function setupReservasLogic() {
+        // Filtros
+        document.getElementById('btn-res-buscar')?.addEventListener('click', () => {
+            loadReservasAdmin(getCurrentFiltros());
+        });
+        document.getElementById('btn-res-limpiar')?.addEventListener('click', () => {
+            document.getElementById('res-search').value = '';
+            document.getElementById('res-estado').value = 'todos';
+            document.getElementById('res-desde').value = '';
+            document.getElementById('res-hasta').value = '';
+            loadReservasAdmin({});
+        });
+        document.getElementById('res-search')?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') loadReservasAdmin(getCurrentFiltros());
+        });
+
+        // Modal Reserva Manual
+        const modal = document.getElementById('modal-reserva-manual');
+        const modalContent = document.getElementById('modal-reserva-manual-content');
+
+        const openManualModal = async () => {
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            });
+            // Load canchas into select
+            const sel = document.getElementById('rm-cancha');
+            if (sel) {
+                if (!_canchasCache.length) _canchasCache = await window.API.getCanchas();
+                sel.innerHTML = _canchasCache
+                    .filter(c => c.estado === 'disponible')
+                    .map(c => `<option value="${c.id}">${c.nombre}</option>`)
+                    .join('');
+            }
+            // Default date to today
+            const fechaInput = document.getElementById('rm-fecha');
+            if (fechaInput && !fechaInput.value) {
+                fechaInput.value = new Date().toISOString().split('T')[0];
+            }
+        };
+
+        const closeManualModal = () => {
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        };
+
+        document.getElementById('btn-abrir-reserva-manual')?.addEventListener('click', openManualModal);
+        document.getElementById('btn-close-reserva-manual')?.addEventListener('click', closeManualModal);
+        modal?.addEventListener('click', (e) => { if (e.target === modal) closeManualModal(); });
+
+        document.getElementById('form-reserva-manual')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-reserva-manual');
+            btn.disabled = true;
+            btn.innerText = 'Guardando...';
+
+            const canchaId = document.getElementById('rm-cancha').value;
+            const fecha = document.getElementById('rm-fecha').value;
+            const hora = document.getElementById('rm-hora').value;
+            const cliente = document.getElementById('rm-cliente').value.trim();
+            const duracion = parseInt(document.getElementById('rm-duracion').value) || 60;
+            const precio = parseInt(document.getElementById('rm-precio').value) || 0;
+
+            try {
+                await window.API.crearReserva({ canchaId, fecha, hora, cliente, duracion, precio, estado: 'confirmada' });
+                showAlertModal('Éxito', `Reserva creada para ${cliente} el ${fecha} a las ${hora}.`, 'success');
+                closeManualModal();
+                document.getElementById('form-reserva-manual').reset();
+                loadReservasAdmin(getCurrentFiltros());
+            } catch(err) {
+                showAlertModal('Error', err.message, 'error');
+            }
+
+            btn.disabled = false;
+            btn.innerText = 'Confirmar Reserva';
         });
     }
 
@@ -615,7 +892,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function deleteCancha(id) {
-        if (confirm(`¿Estás seguro de eliminar la cancha #${id}?`)) {
+        showConfirmModal('Eliminar Cancha', `¿Estás seguro de eliminar la cancha #${id}?`, async () => {
             try {
                 await window.API.eliminarCancha(id);
                 showAlertModal('Eliminada', 'La cancha fue eliminada', 'success');
@@ -623,7 +900,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch(e) {
                 showAlertModal('Error', 'No se pudo eliminar', 'error');
             }
-        }
+        });
     }
 
     function showAlertModal(title, text, type = 'success') {
@@ -658,6 +935,43 @@ document.addEventListener('DOMContentLoaded', () => {
             btnAccept.removeEventListener('click', cleanup);
         };
         btnAccept.addEventListener('click', cleanup);
+    }
+
+    function showConfirmModal(title, text, onConfirm) {
+        const cModal = document.getElementById('confirm-modal');
+        const cModalContent = document.getElementById('confirm-modal-content');
+        if (!cModal) {
+            if (confirm(title + '\n' + text)) onConfirm();
+            return;
+        }
+
+        document.getElementById('confirm-modal-title').innerText = title;
+        document.getElementById('confirm-modal-text').innerText = text;
+        const btnCancel = document.getElementById('confirm-modal-btn-cancel');
+        const btnConfirm = document.getElementById('confirm-modal-btn-confirm');
+
+        cModal.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            cModalContent.classList.remove('scale-95', 'opacity-0');
+            cModalContent.classList.add('scale-100', 'opacity-100');
+        });
+
+        const cleanup = () => {
+            cModalContent.classList.remove('scale-100', 'opacity-100');
+            cModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => cModal.classList.add('hidden'), 300);
+            btnCancel.removeEventListener('click', onCancel);
+            btnConfirm.removeEventListener('click', onAccept);
+        };
+
+        const onCancel = () => cleanup();
+        const onAccept = () => {
+            cleanup();
+            onConfirm();
+        };
+
+        btnCancel.addEventListener('click', onCancel);
+        btnConfirm.addEventListener('click', onAccept);
     }
 
     init();
