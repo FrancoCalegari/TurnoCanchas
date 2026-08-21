@@ -1,113 +1,164 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full bg-slate-50 dark:bg-slate-950">
+<html lang="es" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suscripción de Plataforma - Master Admin</title>
+    <title>Panel Super Admin — TurnoCanchas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'media',
+            darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    }
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] }
                 }
             }
         }
     </script>
+    <style>
+        body { background: #0f1117; color: #e2e8f0; }
+        .card-active { border-color: #6366f1; box-shadow: 0 0 0 1px #6366f140; }
+        .card-blocked { border-color: #ef4444; box-shadow: 0 0 0 1px #ef444440; }
+        .card-pending { border-color: #f59e0b; box-shadow: 0 0 0 1px #f59e0b40; }
+        .sidebar-item:hover { background: #1e2436; }
+        .sidebar-item.active { background: #1e2748; color: #818cf8; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #0f1117; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
 </head>
-<body class="h-full flex flex-col font-sans text-slate-900 dark:text-slate-100 antialiased">
+<body class="h-full flex font-sans antialiased">
 
-    <!-- Header -->
-    <header class="bg-indigo-900 border-b border-indigo-950 sticky top-0 z-40">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-indigo-400 flex items-center justify-center text-white shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-server w-4 h-4"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
-                    </div>
-                    <h1 class="text-xl font-black tracking-tight text-white">SaaS<span class="text-indigo-400">Control</span></h1>
+    <!-- Sidebar -->
+    <aside class="w-56 min-h-screen bg-[#13161f] border-r border-slate-800/60 flex flex-col shrink-0">
+        <div class="p-5 border-b border-slate-800/60">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
                 </div>
-                
-                <!-- Boton Logout -->
-                <button id="btn-master-logout" class="px-4 py-2 rounded-xl text-sm font-bold bg-white/10 hover:bg-white/20 text-white transition-all shadow-sm flex items-center gap-2 cursor-pointer border border-white/5">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out w-4 h-4"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" x2="9" y1="12" y2="12"></line></svg>
-                    Salir
-                </button>
+                <div>
+                    <p class="text-[11px] font-bold text-indigo-400 uppercase tracking-widest">SaaS Control</p>
+                    <p class="text-xs text-slate-500 font-medium">TurnoCanchas</p>
+                </div>
             </div>
         </div>
-    </header>
+
+        <nav class="flex-1 p-3 space-y-1">
+            <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-400 cursor-pointer transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                Configuración
+            </a>
+            <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-400 cursor-pointer transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                Auditoría & Logs
+            </a>
+            <a href="#" id="nav-panel" class="sidebar-item active flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold cursor-pointer transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                Panel Super Admin
+                <span id="badge-total" class="ml-auto bg-indigo-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">0</span>
+            </a>
+            <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-400 cursor-pointer transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+                PWA Instalable
+                <span class="ml-auto text-[9px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/30 px-1.5 py-0.5 rounded-full">Android & iPhone listo</span>
+            </a>
+        </nav>
+
+        <div class="p-3 border-t border-slate-800/60">
+            <button id="btn-master-logout" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-rose-400 hover:bg-rose-400/10 cursor-pointer transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                Cerrar Sesión
+            </button>
+        </div>
+    </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
-        
-        <div class="text-center space-y-2">
-            <h2 class="text-3xl font-black tracking-tight">Estado de la Suscripción</h2>
-            <p class="text-slate-500 dark:text-slate-400">Administra el acceso a la plataforma TurnoCanchas para este cliente.</p>
-        </div>
-
-        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden p-8 flex flex-col md:flex-row gap-8 items-center">
-            
-            <div class="flex-1 space-y-6 w-full">
-                <!-- Status Badge -->
-                <div class="flex items-center gap-3">
-                    <span class="text-sm font-bold text-slate-500 uppercase tracking-widest">Estado Actual</span>
-                    <div id="plat-estado-badge" class="px-3 py-1 rounded-full text-sm font-black border bg-slate-100 text-slate-500">Cargando...</div>
-                </div>
-
-                <!-- Expiration Date -->
-                <div>
-                    <span class="text-sm font-bold text-slate-500 uppercase tracking-widest block mb-1">Vencimiento</span>
-                    <p id="plat-vencimiento" class="text-2xl font-black text-slate-900 dark:text-white">--/--/----</p>
-                </div>
-
-                <!-- Demo Mode Status -->
-                <div class="flex items-center gap-3 mt-4">
-                    <span class="text-sm font-bold text-slate-500 uppercase tracking-widest">Modo Demo</span>
-                    <button id="btn-toggle-demo" class="px-3 py-1 rounded-full text-sm font-black border transition-colors bg-slate-100 text-slate-500">Cargando...</button>
-                </div>
-
-                <hr class="border-slate-100 dark:border-slate-800">
-
-                <!-- Actions -->
-                <div class="flex flex-col gap-3">
-                    <h3 class="font-bold text-slate-700 dark:text-slate-300">Renovar Suscripción</h3>
-                    <div class="flex gap-2">
-                        <button id="btn-add-1m" class="flex-1 py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 dark:text-indigo-300 rounded-xl font-bold transition-colors border border-indigo-200 dark:border-indigo-800">+ 1 Mes</button>
-                        <button id="btn-add-6m" class="flex-1 py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 dark:text-indigo-300 rounded-xl font-bold transition-colors border border-indigo-200 dark:border-indigo-800">+ 6 Meses</button>
-                    </div>
-                </div>
+    <main class="flex-1 flex flex-col min-h-screen overflow-hidden">
+        <!-- Top bar -->
+        <div class="bg-[#13161f]/80 backdrop-blur-md border-b border-slate-800/60 px-6 py-3 flex items-center gap-4 sticky top-0 z-10">
+            <!-- Search -->
+            <div class="flex-1 relative max-w-xl">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input id="search-input" type="text" placeholder="Buscar por complejo, propietario, teléfono o localidad..." class="w-full bg-slate-800/50 border border-slate-700/50 text-sm text-slate-300 placeholder:text-slate-600 rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 transition-all">
             </div>
 
-            <!-- Danger Zone -->
-            <div class="w-full md:w-64 flex flex-col gap-4 p-6 bg-rose-50 dark:bg-rose-950/20 rounded-2xl border border-rose-100 dark:border-rose-900/30">
-                <h3 class="font-black text-rose-700 dark:text-rose-400 text-center">Zona de Peligro</h3>
-                <p class="text-xs text-rose-600/80 dark:text-rose-400/80 text-center font-medium">Estas acciones afectarán inmediatamente la plataforma del cliente.</p>
-                
-                <button id="btn-toggle-status" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black transition-colors shadow-lg shadow-rose-600/20 mt-2">
-                    Suspender Servicio
-                </button>
+            <!-- Filters -->
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button data-filter="todos" class="filter-btn active px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 text-white transition-all">Todos <span class="filter-count-todos opacity-70"></span></button>
+                <button data-filter="activo" class="filter-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:bg-slate-700/50 transition-all">Habilitados <span class="filter-count-activo opacity-70"></span></button>
+                <button data-filter="por_vencer" class="filter-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:bg-slate-700/50 transition-all">Por Vencer (≤7d) <span class="filter-count-por_vencer opacity-70"></span></button>
+                <button data-filter="vencidos" class="filter-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:bg-slate-700/50 transition-all">Vencidos/Bloqueados <span class="filter-count-vencidos opacity-70"></span></button>
+                <button data-filter="pendiente" class="filter-btn px-3 py-1.5 text-xs font-bold rounded-lg text-amber-400/80 hover:bg-amber-400/10 transition-all">Pendientes <span class="filter-count-pendiente opacity-70"></span></button>
             </div>
 
+            <!-- Global action -->
+            <button id="btn-renew-all" class="flex items-center gap-1.5 px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-900 text-xs font-black rounded-lg shadow-lg shadow-amber-400/20 transition-all shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-6h2v6zm0-8h-2v-2h2v2z"/></svg>
+                +30 Días a Todos
+            </button>
         </div>
 
+        <!-- Cards area -->
+        <div class="flex-1 overflow-y-auto p-6">
+            <div id="tenants-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                <!-- Loading state -->
+                <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-600">
+                    <svg class="animate-spin h-8 w-8 mb-4 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <p class="font-bold">Cargando tenants...</p>
+                </div>
+            </div>
+        </div>
     </main>
 
-    <!-- Alert Modal (Reused Logic) -->
-    <div id="alert-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl w-full max-w-sm overflow-hidden scale-95 opacity-0 transition-all duration-300 transform" id="alert-modal-content">
-            <div class="p-6">
-                <div id="alert-modal-icon" class="w-12 h-12 rounded-full mb-4 mx-auto flex items-center justify-center"></div>
-                <h3 id="alert-modal-title" class="text-xl font-black text-center text-slate-900 dark:text-white mb-2"></h3>
-                <p id="alert-modal-text" class="text-sm text-center text-slate-500 dark:text-slate-400 font-medium"></p>
+    <!-- Modal: Aprobar Tenant -->
+    <div id="modal-approve" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div id="modal-approve-content" class="bg-[#1a1f2e] border border-slate-700/60 rounded-3xl shadow-2xl w-full max-w-sm p-6 scale-95 opacity-0 transition-all duration-300">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div>
+                    <h3 class="font-black text-white">Aprobar Tenant</h3>
+                    <p id="modal-approve-name" class="text-xs text-slate-400 font-medium"></p>
+                </div>
             </div>
-            <div class="border-t border-slate-100 dark:border-slate-800">
-                <button id="alert-btn-accept" class="w-full py-4 text-sm font-black text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">Aceptar</button>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 mb-1.5 block">Meses a otorgar</label>
+                    <input type="number" id="approve-meses" value="1" min="1" max="24" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white font-bold text-sm focus:outline-none focus:border-emerald-500/50">
+                </div>
+            </div>
+            <div class="flex gap-3 mt-5">
+                <button id="btn-approve-cancel" class="flex-1 py-3 text-sm font-bold text-slate-400 hover:text-white border border-slate-700 rounded-xl transition-colors">Cancelar</button>
+                <button id="btn-approve-confirm" class="flex-1 py-3 text-sm font-black text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-colors">Aprobar y Activar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Alert -->
+    <div id="alert-modal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div id="alert-modal-content" class="bg-[#1a1f2e] border border-slate-700/60 rounded-3xl shadow-2xl w-full max-w-xs p-6 scale-95 opacity-0 transition-all duration-300 text-center">
+            <div id="alert-icon" class="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center"></div>
+            <h3 id="alert-title" class="text-lg font-black text-white mb-1"></h3>
+            <p id="alert-text" class="text-sm text-slate-400 font-medium mb-5"></p>
+            <button id="alert-btn-ok" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-black rounded-xl transition-colors">Aceptar</button>
+        </div>
+    </div>
+
+    <!-- Modal: Confirm -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div id="confirm-modal-content" class="bg-[#1a1f2e] border border-slate-700/60 rounded-3xl shadow-2xl w-full max-w-xs p-6 scale-95 opacity-0 transition-all duration-300 text-center">
+            <div id="confirm-icon" class="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center bg-indigo-500/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h3 id="confirm-title" class="text-lg font-black text-white mb-1"></h3>
+            <p id="confirm-text" class="text-sm text-slate-400 font-medium mb-5"></p>
+            <div class="flex gap-3">
+                <button id="confirm-btn-cancel" class="flex-1 py-3 text-sm font-bold text-slate-400 hover:text-white border border-slate-700 rounded-xl transition-colors">Cancelar</button>
+                <button id="confirm-btn-ok" class="flex-1 py-3 text-sm font-black text-white bg-rose-600 hover:bg-rose-500 rounded-xl transition-colors">Confirmar</button>
             </div>
         </div>
     </div>

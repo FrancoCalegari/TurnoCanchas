@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrá tu Complejo — TurnoCanchas</title>
+    <meta name="description" content="Registrá tu complejo deportivo en TurnoCanchas y empezá a gestionar tus canchas y reservas online.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'media',
+            theme: { extend: { fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] } } }
+        }
+    </script>
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); }
+        .input-field {
+            @apply w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500
+            focus:outline-none focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm font-medium;
+        }
+        .glow { box-shadow: 0 0 60px rgba(99, 102, 241, 0.15); }
+    </style>
+</head>
+<body class="min-h-screen gradient-bg font-sans antialiased text-white flex flex-col">
+
+    <!-- Header -->
+    <header class="border-b border-white/5 px-6 py-4">
+        <div class="max-w-5xl mx-auto flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                </div>
+                <span class="text-lg font-black tracking-tight">TurnoCanchas</span>
+            </a>
+            <a href="/masterlogin.html" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors">Ya tengo cuenta →</a>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="flex-1 flex items-center justify-center px-4 py-12">
+        <div class="w-full max-w-lg">
+
+            <!-- Hero -->
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-bold mb-5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                    Plataforma SaaS para Complejos Deportivos
+                </div>
+                <h1 class="text-3xl font-black tracking-tight mb-3">
+                    Registrá tu <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400">Complejo</span>
+                </h1>
+                <p class="text-slate-400 font-medium">Completá el formulario y en menos de 24hs tendrás tu panel activo para gestionar reservas.</p>
+            </div>
+
+            <!-- Form Card -->
+            <div id="form-container" class="bg-white/[0.03] border border-white/10 rounded-3xl p-7 glow">
+                <form id="register-form" class="space-y-4" novalidate>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-400">Nombre del Complejo *</label>
+                        <input type="text" id="f-nombre" placeholder="Ej: Arena Sport Club" required class="input-field">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-400">URL de tu panel *</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-bold">/t/</span>
+                                <input type="text" id="f-slug" placeholder="mi-complejo" required class="input-field pl-9" pattern="[a-z0-9-]+" title="Solo letras minúsculas, números y guiones">
+                            </div>
+                            <p id="slug-check" class="text-[10px] font-medium text-slate-600 pl-1"></p>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-400">Teléfono / WhatsApp</label>
+                            <input type="tel" id="f-telefono" placeholder="+54 911 0000-0000" class="input-field">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-400">Localidad / Ubicación</label>
+                        <input type="text" id="f-ubicacion" placeholder="Ej: San Isidro, Buenos Aires" class="input-field">
+                    </div>
+
+                    <hr class="border-white/10">
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-400">Email de acceso *</label>
+                        <input type="email" id="f-email" placeholder="tu@email.com" required class="input-field">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-400">Contraseña *</label>
+                            <div class="relative">
+                                <input type="password" id="f-password" placeholder="Mínimo 6 caracteres" required minlength="6" class="input-field pr-10">
+                                <button type="button" id="toggle-pass" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                                    <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-400">Repetir contraseña *</label>
+                            <input type="password" id="f-password-confirm" placeholder="Igual que arriba" required class="input-field">
+                        </div>
+                    </div>
+
+                    <!-- Error msg -->
+                    <div id="error-msg" class="hidden px-4 py-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm font-semibold"></div>
+
+                    <button type="submit" id="btn-submit" class="w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-black text-sm rounded-xl transition-all shadow-lg shadow-indigo-600/30 mt-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Enviar Solicitud →
+                    </button>
+
+                    <p class="text-[11px] text-center text-slate-600 font-medium">
+                        Al registrarte aceptás nuestros <span class="text-slate-400 cursor-pointer hover:text-white">Términos y Condiciones</span>. Tu cuenta será activada en menos de 24hs.
+                    </p>
+                </form>
+            </div>
+
+            <!-- Success state (hidden) -->
+            <div id="success-container" class="hidden bg-white/[0.03] border border-emerald-500/30 rounded-3xl p-10 text-center glow">
+                <div class="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <h2 class="text-2xl font-black mb-2">¡Solicitud enviada!</h2>
+                <p class="text-slate-400 font-medium mb-6">Tu cuenta fue registrada y está siendo revisada por el equipo de TurnoCanchas.<br>Te contactaremos por email o WhatsApp cuando esté lista.</p>
+                <a href="/" class="inline-flex items-center gap-2 px-5 py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl text-sm font-bold transition-colors">
+                    ← Volver al inicio
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // ─── Slug auto-format ─────────────────────────────────────────────────
+        document.getElementById('f-nombre').addEventListener('input', (e) => {
+            const slugField = document.getElementById('f-slug');
+            if (!slugField._edited) {
+                slugField.value = e.target.value
+                    .toLowerCase()
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^a-z0-9 -]/g, '')
+                    .trim()
+                    .replace(/\s+/g, '-');
+            }
+        });
+
+        document.getElementById('f-slug').addEventListener('input', (e) => {
+            e._edited = true;
+            e.target._edited = true;
+            e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+        });
+
+        // ─── Password toggle ──────────────────────────────────────────────────
+        document.getElementById('toggle-pass').addEventListener('click', () => {
+            const input = document.getElementById('f-password');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        });
+
+        // ─── Form submit ──────────────────────────────────────────────────────
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const nombre = document.getElementById('f-nombre').value.trim();
+            const slug = document.getElementById('f-slug').value.trim();
+            const email = document.getElementById('f-email').value.trim();
+            const password = document.getElementById('f-password').value;
+            const passwordConfirm = document.getElementById('f-password-confirm').value;
+            const telefono = document.getElementById('f-telefono').value.trim();
+            const ubicacion = document.getElementById('f-ubicacion').value.trim();
+
+            const errorEl = document.getElementById('error-msg');
+            const btn = document.getElementById('btn-submit');
+
+            const showError = (msg) => {
+                errorEl.textContent = msg;
+                errorEl.classList.remove('hidden');
+            };
+
+            errorEl.classList.add('hidden');
+
+            if (password !== passwordConfirm) return showError('Las contraseñas no coinciden.');
+            if (password.length < 6) return showError('La contraseña debe tener al menos 6 caracteres.');
+            if (!slug) return showError('El slug de URL es obligatorio.');
+
+            btn.disabled = true;
+            btn.textContent = 'Enviando solicitud...';
+
+            try {
+                const res = await fetch('/api/tenants/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre, slug, email, password, telefono, ubicacion })
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Error al registrar');
+
+                document.getElementById('form-container').classList.add('hidden');
+                document.getElementById('success-container').classList.remove('hidden');
+            } catch (err) {
+                showError(err.message);
+                btn.disabled = false;
+                btn.textContent = 'Enviar Solicitud →';
+            }
+        });
+    </script>
+</body>
+</html>

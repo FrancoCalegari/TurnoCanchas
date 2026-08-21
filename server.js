@@ -30,6 +30,10 @@ app.get('/masteradmin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'masteradmin.html'));
 });
 
+app.get('/register-tenant', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'register-tenant.html'));
+});
+
 // Rutas de la API
 app.use('/api', routes);
 

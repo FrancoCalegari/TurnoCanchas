@@ -67,7 +67,10 @@
             errorMsg.classList.add('hidden');
 
             try {
-                await window.API.masterLogin(user, pass);
+                const res = await window.API.masterLogin(user, pass);
+                // Store with the superadmin format expected by the middleware
+                localStorage.setItem('masterToken', res.token);
+                localStorage.setItem('masterUser', res.username);
                 window.location.href = '/masteradmin.html';
             } catch (err) {
                 errorMsg.classList.remove('hidden');

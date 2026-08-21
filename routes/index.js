@@ -7,6 +7,7 @@ const usuariosRoutes = require('./usuarios');
 const plataformaRoutes = require('./plataforma');
 const authRoutes = require('./auth');
 const ajustesRoutes = require('./ajustes');
+const tenantsRoutes = require('./tenants');
 
 router.use('/canchas', canchasRoutes);
 router.use('/reservas', reservasRoutes);
@@ -14,5 +15,7 @@ router.use('/usuarios', usuariosRoutes);
 router.use('/plataforma', plataformaRoutes);
 router.use('/auth', authRoutes);
 router.use('/ajustes', ajustesRoutes);
+router.use('/tenants', tenantsRoutes);
 
 module.exports = router;
+

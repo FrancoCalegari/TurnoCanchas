@@ -22,6 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnNavReportes = document.getElementById('nav-reportes');
     const btnNavAjustes = document.getElementById('nav-ajustes');
 
+    // Dashboard State
+    let _dashboardReservas = [];
+    let _dashboardCanchas = [];
+    let _dashboardIsDemo = false;
+
     // Init
     async function init() {
         if (!tableBody) return; // Ensure we are on admin page
@@ -66,6 +71,15 @@ document.addEventListener('DOMContentLoaded', () => {
         setupAjustesLogic();
         setupQuickActions();
         setupReservasLogic();
+
+        const toggleCanceladas = document.getElementById('toggle-canceladas-dashboard');
+        if (toggleCanceladas) {
+            toggleCanceladas.addEventListener('change', () => {
+                if (_dashboardReservas.length > 0) {
+                    renderTable(_dashboardReservas, _dashboardCanchas, _dashboardIsDemo);
+                }
+            });
+        }
     }
 
     // Load Data
@@ -159,6 +173,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 kpiCanchas.innerHTML = `${canchasActivas}<span class="text-lg text-slate-400 font-medium">/${totalCanchas}</span>`;
             }
 
+            _dashboardCanchas = canchas;
+            _dashboardReservas = reservasRecientes;
+            _dashboardIsDemo = isDemo;
+
             // Render Table
             renderTable(reservasRecientes, canchas, isDemo);
 
@@ -187,9 +205,31 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const toggleCanceladas = document.getElementById('toggle-canceladas-dashboard');
+        const showCanceladas = toggleCanceladas ? toggleCanceladas.checked : false;
+
+        const filteredReservas = reservas.filter(r => {
+            const estadoActual = (r.estado || 'confirmada').toLowerCase();
+            if (estadoActual === 'cancelada' && !showCanceladas) {
+                return false;
+            }
+            return true;
+        });
+
+        if (filteredReservas.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="p-8 text-center text-slate-500">
+                        No hay reservas para mostrar con los filtros actuales.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
         tableBody.innerHTML = '';
 
-        reservas.forEach(r => {
+        filteredReservas.forEach(r => {
             const cancha = canchas.find(c => c.id === r.canchaId);
             const canchaNombre = cancha ? cancha.nombre : 'Cancha Desconocida';
             
@@ -777,6 +817,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fDesc = document.getElementById('form-descripcion');
     const fEstado = document.getElementById('form-estado');
     const fColor = document.getElementById('form-color');
+    const fSena = document.getElementById('form-sena');
 
     async function loadCanchas() {
         if (!masterTableBody) return;
@@ -844,7 +885,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(!form.checkValidity()) { form.reportValidity(); return; }
                 const data = {
                     nombre: fNombre.value, deporte: fDeporte.value, precioPorHora: fPrecio.value,
-                    descripcion: fDesc.value, estado: fEstado.value, colorTag: fColor.value
+                    descripcion: fDesc.value, estado: fEstado.value, colorTag: fColor.value,
+                    porcentaje_sena: fSena.value
                 };
                 btnSave.disabled = true; btnSave.innerText = 'Guardando...';
                 try {
@@ -874,9 +916,10 @@ document.addEventListener('DOMContentLoaded', () => {
             fId.value = c.id; fNombre.value = c.nombre; fDeporte.value = c.deporte;
             fPrecio.value = c.precioPorHora; fDesc.value = c.descripcion;
             fEstado.value = c.estado; fColor.value = c.colorTag;
+            fSena.value = c.porcentaje_sena !== undefined ? c.porcentaje_sena : 50;
         } else {
             modalTitle.innerText = 'Nueva Cancha';
-            form.reset(); fId.value = ''; fColor.value = 'bg-slate-100 text-slate-700';
+            form.reset(); fId.value = ''; fColor.value = 'bg-slate-100 text-slate-700'; fSena.value = '50';
         }
         modal.classList.remove('hidden');
         requestAnimationFrame(() => {

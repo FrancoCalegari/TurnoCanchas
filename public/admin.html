@@ -493,11 +493,20 @@
                     Turnos de las próximas horas
                   </p>
                 </div>
-                <button
-                  class="text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 cursor-pointer transition-colors"
-                >
-                  Ver todas &rarr;
-                </button>
+                <div class="flex items-center gap-4">
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <div class="relative">
+                      <input type="checkbox" id="toggle-canceladas-dashboard" class="sr-only peer">
+                      <div class="w-8 h-4.5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all dark:border-slate-600 peer-checked:bg-blue-600"></div>
+                    </div>
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 select-none">Ver canceladas</span>
+                  </label>
+                  <button
+                    class="text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 cursor-pointer transition-colors"
+                  >
+                    Ver todas &rarr;
+                  </button>
+                </div>
               </div>
               <div class="overflow-x-auto flex-1">
                 <table class="w-full text-left border-collapse">
@@ -1069,6 +1078,11 @@
                             <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Color Tag (Clases Tailwind)</label>
                             <input type="text" id="form-color" value="bg-blue-100 text-blue-700" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-semibold">
                         </div>
+                    </div>
+                    
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Porcentaje de Seña (%)</label>
+                        <input type="number" id="form-sena" min="0" max="100" value="50" required class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-semibold">
                     </div>
                 </form>
             </div>

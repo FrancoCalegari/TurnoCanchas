@@ -12,7 +12,8 @@ async function initDB() {
             descripcion TEXT,
             precioPorHora INT NOT NULL,
             estado VARCHAR(50) DEFAULT 'disponible',
-            colorTag VARCHAR(100)
+            colorTag VARCHAR(100),
+            porcentaje_sena INT DEFAULT 50
         )
     `;
 
@@ -62,6 +63,7 @@ async function initDB() {
     const createAjustes = `
         CREATE TABLE IF NOT EXISTS ajustes_complejo (
             id INT PRIMARY KEY,
+            tenant_id INT NOT NULL DEFAULT 0,
             nombre_complejo VARCHAR(100),
             open_time VARCHAR(10),
             close_time VARCHAR(10),
@@ -75,9 +77,36 @@ async function initDB() {
         )
     `;
 
+    const createTenants = `
+        CREATE TABLE IF NOT EXISTS tenants (
+            id SERIAL PRIMARY KEY,
+            nombre VARCHAR(100) NOT NULL,
+            slug VARCHAR(50) UNIQUE NOT NULL,
+            email VARCHAR(100) UNIQUE NOT NULL,
+            password_hash VARCHAR(255) NOT NULL,
+            telefono VARCHAR(50),
+            ubicacion VARCHAR(255),
+            estado VARCHAR(20) DEFAULT 'pendiente',
+            fecha_vencimiento VARCHAR(50),
+            plan VARCHAR(30) DEFAULT 'mensual',
+            createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+
+    const createSuperAdmins = `
+        CREATE TABLE IF NOT EXISTS super_admins (
+            id SERIAL PRIMARY KEY,
+            username VARCHAR(50) UNIQUE NOT NULL,
+            password_hash VARCHAR(255) NOT NULL
+        )
+    `;
+
     try {
         console.log("Creando tabla 'canchas'...");
         await executeQuery(createCanchas);
+        try {
+            await executeQuery("ALTER TABLE canchas ADD COLUMN porcentaje_sena INT DEFAULT 50");
+        } catch(e) {}
         console.log("Tabla 'canchas' lista.");
 
         console.log("Creando tabla 'reservas'...");
@@ -100,54 +129,72 @@ async function initDB() {
         await executeQuery(createAjustes);
         
         // Intentar agregar las columnas por si ya existía la tabla
-        try {
-            await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN ubicacion_maps VARCHAR(500)");
-        } catch (e) {}
-        try {
-            await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN logo_url VARCHAR(500)");
-        } catch (e) {}
-        try {
-            await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN hero_image_url VARCHAR(500)");
-        } catch (e) {}
-        try {
-            await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN hero_title VARCHAR(200)");
-        } catch (e) {}
-        try {
-            await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN canchas_title VARCHAR(100)");
-        } catch (e) {}
-        try {
-            await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN nosotros_title VARCHAR(100)");
-        } catch (e) {}
-        
+        const ajustesAlters = [
+            "ALTER TABLE ajustes_complejo ADD COLUMN ubicacion_maps VARCHAR(500)",
+            "ALTER TABLE ajustes_complejo ADD COLUMN logo_url VARCHAR(500)",
+            "ALTER TABLE ajustes_complejo ADD COLUMN hero_image_url VARCHAR(500)",
+            "ALTER TABLE ajustes_complejo ADD COLUMN hero_title VARCHAR(200)",
+            "ALTER TABLE ajustes_complejo ADD COLUMN canchas_title VARCHAR(100)",
+            "ALTER TABLE ajustes_complejo ADD COLUMN nosotros_title VARCHAR(100)",
+            "ALTER TABLE ajustes_complejo ADD COLUMN tenant_id INT NOT NULL DEFAULT 0",
+        ];
+        for (const sql of ajustesAlters) {
+            try { await executeQuery(sql); } catch(e) {}
+        }
         console.log("Tabla 'ajustes_complejo' lista.");
 
-        // Poblar algunas canchas mock si la tabla está vacía
-        console.log("Comprobando si existen canchas...");
-        const result = await executeQuery("SELECT COUNT(*) as count FROM canchas");
-        // Dependiendo de cómo devuelva los resultados la API de SpiderWeb, count será un array
-        const count = Array.isArray(result) && result[0] ? parseInt(result[0].count) : 0;
-        
-        if (count === 0) {
-            console.log("Poblando canchas de prueba...");
+        // --- NUEVAS TABLAS SAAS ---
+        console.log("Creando tabla 'tenants'...");
+        await executeQuery(createTenants);
+        console.log("Tabla 'tenants' lista.");
+
+        console.log("Creando tabla 'super_admins'...");
+        await executeQuery(createSuperAdmins);
+        console.log("Tabla 'super_admins' lista.");
+
+        // Agregar tenant_id a tablas existentes
+        const tenantAlters = [
+            "ALTER TABLE canchas ADD COLUMN tenant_id INT NOT NULL DEFAULT 0",
+            "ALTER TABLE reservas ADD COLUMN tenant_id INT NOT NULL DEFAULT 0",
+            "ALTER TABLE clientes ADD COLUMN tenant_id INT NOT NULL DEFAULT 0",
+            "ALTER TABLE admin_users ADD COLUMN tenant_id INT NOT NULL DEFAULT 0",
+        ];
+        for (const sql of tenantAlters) {
+            try { await executeQuery(sql); } catch(e) {}
+        }
+        console.log("Columnas tenant_id aplicadas.");
+
+        // Comprobar super admin
+        const superAdminRes = await executeQuery("SELECT COUNT(*) as count FROM super_admins");
+        const countSuperAdmins = Array.isArray(superAdminRes) && superAdminRes[0] ? parseInt(superAdminRes[0].count) : 0;
+        if (countSuperAdmins === 0) {
+            const bcrypt = require('bcryptjs');
+            const masterPass = process.env.masterpass || 'superadmin123';
+            const masterUser = process.env.masteruser || 'superadmin';
+            const hash = await bcrypt.hash(masterPass, 10);
+            const safeHash = hash.replace(/'/g, "''");
+            console.log(`Inyectando super admin inicial (${masterUser})...`);
             await executeQuery(`
-                INSERT INTO canchas (nombre, deporte, descripcion, precioPorHora, estado, colorTag) VALUES 
-                ('Cancha 1 (Techada)', 'Fútbol 5', 'Césped sintético, techada y buena iluminación.', 18000, 'disponible', 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'),
-                ('Cancha 2 (Descubierta)', 'Fútbol 5', 'Césped sintético al aire libre.', 15000, 'disponible', 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'),
-                ('Pádel Pro 1', 'Pádel', 'Cancha de blindex profesional.', 12000, 'disponible', 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'),
-                ('Pádel Standard 2', 'Pádel', 'Cancha de muro de concreto.', 9000, 'mantenimiento', 'bg-slate-100 text-slate-700 dark:bg-slate-800/40 dark:text-slate-300'),
-                ('Cancha Mixta', 'Básquet/Vóley', 'Suelo de parquet con demarcación.', 16000, 'disponible', 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300')
+                INSERT INTO super_admins (username, password_hash) 
+                VALUES ('${masterUser}', '${safeHash}')
             `);
-            console.log("Canchas de prueba insertadas.");
-        } else {
-            console.log(`Ya existen ${count} canchas en la base de datos.`);
         }
 
-        // Comprobar suscripcion
+        // Comprobar Admin Users (tenant 0 = legacy)
+        const adminRes = await executeQuery("SELECT COUNT(*) as count FROM admin_users");
+        const countAdmins = Array.isArray(adminRes) && adminRes[0] ? parseInt(adminRes[0].count) : 0;
+        if (countAdmins === 0) {
+            console.log("Inyectando admin inicial (admin/admin)...");
+            await executeQuery(`
+                INSERT INTO admin_users (username, password_hash, tenant_id) 
+                VALUES ('admin', 'admin', 0)
+            `);
+        }
+
+        // Comprobar suscripcion legacy
         const platRes = await executeQuery("SELECT COUNT(*) as count FROM plataforma_config");
         const countPlat = Array.isArray(platRes) && platRes[0] ? parseInt(platRes[0].count) : 0;
         if (countPlat === 0) {
-            console.log("Inyectando configuración inicial de plataforma...");
-            // Vence el proximo mes por defecto para la demo
             const nextMonth = new Date();
             nextMonth.setMonth(nextMonth.getMonth() + 1);
             await executeQuery(`
@@ -156,26 +203,14 @@ async function initDB() {
             `);
         }
 
-        // Comprobar Ajustes
-        const ajustesRes = await executeQuery("SELECT COUNT(*) as count FROM ajustes_complejo");
+        // Comprobar Ajustes legacy (tenant_id = 0)
+        const ajustesRes = await executeQuery("SELECT COUNT(*) as count FROM ajustes_complejo WHERE tenant_id = 0");
         const countAjustes = Array.isArray(ajustesRes) && ajustesRes[0] ? parseInt(ajustesRes[0].count) : 0;
         if (countAjustes === 0) {
             console.log("Inyectando configuración inicial de ajustes...");
             await executeQuery(`
-                INSERT INTO ajustes_complejo (id, nombre_complejo, open_time, close_time, wpp_contacto, ubicacion_maps) 
-                VALUES (1, 'Complejo Deportivo TurnoCanchas', '09:00', '23:00', '5491100000000', 'https://maps.app.goo.gl/placeholder')
-            `);
-        }
-
-        // Comprobar Admin Users
-        const adminRes = await executeQuery("SELECT COUNT(*) as count FROM admin_users");
-        const countAdmins = Array.isArray(adminRes) && adminRes[0] ? parseInt(adminRes[0].count) : 0;
-        if (countAdmins === 0) {
-            console.log("Inyectando admin inicial (admin/admin)...");
-            // Nota: En producción usar bcrypt, aquí para el demo usaremos el texto plano 'admin' validado de forma básica
-            await executeQuery(`
-                INSERT INTO admin_users (username, password_hash) 
-                VALUES ('admin', 'admin')
+                INSERT INTO ajustes_complejo (id, tenant_id, nombre_complejo, open_time, close_time, wpp_contacto, ubicacion_maps) 
+                VALUES (1, 0, 'Complejo Deportivo TurnoCanchas', '09:00', '23:00', '5491100000000', 'https://maps.app.goo.gl/placeholder')
             `);
         }
 

@@ -42,15 +42,28 @@ const masterLogin = async (req, res) => {
             return res.status(400).json({ error: 'Faltan credenciales' });
         }
 
+        // Fallback a env vars para retrocompatibilidad
         const envUser = process.env.masteruser;
         const envPass = process.env.masterpass;
 
         if (username === envUser && password === envPass) {
-            const fakeToken = Buffer.from(`master:${Date.now()}`).toString('base64');
+            const fakeToken = Buffer.from(`superadmin:${username}:${Date.now()}`).toString('base64');
             res.json({ token: fakeToken, username: envUser });
-        } else {
-            res.status(401).json({ error: 'Credenciales inválidas' });
+            return;
         }
+
+        // Buscar en la tabla super_admins
+        const safeUser = String(username).replace(/'/g, "''");
+        const result = await executeQuery(`SELECT * FROM super_admins WHERE username = '${safeUser}'`);
+        if (!result || result.length === 0) {
+            return res.status(401).json({ error: 'Credenciales inválidas' });
+        }
+        const admin = result[0];
+        const match = await bcrypt.compare(String(password), admin.password_hash);
+        if (!match) return res.status(401).json({ error: 'Credenciales inválidas' });
+
+        const token = Buffer.from(`superadmin:${admin.username}:${Date.now()}`).toString('base64');
+        res.json({ token, username: admin.username });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
