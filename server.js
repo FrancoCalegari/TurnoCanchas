@@ -22,6 +22,11 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Ruta dinámica para el portal del tenant
+app.get('/t/:slug', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'portal.html'));
+});
+
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });

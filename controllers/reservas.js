@@ -3,9 +3,22 @@ const { executeQuery } = require('../config/db');
 const getAll = async (req, res) => {
     try {
         const { fecha } = req.query;
+        let tenantFilter = '';
+        if (req.query.tenant) {
+            const safeSlug = String(req.query.tenant).replace(/'/g, "''");
+            const tRes = await executeQuery(`SELECT id FROM tenants WHERE slug = '${safeSlug}'`);
+            if (tRes && tRes.length > 0) {
+                tenantFilter = `tenant_id = ${tRes[0].id}`;
+            }
+        }
+
+        let conditions = [];
+        if (fecha) conditions.push(`fecha = '${String(fecha).replace(/'/g, "''")}'`);
+        if (tenantFilter) conditions.push(tenantFilter);
+
         let query = 'SELECT * FROM reservas';
-        if (fecha) {
-            query += ` WHERE fecha = '${String(fecha).replace(/'/g, "''")}'`;
+        if (conditions.length > 0) {
+            query += ' WHERE ' + conditions.join(' AND ');
         }
         
         const reservas = await executeQuery(query);
@@ -20,6 +33,10 @@ const getAdminReservas = async (req, res) => {
     try {
         const { search, estado, desde, hasta, limit = 100 } = req.query;
         let conditions = [];
+        
+        if (req.tenant && req.tenant.id) {
+            conditions.push(`r.tenant_id = ${req.tenant.id}`);
+        }
 
         if (search) {
             const s = String(search).replace(/'/g, "''");
@@ -98,9 +115,13 @@ const create = async (req, res) => {
         const safeClienteId = cliente_id ? parseInt(cliente_id) : 'NULL';
         const finalEstado = estado ? String(estado).replace(/'/g, "''") : 'por confirmar';
 
+        // Get tenant_id from cancha
+        const canchaRes = await executeQuery(`SELECT tenant_id FROM canchas WHERE id = ${safeCanchaId}`);
+        const tenantId = (canchaRes && canchaRes.length > 0) ? canchaRes[0].tenant_id : 0;
+
         const query = `
-            INSERT INTO reservas (id, canchaId, fecha, hora, cliente, cliente_id, duracion, precio, estado) 
-            VALUES ('${id}', ${safeCanchaId}, '${safeFecha}', '${safeHora}', '${safeCliente}', ${safeClienteId}, ${safeDuracion}, ${safePrecio}, '${finalEstado}')
+            INSERT INTO reservas (id, canchaId, fecha, hora, cliente, cliente_id, duracion, precio, estado, tenant_id) 
+            VALUES ('${id}', ${safeCanchaId}, '${safeFecha}', '${safeHora}', '${safeCliente}', ${safeClienteId}, ${safeDuracion}, ${safePrecio}, '${finalEstado}', ${tenantId})
         `;
         
         await executeQuery(query);
@@ -121,7 +142,8 @@ const updateStatus = async (req, res) => {
         const { status } = req.body;
         
         const safeStatus = String(status).replace(/'/g, "''");
-        await executeQuery(`UPDATE reservas SET estado = '${safeStatus}' WHERE id = '${id}'`);
+        const tenantFilter = req.tenant && req.tenant.id ? `AND tenant_id = ${req.tenant.id}` : '';
+        await executeQuery(`UPDATE reservas SET estado = '${safeStatus}' WHERE id = '${id}' ${tenantFilter}`);
         
         res.json({ message: `Estado de la reserva ${id} actualizado a ${status}` });
     } catch (error) {
@@ -131,9 +153,9 @@ const updateStatus = async (req, res) => {
 
 const getRecent = async (req, res) => {
     try {
-        // Obtenemos las últimas 50 reservas order by createdat desc
-        // The mock returned this endpoint for the admin
-        const result = await executeQuery(`SELECT * FROM reservas ORDER BY createdAt DESC LIMIT 50`);
+        const tenantFilter = req.tenant && req.tenant.id ? `WHERE tenant_id = ${req.tenant.id}` : '';
+        // Obtenemos las últimas 50 reservas
+        const result = await executeQuery(`SELECT * FROM reservas ${tenantFilter} ORDER BY createdAt DESC LIMIT 50`);
         res.json({ message: 'Reservas recientes', data: result });
     } catch (error) {
         res.status(500).json({ error: error.message });

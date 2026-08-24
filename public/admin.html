@@ -418,10 +418,8 @@
               class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm"
             >
               <div class="flex items-center justify-between">
-                <h3
-                  class="text-xs font-bold text-slate-500 uppercase tracking-wider"
-                >
-                  Canchas Activas
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  Servicios Activos
                 </h3>
                 <div
                   class="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400"
@@ -472,7 +470,7 @@
                 </span>
               </div>
               <p class="text-xs text-slate-400 mt-1">
-                Cancha 3 (Fútbol 5) inactiva
+                Servicio 3 inactivo
               </p>
             </div>
           </div>
@@ -515,7 +513,7 @@
                       class="bg-slate-50 dark:bg-slate-800/50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700"
                     >
                       <th class="p-4">Hora</th>
-                      <th class="p-4">Cancha</th>
+                      <th class="p-4">Servicio</th>
                       <th class="p-4">Cliente</th>
                       <th class="p-4">Estado</th>
                       <th class="p-4 text-right">Acciones</th>
@@ -676,16 +674,16 @@
           </div>
         </div> <!-- Cierra view-dashboard -->
 
-        <!-- Vista de Configuración de Canchas (Oculta por defecto) -->
+        <!-- Vista de Configuración de Servicios (Oculta por defecto) -->
         <div id="view-canchas" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Gestión de Canchas</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Administra el inventario de canchas y sus propiedades principales.</p>
+                    <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Gestión de Servicios</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Administra el inventario de servicios y sus propiedades principales.</p>
                 </div>
                 <button id="btn-add-cancha" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/30 hover:-translate-y-0.5">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus w-4 h-4"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                    Nueva Cancha
+                    Nuevo Servicio
                 </button>
             </div>
             
@@ -695,8 +693,8 @@
                         <thead>
                             <tr class="bg-slate-50 dark:bg-slate-800/50 text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase">
                                 <th class="p-4 pl-6 border-b border-slate-200 dark:border-slate-800">ID</th>
-                                <th class="p-4 border-b border-slate-200 dark:border-slate-800">Cancha</th>
-                                <th class="p-4 border-b border-slate-200 dark:border-slate-800">Deporte</th>
+                                <th class="p-4 border-b border-slate-200 dark:border-slate-800">Servicio</th>
+                                <th class="p-4 border-b border-slate-200 dark:border-slate-800">Deporte/Categoría</th>
                                 <th class="p-4 border-b border-slate-200 dark:border-slate-800">Precio/Hr</th>
                                 <th class="p-4 border-b border-slate-200 dark:border-slate-800">Estado</th>
                                 <th class="p-4 pr-6 border-b border-slate-200 dark:border-slate-800 text-right">Acciones</th>
@@ -709,7 +707,7 @@
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
-                                    Cargando canchas...
+                                    Cargando servicios...
                                 </td>
                             </tr>
                         </tbody>
@@ -771,7 +769,7 @@
                             <tr class="border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40">
                                 <th class="p-4 text-left text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">ID</th>
                                 <th class="p-4 text-left text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Fecha / Hora</th>
-                                <th class="p-4 text-left text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Cancha</th>
+                                <th class="p-4 text-left text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Servicio</th>
                                 <th class="p-4 text-left text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Cliente</th>
                                 <th class="p-4 text-left text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Estado</th>
                                 <th class="p-4 text-right text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Acciones</th>
@@ -801,9 +799,9 @@
                 </div>
                 <form id="form-reserva-manual" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Cancha *</label>
+                        <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Servicio *</label>
                         <select id="rm-cancha" required class="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">Cargando canchas...</option>
+                            <option value="">Cargando servicios...</option>
                         </select>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
@@ -898,7 +896,7 @@
                         <input type="text" id="ajustes-hero-title" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold" placeholder="El mejor lugar para jugar">
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Título de Canchas</label>
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Título de Servicios</label>
                         <input type="text" id="ajustes-canchas-title" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold" placeholder="Nuestras Instalaciones">
                     </div>
                     <div class="space-y-1.5">
@@ -922,7 +920,7 @@
                 <h3 class="text-xl font-black text-slate-900 dark:text-white">Bloquear Horario</h3>
                 <form id="qa-bloquear-form" class="space-y-3">
                     <div class="space-y-1">
-                        <label class="text-xs font-bold text-slate-600">Cancha</label>
+                        <label class="text-xs font-bold text-slate-600">Servicio</label>
                         <select id="qa-bloquear-cancha" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm"></select>
                     </div>
                     <div class="space-y-1">
@@ -990,7 +988,7 @@
                 <h3 class="text-xl font-black text-slate-900 dark:text-white">Cambiar Precio</h3>
                 <form id="qa-precios-form" class="space-y-3">
                     <div class="space-y-1">
-                        <label class="text-xs font-bold text-slate-600">Cancha</label>
+                        <label class="text-xs font-bold text-slate-600">Servicio</label>
                         <select id="qa-precios-cancha" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm"></select>
                     </div>
                     <div class="space-y-1">
@@ -1015,7 +1013,7 @@
                 <form id="qa-avisos-form" class="space-y-3">
                     <div class="space-y-1">
                         <label class="text-xs font-bold text-slate-600">Mensaje Masivo</label>
-                        <textarea id="qa-avisos-texto" required rows="3" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm" placeholder="Las canchas estarán cerradas el feriado..."></textarea>
+                        <textarea id="qa-avisos-texto" required rows="3" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 text-sm" placeholder="Los servicios estarán cerrados el feriado..."></textarea>
                     </div>
                     <div class="flex gap-4 items-center">
                         <label class="flex items-center gap-2 text-sm font-bold text-slate-600">
@@ -1040,13 +1038,13 @@
     <!-- Modal Form (Hidden) -->
     <div id="cancha-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden scale-95 opacity-0 transition-all duration-300 transform" id="cancha-modal-content">
-            <div class="p-6">
-                <h3 id="modal-title" class="text-xl font-black text-slate-900 dark:text-white mb-6">Agregar Cancha</h3>
+            <div class="p-6 md:p-8">
+                <h3 id="modal-title" class="text-xl font-black text-slate-900 dark:text-white mb-6">Agregar Servicio</h3>
                 <form id="cancha-form" class="space-y-4">
                     <input type="hidden" id="form-id">
                     
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Nombre de la Cancha</label>
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Nombre del Servicio</label>
                         <input type="text" id="form-nombre" required class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-semibold">
                     </div>
                     

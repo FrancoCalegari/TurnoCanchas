@@ -10,6 +10,7 @@ router.post('/login', tenantsController.loginTenant);
 router.post('/super/login', tenantsController.loginSuperAdmin);
 
 // Rutas protegidas (Super Admin)
+router.post('/super-create', requireSuperAdmin, tenantsController.superCreateTenant);
 router.get('/', requireSuperAdmin, tenantsController.listTenants);
 router.put('/:id/approve', requireSuperAdmin, tenantsController.approveTenant);
 router.put('/:id/suspend', requireSuperAdmin, tenantsController.suspendTenant);

@@ -347,12 +347,15 @@ document.addEventListener('DOMContentLoaded', () => {
         courtsGrid.innerHTML = '';
         
         const filteredCanchas = state.canchas.filter(c => {
-            if (state.filters.sport !== 'ALL' && c.deporte !== state.filters.sport) return false;
-            return true;
+            const matchSport = state.filters.sport === 'ALL' || c.deporte.toUpperCase() === state.filters.sport.toUpperCase();
+            return matchSport;
         });
 
+        const countServicios = document.getElementById('count-servicios');
+        if (countServicios) countServicios.innerText = filteredCanchas.length;
+
         if (filteredCanchas.length === 0) {
-            courtsGrid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-500 font-bold bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">No hay canchas disponibles para los filtros seleccionados.</div>';
+            courtsGrid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-500 font-bold bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">No hay servicios disponibles para los filtros seleccionados.</div>';
             return;
         }
 
@@ -466,15 +469,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderCourtsList(filteredCanchas) {
-        const tableWrapper = document.createElement('div');
-        tableWrapper.className = 'col-span-full overflow-x-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm';
-        
-        const table = document.createElement('table');
-        table.className = 'w-full text-left border-collapse min-w-[900px]';
-        
-        // Header
-        const thead = document.createElement('thead');
-        let headerHTML = `<tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200/80 dark:border-slate-800"><th class="p-3 text-xs font-bold text-slate-500 sticky left-0 bg-slate-50 dark:bg-slate-800/90 z-10 w-48 border-r border-slate-200/80 dark:border-slate-700">Cancha</th>`;
+        courtsGrid.innerHTML = `
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200/80 dark:border-slate-800"><th class="p-3 text-xs font-bold text-slate-500 sticky left-0 bg-slate-50 dark:bg-slate-800/90 z-10 w-48 border-r border-slate-200/80 dark:border-slate-700">Servicio</th>`;
         for (let h = 8; h <= 22; h++) {
             headerHTML += `<th class="p-3 text-xs font-bold text-slate-500 text-center min-w-[70px]">${formatTime(h)}</th>`;
         }
@@ -636,6 +635,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reservation Handler
     function handleReserva(btn, cancha, hour, duration, price) {
+        const now = new Date();
+        const selDate = new Date(state.selectedDate);
+        selDate.setHours(parseInt(hour.split(':')[0]), parseInt(hour.split(':')[1]), 0, 0);
+
+        if (selDate < now) {
+            alert('No puedes reservar en un horario pasado.');
+            return;
+        }
+
         let nombreCliente = 'Cliente Web';
         let clienteId = null;
 

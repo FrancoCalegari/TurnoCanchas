@@ -21,6 +21,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnRenewAll = document.getElementById('btn-renew-all');
     const btnLogout = document.getElementById('btn-master-logout');
     const badgeTotal = document.getElementById('badge-total');
+    const btnCreateTenant = document.getElementById('btn-create-tenant');
+
+    // Views
+    const navPanel = document.getElementById('nav-panel');
+    const navRubros = document.getElementById('nav-rubros');
+    const navPlanes = document.getElementById('nav-planes');
+    const viewTenants = document.getElementById('view-tenants');
+    const viewRubros = document.getElementById('view-rubros');
+    const viewPlanes = document.getElementById('view-planes');
+    const topBar = viewTenants.previousElementSibling; // The search/filter bar is only for tenants for now
 
     // Modal: Approve
     const modalApprove = document.getElementById('modal-approve');
@@ -29,6 +39,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const approveMeses = document.getElementById('approve-meses');
     const btnApproveCancel = document.getElementById('btn-approve-cancel');
     const btnApproveConfirm = document.getElementById('btn-approve-confirm');
+
+    // Modal: Create Tenant
+    const modalCreateTenant = document.getElementById('modal-create-tenant');
+    const modalCreateTenantContent = document.getElementById('modal-create-tenant-content');
+    const formCreateTenant = document.getElementById('form-create-tenant');
+    const btnCtCancel = document.getElementById('btn-ct-cancel');
+    
+    // Modal: Rubro
+    const modalRubro = document.getElementById('modal-rubro');
+    const modalRubroContent = document.getElementById('modal-rubro-content');
+    const formRubro = document.getElementById('form-rubro');
+    const btnRCancel = document.getElementById('btn-r-cancel');
+    const btnCreateRubro = document.getElementById('btn-create-rubro');
+    const rubrosList = document.getElementById('rubros-list');
+
+    // Modal: Plan
+    const modalPlan = document.getElementById('modal-plan');
+    const modalPlanContent = document.getElementById('modal-plan-content');
+    const formPlan = document.getElementById('form-plan');
+    const btnPCancel = document.getElementById('btn-p-cancel');
+    const btnCreatePlan = document.getElementById('btn-create-plan');
+    const planesList = document.getElementById('planes-list');
 
     // ─── API helper ──────────────────────────────────────────────────────────
     const apiHeaders = () => ({
@@ -62,6 +94,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '/masterlogin.html';
             }
             grid.innerHTML = `<div class="col-span-full text-center py-20 text-rose-400 font-bold">${err.message}</div>`;
+        }
+    };
+
+    const loadRubros = async () => {
+        try {
+            const result = await apiFetch('/api/rubros');
+            renderRubros(result.data || []);
+            
+            // Populate select in Create Tenant modal
+            const select = document.getElementById('ct-rubro');
+            select.innerHTML = '<option value="">Seleccionar Rubro...</option>';
+            (result.data || []).forEach(r => {
+                select.innerHTML += `<option value="${r.id}">${r.nombre}</option>`;
+            });
+        } catch (err) {
+            rubrosList.innerHTML = `<div class="text-center py-10 text-rose-400 font-bold">${err.message}</div>`;
         }
     };
 
@@ -183,6 +231,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 ${t.telefono ? `<div class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-slate-600 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.54 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l.81-.81a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>${t.telefono}</span></div>` : ''}
                 ${t.ubicacion ? `<div class="flex items-center gap-2"><svg class="w-3.5 h-3.5 text-slate-600 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span class="truncate max-w-[160px]" title="${t.ubicacion}">${t.ubicacion}</span></div>` : ''}
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400 font-bold border border-indigo-500/30">${t.rubro_nombre || 'Sin Rubro'}</span>
+                </div>
             </div>`;
 
         // Stats
@@ -321,6 +372,127 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ─── Render Rubros ────────────────────────────────────────────────────────
+    const renderRubros = (list) => {
+        if (list.length === 0) {
+            rubrosList.innerHTML = `<div class="text-center py-10 text-slate-500 font-bold">No hay rubros creados.</div>`;
+            return;
+        }
+        rubrosList.innerHTML = list.map(r => `
+            <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4 flex items-center justify-between">
+                <div>
+                    <h4 class="font-bold text-white flex items-center gap-2">
+                        ${r.nombre} 
+                        ${r.activo ? '<span class="w-2 h-2 rounded-full bg-emerald-500" title="Activo"></span>' : '<span class="w-2 h-2 rounded-full bg-rose-500" title="Inactivo"></span>'}
+                    </h4>
+                    <p class="text-xs text-slate-400 mt-1">${r.descripcion || 'Sin descripción'}</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors btn-edit-rubro" 
+                        data-id="${r.id}" data-nombre="${r.nombre}" data-desc="${r.descripcion || ''}" data-activo="${r.activo}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors btn-delete-rubro" data-id="${r.id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    };
+
+    rubrosList.addEventListener('click', async (e) => {
+        const btnEdit = e.target.closest('.btn-edit-rubro');
+        const btnDelete = e.target.closest('.btn-delete-rubro');
+
+        if (btnEdit) {
+            document.getElementById('modal-rubro-title').textContent = 'Editar Rubro';
+            document.getElementById('r-id').value = btnEdit.dataset.id;
+            document.getElementById('r-nombre').value = btnEdit.dataset.nombre;
+            document.getElementById('r-desc').value = btnEdit.dataset.desc;
+            document.getElementById('r-activo').checked = btnEdit.dataset.activo == '1';
+            openModal(modalRubro, modalRubroContent);
+        }
+
+        if (btnDelete) {
+            const id = btnDelete.dataset.id;
+            showConfirm('Eliminar Rubro', '¿Estás seguro? Esta acción no se puede deshacer y fallará si hay clientes usándolo.', async () => {
+                try {
+                    await apiFetch(`/api/rubros/${id}`, { method: 'DELETE' });
+                    showAlert('Eliminado', 'Rubro eliminado', 'success');
+                    await loadRubros();
+                } catch (err) { showAlert('Error', err.message, 'error'); }
+            });
+        }
+    });
+
+    // ─── Modal Create Rubro ──────────────────────────────────────────────────
+    btnCreateRubro.addEventListener('click', () => {
+        document.getElementById('modal-rubro-title').textContent = 'Nuevo Rubro';
+        formRubro.reset();
+        document.getElementById('r-id').value = '';
+        openModal(modalRubro, modalRubroContent);
+    });
+
+    btnRCancel.addEventListener('click', () => closeModal(modalRubro, modalRubroContent));
+
+    formRubro.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('r-id').value;
+        const body = {
+            nombre: document.getElementById('r-nombre').value,
+            descripcion: document.getElementById('r-desc').value,
+            activo: document.getElementById('r-activo').checked
+        };
+        try {
+            if (id) {
+                await apiFetch(`/api/rubros/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+                showAlert('Actualizado', 'Rubro actualizado', 'success');
+            } else {
+                await apiFetch('/api/rubros', { method: 'POST', body: JSON.stringify(body) });
+                showAlert('Creado', 'Rubro creado', 'success');
+            }
+            closeModal(modalRubro, modalRubroContent);
+            await loadRubros();
+        } catch (err) {
+            showAlert('Error', err.message, 'error');
+        }
+    });
+
+    // ─── Modal Create Tenant ──────────────────────────────────────────────────
+    btnCreateTenant.addEventListener('click', () => {
+        formCreateTenant.reset();
+        openModal(modalCreateTenant, modalCreateTenantContent);
+    });
+
+    btnCtCancel.addEventListener('click', () => closeModal(modalCreateTenant, modalCreateTenantContent));
+
+    document.getElementById('ct-nombre').addEventListener('input', (e) => {
+        const slug = document.getElementById('ct-slug');
+        if (!slug._edited) {
+            slug.value = e.target.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 -]/g, '').trim().replace(/\s+/g, '-');
+        }
+    });
+    document.getElementById('ct-slug').addEventListener('input', (e) => e.target._edited = true);
+
+    formCreateTenant.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const body = {
+            nombre: document.getElementById('ct-nombre').value,
+            slug: document.getElementById('ct-slug').value,
+            rubro_id: document.getElementById('ct-rubro').value,
+            email: document.getElementById('ct-email').value,
+            password: document.getElementById('ct-password').value
+        };
+        try {
+            await apiFetch('/api/tenants/super-create', { method: 'POST', body: JSON.stringify(body) });
+            showAlert('Creado', 'Cliente creado y activado', 'success');
+            closeModal(modalCreateTenant, modalCreateTenantContent);
+            await loadTenants();
+        } catch (err) {
+            showAlert('Error', err.message, 'error');
+        }
+    });
+
     // ─── Approve Modal ────────────────────────────────────────────────────────
     btnApproveCancel.addEventListener('click', () => closeModal(modalApprove, modalApproveContent));
     btnApproveConfirm.addEventListener('click', async () => {
@@ -379,6 +551,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 250);
     });
 
+    // ─── Nav switching ────────────────────────────────────────────────────────
+    const switchNav = (activeNav, activeView) => {
+        [navPanel, navRubros, navPlanes].forEach(nav => {
+            if(nav) {
+                nav.classList.remove('active', 'text-indigo-400');
+                nav.classList.add('text-slate-400');
+            }
+        });
+        [viewTenants, viewRubros, viewPlanes].forEach(view => {
+            if(view) view.classList.add('hidden');
+        });
+        
+        activeNav.classList.add('active', 'text-indigo-400');
+        activeNav.classList.remove('text-slate-400');
+        activeView.classList.remove('hidden');
+        
+        if(activeView === viewTenants) topBar.classList.remove('hidden');
+        else topBar.classList.add('hidden');
+    };
+
+    navPanel.addEventListener('click', () => switchNav(navPanel, viewTenants));
+    navRubros.addEventListener('click', () => switchNav(navRubros, viewRubros));
+    if(navPlanes) navPlanes.addEventListener('click', () => switchNav(navPlanes, viewPlanes));
+
     // ─── Logout ───────────────────────────────────────────────────────────────
     btnLogout.addEventListener('click', () => {
         localStorage.removeItem('masterToken');
@@ -429,6 +625,115 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal(modal, content);
     };
 
+    // ─── Planes y Precios ──────────────────────────────────────────────────────
+    const loadPlanes = async () => {
+        try {
+            const result = await apiFetch('/api/planes');
+            renderPlanes(result.data || []);
+        } catch (err) {
+            if(planesList) planesList.innerHTML = `<div class="text-center py-10 text-rose-400 font-bold">${err.message}</div>`;
+        }
+    };
+
+    const renderPlanes = (list) => {
+        if (!planesList) return;
+        if (list.length === 0) {
+            planesList.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500 font-bold">No hay planes creados.</div>`;
+            return;
+        }
+        planesList.innerHTML = list.map(p => `
+            <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-5 flex flex-col relative">
+                ${p.activo ? '<span class="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-wider border border-emerald-500/30">Activo</span>' : '<span class="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-400 text-[10px] font-black uppercase tracking-wider border border-slate-500/30">Inactivo</span>'}
+                <h4 class="font-black text-white text-lg mb-1">${p.nombre}</h4>
+                <p class="text-3xl font-black text-indigo-400 mb-4">$${Number(p.precio).toLocaleString('es-AR')}</p>
+                <div class="space-y-2 mb-6 flex-1">
+                    ${(p.caracteristicas || '').split(',').map(c => c.trim()).filter(c=>c).map(c => `
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span class="text-sm text-slate-300">${c}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="flex items-center gap-2 mt-auto pt-4 border-t border-slate-700/50">
+                    <button class="flex-1 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700 font-bold text-sm transition-colors btn-edit-plan" 
+                        data-id="${p.id}" data-nombre="${p.nombre}" data-precio="${p.precio}" data-carac="${p.caracteristicas || ''}" data-activo="${p.activo}">
+                        Editar Plan
+                    </button>
+                    <button class="px-3 py-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors btn-delete-plan" data-id="${p.id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    };
+
+    if(planesList) {
+        planesList.addEventListener('click', async (e) => {
+            const btnEdit = e.target.closest('.btn-edit-plan');
+            const btnDelete = e.target.closest('.btn-delete-plan');
+
+            if (btnEdit) {
+                document.getElementById('modal-plan-title').textContent = 'Editar Plan';
+                document.getElementById('p-id').value = btnEdit.dataset.id;
+                document.getElementById('p-nombre').value = btnEdit.dataset.nombre;
+                document.getElementById('p-precio').value = btnEdit.dataset.precio;
+                document.getElementById('p-carac').value = btnEdit.dataset.carac;
+                document.getElementById('p-activo').checked = btnEdit.dataset.activo == '1';
+                openModal(modalPlan, modalPlanContent);
+            }
+
+            if (btnDelete) {
+                const id = btnDelete.dataset.id;
+                showConfirm('Eliminar Plan', '¿Estás seguro? Esta acción no se puede deshacer.', async () => {
+                    try {
+                        await apiFetch(`/api/planes/${id}`, { method: 'DELETE' });
+                        showAlert('Eliminado', 'Plan eliminado', 'success');
+                        await loadPlanes();
+                    } catch (err) { showAlert('Error', err.message, 'error'); }
+                });
+            }
+        });
+    }
+
+    if(btnCreatePlan) {
+        btnCreatePlan.addEventListener('click', () => {
+            document.getElementById('modal-plan-title').textContent = 'Nuevo Plan';
+            formPlan.reset();
+            document.getElementById('p-id').value = '';
+            openModal(modalPlan, modalPlanContent);
+        });
+    }
+
+    if(btnPCancel) btnPCancel.addEventListener('click', () => closeModal(modalPlan, modalPlanContent));
+
+    if(formPlan) {
+        formPlan.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('p-id').value;
+            const body = {
+                nombre: document.getElementById('p-nombre').value,
+                precio: document.getElementById('p-precio').value,
+                caracteristicas: document.getElementById('p-carac').value,
+                activo: document.getElementById('p-activo').checked
+            };
+            try {
+                if (id) {
+                    await apiFetch(`/api/planes/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+                    showAlert('Actualizado', 'Plan actualizado', 'success');
+                } else {
+                    await apiFetch('/api/planes', { method: 'POST', body: JSON.stringify(body) });
+                    showAlert('Creado', 'Plan creado', 'success');
+                }
+                closeModal(modalPlan, modalPlanContent);
+                await loadPlanes();
+            } catch (err) {
+                showAlert('Error', err.message, 'error');
+            }
+        });
+    }
+
     // ─── Init ─────────────────────────────────────────────────────────────────
+    loadRubros();
     loadTenants();
+    loadPlanes();
 });

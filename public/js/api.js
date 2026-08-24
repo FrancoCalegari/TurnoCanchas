@@ -4,12 +4,25 @@ const API_BASE = '/api';
 
 window.API = {
     /**
+     * Helper para extraer slug público
+     */
+    getPublicTenant: () => {
+        const path = window.location.pathname;
+        if (path.startsWith('/t/')) {
+            return path.split('/t/')[1].split('/')[0];
+        }
+        return null;
+    },
+
+    /**
      * Obtiene la lista de canchas disponibles
      * @returns {Promise<Array>} Array de objetos cancha
      */
     getCanchas: async () => {
         try {
-            const res = await fetch(`${API_BASE}/canchas`);
+            const tenant = window.API.getPublicTenant();
+            const url = tenant ? `${API_BASE}/canchas?tenant=${tenant}` : `${API_BASE}/canchas`;
+            const res = await fetch(url);
             if (!res.ok) throw new Error('Error fetching canchas');
             const result = await res.json();
             return result.data || [];
@@ -78,7 +91,10 @@ window.API = {
      */
     getReservasPorFecha: async (date) => {
         try {
-            const res = await fetch(`${API_BASE}/reservas?fecha=${date}`);
+            const tenant = window.API.getPublicTenant();
+            let url = `${API_BASE}/reservas?fecha=${date}`;
+            if (tenant) url += `&tenant=${tenant}`;
+            const res = await fetch(url);
             if (!res.ok) throw new Error('Error fetching reservas');
             const result = await res.json();
             return result.data || [];
@@ -285,7 +301,10 @@ window.API = {
     // ==========================================
     getAjustes: async () => {
         try {
-            const res = await fetch(`${API_BASE}/ajustes`);
+            const tenant = window.API.getPublicTenant();
+            let url = `${API_BASE}/ajustes`;
+            if (tenant) url += `?tenant=${tenant}`;
+            const res = await fetch(url);
             if (!res.ok) return null;
             const response = await res.json();
             return response.data;

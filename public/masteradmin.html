@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Super Admin — TurnoCanchas</title>
+    <title>Panel Super Admin — Servicio Digital</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
@@ -36,12 +36,10 @@
     <aside class="w-56 min-h-screen bg-[#13161f] border-r border-slate-800/60 flex flex-col shrink-0">
         <div class="p-5 border-b border-slate-800/60">
             <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-                </div>
+                <img src="/img/logo.jpg" alt="Logo ServicioDigital" class="w-8 h-8 rounded-xl shadow-lg object-cover">
                 <div>
                     <p class="text-[11px] font-bold text-indigo-400 uppercase tracking-widest">SaaS Control</p>
-                    <p class="text-xs text-slate-500 font-medium">TurnoCanchas</p>
+                    <p class="text-xs text-slate-500 font-medium">Servicio Digital</p>
                 </div>
             </div>
         </div>
@@ -57,8 +55,16 @@
             </a>
             <a href="#" id="nav-panel" class="sidebar-item active flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold cursor-pointer transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-                Panel Super Admin
+                Clientes (Tenants)
                 <span id="badge-total" class="ml-auto bg-indigo-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">0</span>
+            </a>
+            <a href="#" id="nav-rubros" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-400 cursor-pointer transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Gestión de Rubros
+            </a>
+            <a href="#" id="nav-planes" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-400 cursor-pointer transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Planes y Precios
             </a>
             <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-400 cursor-pointer transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
@@ -95,6 +101,10 @@
             </div>
 
             <!-- Global action -->
+            <button id="btn-create-tenant" class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-black rounded-lg shadow-lg shadow-emerald-500/20 transition-all shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                Crear Cliente
+            </button>
             <button id="btn-renew-all" class="flex items-center gap-1.5 px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-900 text-xs font-black rounded-lg shadow-lg shadow-amber-400/20 transition-all shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-6h2v6zm0-8h-2v-2h2v2z"/></svg>
                 +30 Días a Todos
@@ -102,13 +112,33 @@
         </div>
 
         <!-- Cards area -->
-        <div class="flex-1 overflow-y-auto p-6">
+        <div id="view-tenants" class="flex-1 overflow-y-auto p-6">
             <div id="tenants-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                 <!-- Loading state -->
                 <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-600">
                     <svg class="animate-spin h-8 w-8 mb-4 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     <p class="font-bold">Cargando tenants...</p>
                 </div>
+            </div>
+        </div>
+
+        <div id="view-rubros" class="flex-1 overflow-y-auto p-6 hidden">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-black text-white">Gestión de Rubros</h2>
+                <button id="btn-create-rubro" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-black rounded-xl shadow-lg transition-all">+ Nuevo Rubro</button>
+            </div>
+            <div id="rubros-list" class="space-y-3">
+                <!-- Se cargará por JS -->
+            </div>
+        </div>
+
+        <div id="view-planes" class="flex-1 overflow-y-auto p-6 hidden">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-black text-white">Planes y Precios</h2>
+                <button id="btn-create-plan" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-black rounded-xl shadow-lg transition-all">+ Nuevo Plan</button>
+            </div>
+            <div id="planes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Se cargará por JS -->
             </div>
         </div>
     </main>
@@ -160,6 +190,96 @@
                 <button id="confirm-btn-cancel" class="flex-1 py-3 text-sm font-bold text-slate-400 hover:text-white border border-slate-700 rounded-xl transition-colors">Cancelar</button>
                 <button id="confirm-btn-ok" class="flex-1 py-3 text-sm font-black text-white bg-rose-600 hover:bg-rose-500 rounded-xl transition-colors">Confirmar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal: Create Tenant -->
+    <div id="modal-create-tenant" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div id="modal-create-tenant-content" class="bg-[#1a1f2e] border border-slate-700/60 rounded-3xl shadow-2xl w-full max-w-md p-6 scale-95 opacity-0 transition-all duration-300">
+            <h3 class="font-black text-white text-lg mb-4">Crear Nuevo Cliente</h3>
+            <form id="form-create-tenant" class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 mb-1 block">Nombre del Negocio</label>
+                    <input type="text" id="ct-nombre" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 mb-1 block">URL (Slug)</label>
+                    <input type="text" id="ct-slug" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 mb-1 block">Rubro</label>
+                    <select id="ct-rubro" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50">
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 mb-1 block">Email (Admin)</label>
+                    <input type="email" id="ct-email" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 mb-1 block">Contraseña Inicial</label>
+                    <input type="text" id="ct-password" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50">
+                </div>
+                <div class="flex gap-3 mt-5 pt-3 border-t border-slate-700/50">
+                    <button type="button" id="btn-ct-cancel" class="flex-1 py-2.5 text-sm font-bold text-slate-400 hover:text-white border border-slate-700 rounded-xl transition-colors">Cancelar</button>
+                    <button type="submit" id="btn-ct-confirm" class="flex-1 py-2.5 text-sm font-black text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors">Crear Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Rubro -->
+    <div id="modal-rubro" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div id="modal-rubro-content" class="bg-[#1a1f2e] border border-slate-700/60 rounded-3xl shadow-2xl w-full max-w-sm p-6 scale-95 opacity-0 transition-all duration-300">
+            <h3 id="modal-rubro-title" class="font-black text-white text-lg mb-4">Rubro</h3>
+            <form id="form-rubro" class="space-y-3">
+                <input type="hidden" id="r-id">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 mb-1 block">Nombre</label>
+                    <input type="text" id="r-nombre" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 mb-1 block">Descripción</label>
+                    <textarea id="r-desc" rows="2" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50"></textarea>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="r-activo" checked class="rounded bg-slate-800 border-slate-700 text-indigo-500 focus:ring-indigo-500/30">
+                    <label class="text-xs font-bold text-slate-400">Activo</label>
+                </div>
+                <div class="flex gap-3 mt-5 pt-3 border-t border-slate-700/50">
+                    <button type="button" id="btn-r-cancel" class="flex-1 py-2.5 text-sm font-bold text-slate-400 hover:text-white border border-slate-700 rounded-xl transition-colors">Cancelar</button>
+                    <button type="submit" class="flex-1 py-2.5 text-sm font-black text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Plan -->
+    <div id="modal-plan" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div id="modal-plan-content" class="bg-[#1a1f2e] border border-slate-700/60 rounded-3xl shadow-2xl w-full max-w-sm p-6 scale-95 opacity-0 transition-all duration-300">
+            <h3 id="modal-plan-title" class="font-black text-white text-lg mb-4">Plan</h3>
+            <form id="form-plan" class="space-y-3">
+                <input type="hidden" id="p-id">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 mb-1 block">Nombre del Plan</label>
+                    <input type="text" id="p-nombre" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 mb-1 block">Precio (ARS)</label>
+                    <input type="number" id="p-precio" required min="0" step="1" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 mb-1 block">Características (Separadas por coma)</label>
+                    <textarea id="p-carac" rows="3" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50" placeholder="Ej: Gestión de turnos, Soporte 24/7"></textarea>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="p-activo" checked class="rounded bg-slate-800 border-slate-700 text-indigo-500 focus:ring-indigo-500/30">
+                    <label class="text-xs font-bold text-slate-400">Activo</label>
+                </div>
+                <div class="flex gap-3 mt-5 pt-3 border-t border-slate-700/50">
+                    <button type="button" id="btn-p-cancel" class="flex-1 py-2.5 text-sm font-bold text-slate-400 hover:text-white border border-slate-700 rounded-xl transition-colors">Cancelar</button>
+                    <button type="submit" class="flex-1 py-2.5 text-sm font-black text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors">Guardar</button>
+                </div>
+            </form>
         </div>
     </div>
 

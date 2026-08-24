@@ -1,119 +1,198 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Cuenta - Turnos</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/js/api.js"></script>
+    <title>Crear Cuenta - Servicio Digital</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', system-ui, sans-serif; }
-        @media (prefers-color-scheme: dark) {
-            body { background: #020617; color: #f1f5f9; }
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#10b981',
+                        dark: '#060e18'
+                    }
+                }
+            }
         }
+    </script>
+    <script src="/js/api.js"></script>
+    <style>
+        body { background-color: #060e18; color: #f8fafc; }
+        .hero-gradient {
+            background: radial-gradient(circle at top left, rgba(16, 185, 129, 0.3), transparent 60%),
+                        radial-gradient(circle at bottom right, rgba(79, 70, 229, 0.4), transparent 60%),
+                        #060e18;
+        }
+        .glass-panel {
+            background: rgba(6, 14, 24, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #060e18; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center p-4">
+<body class="font-sans antialiased min-h-screen flex text-slate-100 selection:bg-indigo-500/30">
 
-    <div class="w-full max-w-md">
-        <!-- Card -->
-        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-8">
-            <!-- Header -->
-            <div class="text-center mb-7">
-                <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-600/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                    </svg>
+    <!-- Lado Izquierdo: Branding (Oculto en móvil) -->
+    <div class="hidden lg:flex lg:w-1/2 hero-gradient relative items-center justify-center p-12 overflow-hidden">
+        <!-- Decoración de fondo -->
+        <div class="absolute inset-0 w-full h-full opacity-20" style="background-image: radial-gradient(#10b981 1px, transparent 1px); background-size: 40px 40px;"></div>
+        
+        <div class="relative z-10 max-w-lg">
+            <div class="inline-flex items-center gap-3 mb-10">
+                <img src="/img/logo.jpg" alt="Logo ServicioDigital" class="w-12 h-12 rounded-xl shadow-lg shadow-indigo-500/30 object-cover">
+                <span class="text-3xl font-black tracking-tight text-white">Servicio<span class="text-indigo-400">Digital</span></span>
+            </div>
+            <h1 class="text-5xl font-black text-white leading-tight mb-6">
+                Únete a la <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-indigo-400">revolución</span>
+            </h1>
+            <p class="text-lg text-slate-400 font-medium">Regístrate en segundos y comienza a reservar y gestionar tus servicios favoritos con total facilidad.</p>
+            
+            <div class="mt-12 space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                        <svg class="w-4 h-4 text-emerald-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span class="text-slate-300 font-medium">Reservas instantáneas</span>
                 </div>
-                <h1 class="text-2xl font-black text-slate-900 dark:text-white">Crear Cuenta</h1>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">Reservá más rápido y consultá tu historial</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+                        <svg class="w-4 h-4 text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span class="text-slate-300 font-medium">Historial completo</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
+                        <svg class="w-4 h-4 text-purple-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span class="text-slate-300 font-medium">Avisos y recordatorios</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lado Derecho: Formulario -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-[#060e18] relative">
+        <a href="/" class="absolute top-6 left-6 lg:top-8 lg:right-8 lg:left-auto text-sm font-bold text-slate-400 hover:text-white transition-colors flex items-center gap-2 group z-10">
+            <svg class="group-hover:-translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            Volver
+        </a>
+
+        <div class="w-full max-w-md my-auto">
+            <!-- Header Móvil -->
+            <div class="flex lg:hidden items-center gap-2 mb-8 justify-center mt-6">
+                <img src="/img/logo.jpg" alt="Logo ServicioDigital" class="w-8 h-8 rounded-lg shadow-lg shadow-indigo-500/30 object-cover">
+                <span class="text-xl font-black tracking-tight text-white">Servicio<span class="text-indigo-400">Digital</span></span>
             </div>
 
-            <!-- Form -->
+            <div class="text-left mb-8">
+                <h2 class="text-3xl font-black text-white mb-2">Crear una cuenta</h2>
+                <p class="text-slate-400 font-medium text-sm">Completa tus datos para empezar a reservar.</p>
+            </div>
+            
             <form id="register-form" class="space-y-4" novalidate>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Nombre Completo *</label>
-                    <input type="text" id="nombre" required placeholder="Ej: Juan Pérez"
-                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:font-normal placeholder:text-slate-400">
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-slate-300">Nombre Completo *</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <input type="text" id="nombre" required placeholder="Ej: Juan Pérez" class="w-full bg-[#181c28] border border-slate-700/60 rounded-xl pl-10 pr-4 py-3 text-sm font-semibold text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600">
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Correo Electrónico *</label>
-                    <input type="email" id="email" required placeholder="tu@email.com"
-                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:font-normal placeholder:text-slate-400">
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-slate-300">Correo Electrónico *</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                        </div>
+                        <input type="email" id="email" required placeholder="tu@email.com" class="w-full bg-[#181c28] border border-slate-700/60 rounded-xl pl-10 pr-4 py-3 text-sm font-semibold text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600">
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Teléfono (WhatsApp)</label>
-                    <input type="tel" id="telefono" placeholder="Ej: 1122334455"
-                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:font-normal placeholder:text-slate-400">
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-slate-300">Teléfono (WhatsApp)</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        </div>
+                        <input type="tel" id="telefono" placeholder="Ej: 1122334455" class="w-full bg-[#181c28] border border-slate-700/60 rounded-xl pl-10 pr-4 py-3 text-sm font-semibold text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600">
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Contraseña *</label>
-                    <div class="relative">
-                        <input type="password" id="password" required placeholder="Mínimo 8 caracteres"
-                            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all pr-11 placeholder:font-normal placeholder:text-slate-400">
-                        <button type="button" id="toggle-pw" tabindex="-1" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer">
-                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-slate-300">Contraseña *</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <input type="password" id="password" required placeholder="Mínimo 6 caracteres" class="w-full bg-[#181c28] border border-slate-700/60 rounded-xl pl-10 pr-10 py-3 text-sm font-semibold text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600">
+                        <button type="button" id="toggle-pw" tabindex="-1" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-slate-300 cursor-pointer">
+                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
-                    <p class="text-[11px] text-slate-400 mt-1">Tu contraseña se guarda de forma segura y encriptada.</p>
                 </div>
 
                 <!-- Términos y Condiciones -->
-                <div class="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-3.5 border border-slate-200 dark:border-slate-700">
+                <div class="bg-[#181c28] rounded-xl p-3.5 border border-slate-700/60 mt-4">
                     <label class="flex items-start gap-3 cursor-pointer group">
-                        <input type="checkbox" id="acepta-terminos" required
-                            class="mt-0.5 w-4 h-4 accent-blue-600 shrink-0 cursor-pointer">
-                        <span class="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                        <input type="checkbox" id="acepta-terminos" required class="mt-0.5 w-4 h-4 accent-indigo-500 shrink-0 cursor-pointer rounded border-slate-700 bg-slate-800 focus:ring-indigo-500 focus:ring-offset-slate-900">
+                        <span class="text-[11px] text-slate-400 font-medium leading-relaxed">
                             He leído y acepto los
-                            <button type="button" id="btn-ver-terminos" class="font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">Términos y Condiciones</button>
+                            <button type="button" id="btn-ver-terminos" class="font-bold text-indigo-400 hover:text-indigo-300 hover:underline cursor-pointer transition-colors">Términos y Condiciones</button>
                             y la
-                            <button type="button" id="btn-ver-privacidad" class="font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">Política de Privacidad</button>
-                            del servicio.
+                            <button type="button" id="btn-ver-privacidad" class="font-bold text-indigo-400 hover:text-indigo-300 hover:underline cursor-pointer transition-colors">Política de Privacidad</button>.
                         </span>
                     </label>
                 </div>
 
-                <div id="error-msg" class="text-rose-500 text-xs font-bold hidden text-center bg-rose-50 dark:bg-rose-900/20 rounded-xl p-3"></div>
-                <div id="success-msg" class="text-emerald-600 text-xs font-bold hidden text-center bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-3"></div>
+                <div id="error-msg" class="text-rose-400 text-xs font-bold hidden text-center bg-rose-500/10 border border-rose-500/20 rounded-xl p-3"></div>
+                <div id="success-msg" class="text-emerald-400 text-xs font-bold hidden text-center bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3"></div>
 
-                <button type="submit" id="btn-submit"
-                    class="w-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-extrabold text-sm py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/30 mt-1">
-                    Crear Cuenta
+                <button type="submit" id="btn-submit" class="w-full bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white font-black text-sm py-4 rounded-xl transition-all shadow-[0_0_20px_-5px_rgba(79,70,229,0.4)] hover:shadow-[0_0_30px_-5px_rgba(79,70,229,0.6)] mt-4 flex justify-center items-center gap-2 group/btn">
+                    <span>Crear Cuenta</span>
+                    <svg class="group-hover/btn:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </button>
             </form>
-
-            <div class="mt-5 text-center text-sm font-bold text-slate-500">
-                ¿Ya tenés cuenta? <a href="/loginuser.html" class="text-blue-600 hover:underline">Iniciá sesión</a>
-            </div>
-            <div class="mt-3 text-center">
-                <a href="/" class="text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">← Volver al inicio</a>
+            
+            <div class="mt-8 text-center text-sm font-medium text-slate-400">
+                ¿Ya tenés cuenta? <a href="/loginuser.html" class="text-indigo-400 hover:text-indigo-300 font-bold transition-colors">Iniciar sesión</a>
             </div>
         </div>
     </div>
 
     <!-- Modal Términos y Condiciones -->
-    <div id="modal-terminos" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div id="modal-terminos-content" class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col scale-95 opacity-0 transition-all duration-300">
-            <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
-                <h2 id="modal-terminos-titulo" class="text-base font-black text-slate-900 dark:text-white">Términos y Condiciones</h2>
-                <button id="btn-close-terminos" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-all cursor-pointer">
+    <div id="modal-terminos" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-[#0f1117]/80 backdrop-blur-sm">
+        <div id="modal-terminos-content" class="bg-[#181c28] border border-slate-700 rounded-3xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col scale-95 opacity-0 transition-all duration-300">
+            <div class="p-5 border-b border-slate-700/60 flex items-center justify-between shrink-0">
+                <h2 id="modal-terminos-titulo" class="text-base font-black text-white">Términos y Condiciones</h2>
+                <button id="btn-close-terminos" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-800 text-slate-400 transition-all cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
-            <div id="modal-terminos-body" class="overflow-y-auto p-5 text-sm text-slate-600 dark:text-slate-300 space-y-4 leading-relaxed">
+            <div id="modal-terminos-body" class="overflow-y-auto p-6 text-sm text-slate-300 space-y-5 leading-relaxed custom-scrollbar">
                 <!-- Contenido inyectado por JS -->
             </div>
-            <div class="p-4 border-t border-slate-100 dark:border-slate-800 shrink-0 flex gap-3">
-                <button id="btn-aceptar-terminos" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-all cursor-pointer">
+            <div class="p-5 border-t border-slate-700/60 shrink-0 flex gap-3">
+                <button id="btn-aceptar-terminos" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition-all cursor-pointer shadow-lg shadow-indigo-500/20">
                     Aceptar y Cerrar
                 </button>
-                <button id="btn-cerrar-terminos" class="px-5 py-3 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-xl text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer">
+                <button id="btn-cerrar-terminos" class="px-5 py-3 border border-slate-700 text-slate-300 font-bold rounded-xl text-sm hover:bg-slate-800 transition-all cursor-pointer">
                     Cerrar
                 </button>
             </div>
@@ -122,48 +201,33 @@
 
     <script>
         const TERMINOS_CONTENT = `
-            <h3 class="font-black text-slate-900 dark:text-white text-sm">1. Aceptación de los Términos</h3>
+            <h3 class="font-black text-white text-sm">1. Aceptación de los Términos</h3>
             <p>Al registrarte en esta plataforma, aceptás los presentes Términos y Condiciones. Si no estás de acuerdo con alguna de estas condiciones, no deberías utilizar el servicio.</p>
 
-            <h3 class="font-black text-slate-900 dark:text-white text-sm">2. Registro y Cuenta</h3>
+            <h3 class="font-black text-white text-sm mt-4">2. Registro y Cuenta</h3>
             <p>Al crear una cuenta sos responsable de mantener la confidencialidad de tus credenciales. La información proporcionada debe ser veraz y actualizada. Nos reservamos el derecho de suspender cuentas con información falsa.</p>
 
-            <h3 class="font-black text-slate-900 dark:text-white text-sm">3. Uso del Servicio</h3>
-            <p>La plataforma permite reservar turnos para el uso de instalaciones deportivas. Las reservas están sujetas a disponibilidad y pueden ser canceladas con al menos 2 horas de anticipación. Reservas no canceladas dentro del plazo podrán ser penalizadas.</p>
+            <h3 class="font-black text-white text-sm mt-4">3. Uso del Servicio</h3>
+            <p>La plataforma permite reservar turnos para el uso de instalaciones o servicios profesionales. Las reservas están sujetas a disponibilidad y a las políticas específicas de cada proveedor de servicios (tenant).</p>
 
-            <h3 class="font-black text-slate-900 dark:text-white text-sm">4. Pagos y Cancelaciones</h3>
-            <p>El pago de turnos podrá realizarse en el establecimiento o mediante los métodos habilitados. Las cancelaciones tardías o ausencias reiteradas pueden resultar en la suspensión temporal del acceso al servicio de reservas.</p>
-
-            <h3 class="font-black text-slate-900 dark:text-white text-sm">5. Privacidad</h3>
-            <p>Tu información personal (nombre, email, teléfono) se utilizará exclusivamente para gestionar tus reservas y enviarte notificaciones relacionadas al servicio. No se comparte con terceros sin tu consentimiento. Las contraseñas se almacenan encriptadas.</p>
-
-            <h3 class="font-black text-slate-900 dark:text-white text-sm">6. Modificaciones</h3>
-            <p>Podemos actualizar estos términos en cualquier momento. Te notificaremos sobre cambios significativos mediante el email registrado. El uso continuado del servicio implica la aceptación de los términos actualizados.</p>
-
-            <h3 class="font-black text-slate-900 dark:text-white text-sm">7. Contacto</h3>
-            <p>Para cualquier consulta sobre estos términos, podés contactarnos a través de los medios disponibles en la página principal del sitio.</p>
+            <h3 class="font-black text-white text-sm mt-4">4. Privacidad</h3>
+            <p>Tu información personal se utilizará exclusivamente para gestionar tus reservas y enviarte notificaciones. No se comparte con terceros sin tu consentimiento. Las contraseñas se almacenan encriptadas.</p>
         `;
 
         const PRIVACIDAD_CONTENT = `
-            <h3 class="font-black text-slate-900 dark:text-white text-sm">Política de Privacidad</h3>
+            <h3 class="font-black text-white text-sm">Política de Privacidad</h3>
             <p>Esta política describe cómo recopilamos y usamos tu información personal.</p>
 
-            <h3 class="font-black text-slate-900 dark:text-white text-sm">Datos que recopilamos</h3>
-            <ul class="list-disc pl-5 space-y-1">
+            <h3 class="font-black text-white text-sm mt-4">Datos que recopilamos</h3>
+            <ul class="list-disc pl-5 space-y-1 text-slate-400">
                 <li>Nombre completo</li>
                 <li>Correo electrónico</li>
-                <li>Número de teléfono (opcional)</li>
+                <li>Número de teléfono</li>
                 <li>Historial de reservas</li>
             </ul>
 
-            <h3 class="font-black text-slate-900 dark:text-white text-sm">Cómo usamos tus datos</h3>
-            <p>Usamos tus datos únicamente para gestionar tus reservas, enviarte confirmaciones y recordatorios, y mejorar la experiencia del servicio.</p>
-
-            <h3 class="font-black text-slate-900 dark:text-white text-sm">Seguridad</h3>
-            <p>Tus contraseñas se almacenan con encriptación <strong>bcrypt</strong>. Nunca guardamos contraseñas en texto plano. Aplicamos medidas de seguridad estándar para proteger tu información.</p>
-
-            <h3 class="font-black text-slate-900 dark:text-white text-sm">Tus derechos</h3>
-            <p>Podés solicitar la eliminación de tu cuenta y datos en cualquier momento contactándonos directamente.</p>
+            <h3 class="font-black text-white text-sm mt-4">Seguridad</h3>
+            <p>Tus contraseñas se almacenan de forma segura utilizando algoritmos de hash criptográfico. Nunca guardamos contraseñas en texto plano.</p>
         `;
 
         // Modal logic
@@ -211,6 +275,7 @@
             const btn = document.getElementById('btn-submit');
             const errorMsg = document.getElementById('error-msg');
             const successMsg = document.getElementById('success-msg');
+            const btnText = btn.querySelector('span');
 
             const nombre = document.getElementById('nombre').value.trim();
             const email = document.getElementById('email').value.trim();
@@ -221,42 +286,35 @@
             errorMsg.classList.add('hidden');
             successMsg.classList.add('hidden');
 
-            // Validaciones frontend
-            if (!nombre || !email || !password) {
-                errorMsg.innerText = 'Por favor completá todos los campos obligatorios.';
-                errorMsg.classList.remove('hidden');
-                return;
-            }
-            if (password.length < 6) {
-                errorMsg.innerText = 'La contraseña debe tener al menos 6 caracteres.';
-                errorMsg.classList.remove('hidden');
-                return;
-            }
             if (!aceptaTerminos) {
-                errorMsg.innerText = 'Debés aceptar los Términos y Condiciones para continuar.';
+                errorMsg.innerText = 'Debés aceptar los Términos y Condiciones.';
                 errorMsg.classList.remove('hidden');
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = 'Creando cuenta...';
+            btnText.innerText = 'Creando cuenta...';
 
             try {
                 await window.API.clientRegister({ nombre, email, telefono, password, acepta_terminos: true });
+                
+                // Auto-login attempt
+                try {
+                    await window.API.clientLogin(email, password);
+                } catch(e) {
+                    console.log("Auto-login fallback");
+                }
 
-                // Auto-login
-                await window.API.clientLogin(email, password);
-
-                successMsg.innerText = '¡Cuenta creada exitosamente! Redirigiendo...';
+                successMsg.innerText = '¡Cuenta creada! Redirigiendo...';
                 successMsg.classList.remove('hidden');
 
-                setTimeout(() => { window.location.href = '/'; }, 1200);
+                setTimeout(() => { window.location.href = '/'; }, 1500);
             } catch (err) {
                 errorMsg.innerText = err.message || 'Error al registrarse. Intentá de nuevo.';
                 errorMsg.classList.remove('hidden');
             } finally {
                 btn.disabled = false;
-                btn.innerText = 'Crear Cuenta';
+                btnText.innerText = 'Crear Cuenta';
             }
         });
     </script>

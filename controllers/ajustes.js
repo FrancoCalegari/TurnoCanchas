@@ -2,7 +2,20 @@ const { executeQuery } = require('../config/db');
 
 const getAjustes = async (req, res) => {
     try {
-        const result = await executeQuery('SELECT * FROM ajustes_complejo WHERE id = 1');
+        let tenantFilter = 'tenant_id = 0'; // Fallback to 0 if no tenant specified
+        if (req.tenant && req.tenant.id) {
+            tenantFilter = `tenant_id = ${req.tenant.id}`;
+        } else if (req.query.tenant) {
+            const safeSlug = String(req.query.tenant).replace(/'/g, "''");
+            const tRes = await executeQuery(`SELECT id FROM tenants WHERE slug = '${safeSlug}'`);
+            if (tRes && tRes.length > 0) {
+                tenantFilter = `tenant_id = ${tRes[0].id}`;
+            } else {
+                return res.status(404).json({ error: 'Tenant no encontrado' });
+            }
+        }
+
+        const result = await executeQuery(`SELECT * FROM ajustes_complejo WHERE ${tenantFilter}`);
         if (!result || result.length === 0) {
             return res.status(404).json({ error: 'Configuración no encontrada' });
         }
@@ -62,7 +75,8 @@ const updateAjustes = async (req, res) => {
             return res.status(400).json({ error: 'No data to update' });
         }
 
-        const query = `UPDATE ajustes_complejo SET ${updates.join(', ')} WHERE id = 1`;
+        const tenantId = req.tenant ? req.tenant.id : 0;
+        const query = `UPDATE ajustes_complejo SET ${updates.join(', ')} WHERE tenant_id = ${tenantId}`;
         await executeQuery(query);
 
         res.json({ message: 'Ajustes actualizados exitosamente' });

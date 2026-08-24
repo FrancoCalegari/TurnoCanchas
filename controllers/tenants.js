@@ -14,7 +14,7 @@ const calcDiasRestantes = (fechaVencimiento) => {
 // ─── Registro público de tenant (dueño de cancha) ─────────────────────────────
 const registerTenant = async (req, res) => {
     try {
-        const { nombre, slug, email, password, telefono, ubicacion } = req.body;
+        const { nombre, slug, email, password, telefono, ubicacion, rubro_id } = req.body;
 
         if (!nombre || !slug || !email || !password) {
             return res.status(400).json({ error: 'Faltan campos obligatorios (nombre, slug, email, password)' });
@@ -38,13 +38,71 @@ const registerTenant = async (req, res) => {
 
         const hash = await bcrypt.hash(String(password), SALT_ROUNDS);
         const safeHash = hash.replace(/'/g, "''");
+        const safeRubroId = rubro_id ? parseInt(rubro_id) : 1;
 
         await executeQuery(`
-            INSERT INTO tenants (nombre, slug, email, password_hash, telefono, ubicacion, estado)
-            VALUES ('${safeNombre}', '${safeSlug}', '${safeEmail}', '${safeHash}', '${safeTel}', '${safeUbicacion}', 'pendiente')
+            INSERT INTO tenants (nombre, slug, email, password_hash, telefono, ubicacion, estado, rubro_id)
+            VALUES ('${safeNombre}', '${safeSlug}', '${safeEmail}', '${safeHash}', '${safeTel}', '${safeUbicacion}', 'pendiente', ${safeRubroId})
         `);
 
         res.status(201).json({ message: 'Solicitud enviada exitosamente. Tu cuenta será revisada por el administrador.' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// ─── Creación Manual de Tenant desde Super Admin ──────────────────────────────
+const superCreateTenant = async (req, res) => {
+    try {
+        const { nombre, slug, email, password, telefono, ubicacion, rubro_id } = req.body;
+
+        if (!nombre || !slug || !email || !password || !rubro_id) {
+            return res.status(400).json({ error: 'Faltan campos obligatorios' });
+        }
+
+        const safeSlug = String(slug).toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/'/g, "''");
+        const safeEmail = String(email).replace(/'/g, "''").toLowerCase();
+        const safeNombre = String(nombre).replace(/'/g, "''");
+        const safeTel = String(telefono || '').replace(/'/g, "''");
+        const safeUbicacion = String(ubicacion || '').replace(/'/g, "''");
+        const safeRubroId = parseInt(rubro_id);
+
+        const existingSlug = await executeQuery(`SELECT id FROM tenants WHERE slug = '${safeSlug}'`);
+        if (existingSlug && existingSlug.length > 0) return res.status(400).json({ error: 'El slug ya está en uso' });
+        const existingEmail = await executeQuery(`SELECT id FROM tenants WHERE email = '${safeEmail}'`);
+        if (existingEmail && existingEmail.length > 0) return res.status(400).json({ error: 'El email ya está en uso' });
+
+        const hash = await bcrypt.hash(String(password), SALT_ROUNDS);
+        const safeHash = hash.replace(/'/g, "''");
+
+        // Crear Tenant activo y un mes de prueba
+        const vence = new Date();
+        vence.setMonth(vence.getMonth() + 1);
+        const fechaVenc = vence.toISOString();
+
+        await executeQuery(`
+            INSERT INTO tenants (nombre, slug, email, password_hash, telefono, ubicacion, estado, rubro_id, fecha_vencimiento)
+            VALUES ('${safeNombre}', '${safeSlug}', '${safeEmail}', '${safeHash}', '${safeTel}', '${safeUbicacion}', 'activo', ${safeRubroId}, '${fechaVenc}')
+        `);
+
+        // Get created tenant ID (simplified by slug as we just created it)
+        const newT = await executeQuery(`SELECT id FROM tenants WHERE slug = '${safeSlug}'`);
+        const tenantId = newT[0].id;
+
+        // Crear ajustes iniciales
+        const ajusteId = 100 + parseInt(tenantId);
+        await executeQuery(`
+            INSERT INTO ajustes_complejo (id, tenant_id, nombre_complejo, open_time, close_time, wpp_contacto, ubicacion_maps)
+            VALUES (${ajusteId}, ${tenantId}, '${safeNombre}', '08:00', '23:00', '${safeTel}', '${safeUbicacion}')
+        `);
+
+        // Crear usuario admin inicial
+        await executeQuery(`
+            INSERT INTO admin_users (username, password_hash, tenant_id)
+            VALUES ('${safeSlug}', '${safeHash}', ${tenantId})
+        `);
+
+        res.status(201).json({ message: 'Cliente creado y activado exitosamente' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -141,7 +199,13 @@ const listTenants = async (req, res) => {
             }
         }
 
-        const tenants = await executeQuery(`SELECT * FROM tenants ${whereClause} ORDER BY createdAt DESC`);
+        const tenants = await executeQuery(`
+            SELECT t.*, r.nombre as rubro_nombre 
+            FROM tenants t 
+            LEFT JOIN rubros r ON t.rubro_id = r.id 
+            ${whereClause} 
+            ORDER BY t.createdAt DESC
+        `);
         if (!tenants || tenants.length === 0) {
             return res.json({ data: [] });
         }
@@ -348,4 +412,5 @@ module.exports = {
     renewTenant,
     renewAllTenants,
     impersonateTenant,
+    superCreateTenant
 };
