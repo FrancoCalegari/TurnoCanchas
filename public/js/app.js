@@ -79,10 +79,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if (ajustes.logo_url) {
                 const logoImg = document.getElementById('header-logo');
                 if (logoImg) logoImg.src = ajustes.logo_url;
+                
+                // Update favicon
+                let favicon = document.querySelector('link[rel="icon"]');
+                if (!favicon) {
+                    favicon = document.createElement('link');
+                    favicon.rel = 'icon';
+                    document.head.appendChild(favicon);
+                }
+                favicon.href = ajustes.logo_url;
             }
             if (ajustes.hero_image_url) {
                 const heroImg = document.getElementById('hero-image');
                 if (heroImg) heroImg.src = ajustes.hero_image_url;
+            }
+            if (ajustes.hero_image_url_2) {
+                const heroImg2 = document.getElementById('hero-image-2');
+                if (heroImg2) heroImg2.src = ajustes.hero_image_url_2;
+            }
+            if (ajustes.hero_image_url_3) {
+                const heroImg3 = document.getElementById('hero-image-3');
+                if (heroImg3) heroImg3.src = ajustes.hero_image_url_3;
             }
             if (ajustes.hero_title) {
                 const heroTitle = document.getElementById('header-title');
@@ -101,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderCalendar();
         setupEventListeners();
+        setupCarousel();
         await loadData();
     }
 
@@ -702,6 +720,88 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
         }
+    }
+
+    function setupCarousel() {
+        let currentSlide = 0;
+        const totalSlides = 3;
+        const prevBtn = document.getElementById('carousel-prev');
+        const nextBtn = document.getElementById('carousel-next');
+        const indicator = document.getElementById('carousel-indicator');
+        
+        const slides = [
+            document.getElementById('carousel-slide-1'),
+            document.getElementById('carousel-slide-2'),
+            document.getElementById('carousel-slide-3')
+        ];
+        
+        const dots = [
+            document.getElementById('carousel-dot-1'),
+            document.getElementById('carousel-dot-2'),
+            document.getElementById('carousel-dot-3')
+        ];
+
+        function updateSlide(index) {
+            slides.forEach((slide, i) => {
+                if (!slide) return;
+                if (i === index) {
+                    slide.classList.remove('opacity-0', 'z-0', 'pointer-events-none');
+                    slide.classList.add('opacity-100', 'z-10');
+                } else {
+                    slide.classList.remove('opacity-100', 'z-10');
+                    slide.classList.add('opacity-0', 'z-0', 'pointer-events-none');
+                }
+            });
+
+            dots.forEach((dot, i) => {
+                if (!dot) return;
+                if (i === index) {
+                    dot.className = 'transition-all rounded-full cursor-pointer w-6 h-2 bg-blue-500 shadow-sm';
+                } else {
+                    dot.className = 'transition-all rounded-full cursor-pointer w-2 h-2 bg-white/50 hover:bg-white/80';
+                }
+            });
+
+            if (indicator) {
+                indicator.innerText = `Instalaciones del Complejo (${index + 1}/${totalSlides})`;
+            }
+            
+            currentSlide = index;
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                let newIndex = currentSlide - 1;
+                if (newIndex < 0) newIndex = totalSlides - 1;
+                updateSlide(newIndex);
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                let newIndex = currentSlide + 1;
+                if (newIndex >= totalSlides) newIndex = 0;
+                updateSlide(newIndex);
+            });
+        }
+
+        dots.forEach((dot, i) => {
+            if (dot) {
+                dot.addEventListener('click', () => {
+                    updateSlide(i);
+                });
+            }
+        });
+
+        // Initialize first slide
+        updateSlide(0);
+        
+        // Auto-advance every 5 seconds
+        setInterval(() => {
+            let newIndex = currentSlide + 1;
+            if (newIndex >= totalSlides) newIndex = 0;
+            updateSlide(newIndex);
+        }, 5000);
     }
 
     // Start

@@ -398,6 +398,57 @@
                             <input type="text" id="ubicacion_maps" name="ubicacion_maps" class="input-field w-full p-2">
                         </div>
                     </div>
+                    <!-- Branding -->
+                    <div class="space-y-4">
+                        <div>
+                            <label for="logo_url" class="block text-sm font-medium mb-1">Logo del Emprendimiento</label>
+                            <div class="flex gap-2">
+                                <input type="url" id="logo_url" name="logo_url" placeholder="https://ejemplo.com/mi-logo.png" class="input-field w-full p-2">
+                                <label class="cursor-pointer bg-slate-700 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition whitespace-nowrap flex items-center justify-center">
+                                    <span>Subir Foto</span>
+                                    <input type="file" id="logo_upload" class="hidden" accept="image/*" onchange="uploadImage(event, 'logo_url')">
+                                </label>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1">Podés pegar un enlace directo o subir una foto desde tu dispositivo. Esta imagen se usará como ícono (favicon) en tu página pública.</p>
+                        </div>
+                        
+                        <div class="pt-2 border-t border-slate-700">
+                            <h4 class="text-sm font-bold mb-3 text-slate-300">Imágenes del Carrusel (Página Pública)</h4>
+                            
+                            <!-- Carrusel 1 -->
+                            <div class="mb-3">
+                                <label for="hero_image_url" class="block text-xs font-medium mb-1">Imagen 1</label>
+                                <div class="flex gap-2">
+                                    <input type="url" id="hero_image_url" placeholder="URL de la imagen 1" class="input-field w-full p-2">
+                                    <label class="cursor-pointer bg-slate-700 hover:bg-indigo-600 text-white px-3 py-2 rounded-lg transition whitespace-nowrap flex items-center justify-center text-xs">
+                                        Subir <input type="file" class="hidden" accept="image/*" onchange="uploadImage(event, 'hero_image_url')">
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Carrusel 2 -->
+                            <div class="mb-3">
+                                <label for="hero_image_url_2" class="block text-xs font-medium mb-1">Imagen 2</label>
+                                <div class="flex gap-2">
+                                    <input type="url" id="hero_image_url_2" placeholder="URL de la imagen 2" class="input-field w-full p-2">
+                                    <label class="cursor-pointer bg-slate-700 hover:bg-indigo-600 text-white px-3 py-2 rounded-lg transition whitespace-nowrap flex items-center justify-center text-xs">
+                                        Subir <input type="file" class="hidden" accept="image/*" onchange="uploadImage(event, 'hero_image_url_2')">
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Carrusel 3 -->
+                            <div>
+                                <label for="hero_image_url_3" class="block text-xs font-medium mb-1">Imagen 3</label>
+                                <div class="flex gap-2">
+                                    <input type="url" id="hero_image_url_3" placeholder="URL de la imagen 3" class="input-field w-full p-2">
+                                    <label class="cursor-pointer bg-slate-700 hover:bg-indigo-600 text-white px-3 py-2 rounded-lg transition whitespace-nowrap flex items-center justify-center text-xs">
+                                        Subir <input type="file" class="hidden" accept="image/*" onchange="uploadImage(event, 'hero_image_url_3')">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
 
@@ -719,6 +770,10 @@
                 document.getElementById('close_time').value      = ajustes.close_time      || '23:00';
                 document.getElementById('wpp_contacto').value    = ajustes.wpp_contacto    || '';
                 document.getElementById('ubicacion_maps').value  = ajustes.ubicacion_maps  || '';
+                document.getElementById('logo_url').value        = ajustes.logo_url        || '';
+                document.getElementById('hero_image_url').value  = ajustes.hero_image_url  || '';
+                document.getElementById('hero_image_url_2').value = ajustes.hero_image_url_2 || '';
+                document.getElementById('hero_image_url_3').value = ajustes.hero_image_url_3 || '';
             } catch (e) {
                 console.error('Error cargando ajustes:', e);
             }
@@ -731,12 +786,43 @@
                 close_time:      document.getElementById('close_time').value,
                 wpp_contacto:    document.getElementById('wpp_contacto').value,
                 ubicacion_maps:  document.getElementById('ubicacion_maps').value,
+                logo_url:        document.getElementById('logo_url').value,
+                hero_image_url:  document.getElementById('hero_image_url').value,
+                hero_image_url_2: document.getElementById('hero_image_url_2').value,
+                hero_image_url_3: document.getElementById('hero_image_url_3').value,
             };
             try {
                 await window.API.updateAjustes(formData);
                 showToast('Configuración guardada exitosamente', 'success');
             } catch (e) {
                 showToast(`Error: ${e.message}`, 'error');
+            }
+        }
+
+        async function uploadImage(event, targetId) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('logo', file);
+            
+            const API_BASE = '/api';
+
+            try {
+                const res = await fetch(`${API_BASE}/upload/logo`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Tenant ${localStorage.getItem('tenantToken')}`
+                    },
+                    body: formData
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Error al subir la imagen');
+                
+                document.getElementById(targetId).value = data.url;
+                showToast('Imagen subida correctamente, recordá guardar los ajustes.', 'success');
+            } catch (e) {
+                showToast(e.message, 'error');
             }
         }
 

@@ -19,6 +19,7 @@ router.use('/ajustes', ajustesRoutes);
 router.use('/tenants', tenantsRoutes);
 router.use('/rubros', rubrosRoutes);
 router.use('/planes', require('./planes'));
+router.use('/upload', require('./upload'));
 
 module.exports = router;
 

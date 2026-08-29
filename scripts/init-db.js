@@ -133,6 +133,8 @@ async function initDB() {
             "ALTER TABLE ajustes_complejo ADD COLUMN ubicacion_maps VARCHAR(500)",
             "ALTER TABLE ajustes_complejo ADD COLUMN logo_url VARCHAR(500)",
             "ALTER TABLE ajustes_complejo ADD COLUMN hero_image_url VARCHAR(500)",
+            "ALTER TABLE ajustes_complejo ADD COLUMN hero_image_url_2 VARCHAR(500)",
+            "ALTER TABLE ajustes_complejo ADD COLUMN hero_image_url_3 VARCHAR(500)",
             "ALTER TABLE ajustes_complejo ADD COLUMN hero_title VARCHAR(200)",
             "ALTER TABLE ajustes_complejo ADD COLUMN canchas_title VARCHAR(100)",
             "ALTER TABLE ajustes_complejo ADD COLUMN nosotros_title VARCHAR(100)",
