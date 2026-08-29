@@ -401,6 +401,31 @@ const impersonateTenant = async (req, res) => {
     }
 };
 
+// ─── Estadísticas globales (Dashboard SuperAdmin) ──────────────────────────────
+const getTenantStats = async (req, res) => {
+    try {
+        const [totalRes, activosRes, pendientesRes, suspendidosRes, planesRes] = await Promise.all([
+            executeQuery(`SELECT COUNT(*) as count FROM tenants`),
+            executeQuery(`SELECT COUNT(*) as count FROM tenants WHERE estado = 'activo'`),
+            executeQuery(`SELECT COUNT(*) as count FROM tenants WHERE estado = 'pendiente'`),
+            executeQuery(`SELECT COUNT(*) as count FROM tenants WHERE estado = 'suspendido'`),
+            executeQuery(`SELECT precio FROM planes WHERE activo = 1 LIMIT 1`)
+        ]);
+
+        const total = Array.isArray(totalRes) && totalRes[0] ? parseInt(totalRes[0].count) : 0;
+        const activos = Array.isArray(activosRes) && activosRes[0] ? parseInt(activosRes[0].count) : 0;
+        const pendientes = Array.isArray(pendientesRes) && pendientesRes[0] ? parseInt(pendientesRes[0].count) : 0;
+        const suspendidos = Array.isArray(suspendidosRes) && suspendidosRes[0] ? parseInt(suspendidosRes[0].count) : 0;
+        
+        const planBasePrecio = Array.isArray(planesRes) && planesRes[0] ? parseInt(planesRes[0].precio) : 0;
+        const mrr = activos * planBasePrecio;
+
+        res.json({ data: { total, activos, pendientes, suspendidos, mrr } });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     registerTenant,
     loginTenant,
@@ -412,5 +437,6 @@ module.exports = {
     renewTenant,
     renewAllTenants,
     impersonateTenant,
-    superCreateTenant
+    superCreateTenant,
+    getTenantStats
 };

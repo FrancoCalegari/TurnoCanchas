@@ -24,9 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCreateTenant = document.getElementById('btn-create-tenant');
 
     // Views
-    const navPanel = document.getElementById('nav-panel');
+    const navDashboard = document.getElementById('nav-dashboard');
+    const navTenants = document.getElementById('nav-tenants');
     const navRubros = document.getElementById('nav-rubros');
     const navPlanes = document.getElementById('nav-planes');
+    const viewDashboard = document.getElementById('view-dashboard');
     const viewTenants = document.getElementById('view-tenants');
     const viewRubros = document.getElementById('view-rubros');
     const viewPlanes = document.getElementById('view-planes');
@@ -553,13 +555,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ─── Nav switching ────────────────────────────────────────────────────────
     const switchNav = (activeNav, activeView) => {
-        [navPanel, navRubros, navPlanes].forEach(nav => {
+        [navDashboard, navTenants, navRubros, navPlanes].forEach(nav => {
             if(nav) {
                 nav.classList.remove('active', 'text-indigo-400');
                 nav.classList.add('text-slate-400');
             }
         });
-        [viewTenants, viewRubros, viewPlanes].forEach(view => {
+        [viewDashboard, viewTenants, viewRubros, viewPlanes].forEach(view => {
             if(view) view.classList.add('hidden');
         });
         
@@ -571,8 +573,12 @@ document.addEventListener('DOMContentLoaded', () => {
         else topBar.classList.add('hidden');
     };
 
-    navPanel.addEventListener('click', () => switchNav(navPanel, viewTenants));
-    navRubros.addEventListener('click', () => switchNav(navRubros, viewRubros));
+    if(navDashboard) navDashboard.addEventListener('click', () => {
+        switchNav(navDashboard, viewDashboard);
+        loadDashboardStats();
+    });
+    if(navTenants) navTenants.addEventListener('click', () => switchNav(navTenants, viewTenants));
+    if(navRubros) navRubros.addEventListener('click', () => switchNav(navRubros, viewRubros));
     if(navPlanes) navPlanes.addEventListener('click', () => switchNav(navPlanes, viewPlanes));
 
     // ─── Logout ───────────────────────────────────────────────────────────────
@@ -733,7 +739,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ─── Init ─────────────────────────────────────────────────────────────────
+    const loadDashboardStats = async () => {
+        try {
+            // Usa apiFetch para mantener los headers correctos
+            const res = await apiFetch('/api/tenants/stats');
+            if (res && res.data) {
+                const { total, activos, pendientes, suspendidos, mrr } = res.data;
+                document.getElementById('stat-total').textContent = total;
+                document.getElementById('stat-activos').textContent = activos;
+                document.getElementById('stat-pendientes').textContent = pendientes + suspendidos;
+                
+                const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
+                document.getElementById('stat-mrr').textContent = formatter.format(mrr);
+            }
+        } catch (error) {
+            console.error('Error cargando stats:', error);
+        }
+    };
+
+    // Hacer window.loadDashboardStats global si es necesario
+    window.loadDashboardStats = loadDashboardStats;
+
     loadRubros();
     loadTenants();
     loadPlanes();
+    
+    if (navDashboard && viewDashboard && !viewDashboard.classList.contains('hidden')) {
+        loadDashboardStats();
+    }
 });

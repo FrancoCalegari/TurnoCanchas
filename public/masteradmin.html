@@ -53,8 +53,12 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                 Auditoría & Logs
             </a>
-            <a href="#" id="nav-panel" class="sidebar-item active flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold cursor-pointer transition-all">
+            <a href="#" id="nav-dashboard" class="sidebar-item active flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold cursor-pointer transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                Resumen (Dashboard)
+            </a>
+            <a href="#" id="nav-tenants" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-400 cursor-pointer transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 Clientes (Tenants)
                 <span id="badge-total" class="ml-auto bg-indigo-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">0</span>
             </a>
@@ -111,8 +115,39 @@
             </button>
         </div>
 
+        <!-- Dashboard area -->
+        <div id="view-dashboard" class="flex-1 overflow-y-auto p-6">
+            <h2 class="text-xl font-black text-white mb-6">Resumen General</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- KPI 1 -->
+                <div class="bg-[#1a1f2e] border border-slate-700/60 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-2xl"></div>
+                    <p class="text-xs font-bold text-slate-400 mb-2">Total de Clientes</p>
+                    <h3 id="stat-total" class="text-3xl font-black text-white">0</h3>
+                </div>
+                <!-- KPI 2 -->
+                <div class="bg-[#1a1f2e] border border-slate-700/60 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-emerald-500/10 rounded-full blur-2xl"></div>
+                    <p class="text-xs font-bold text-slate-400 mb-2">Clientes Activos</p>
+                    <h3 id="stat-activos" class="text-3xl font-black text-emerald-400">0</h3>
+                </div>
+                <!-- KPI 3 -->
+                <div class="bg-[#1a1f2e] border border-slate-700/60 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-amber-500/10 rounded-full blur-2xl"></div>
+                    <p class="text-xs font-bold text-slate-400 mb-2">Pendientes / Suspendidos</p>
+                    <h3 id="stat-pendientes" class="text-3xl font-black text-amber-400">0</h3>
+                </div>
+                <!-- KPI 4 -->
+                <div class="bg-[#1a1f2e] border border-emerald-500/30 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent"></div>
+                    <p class="text-xs font-bold text-emerald-400 mb-2">MRR Estimado</p>
+                    <h3 id="stat-mrr" class="text-3xl font-black text-white relative z-10">$0</h3>
+                </div>
+            </div>
+        </div>
+
         <!-- Cards area -->
-        <div id="view-tenants" class="flex-1 overflow-y-auto p-6">
+        <div id="view-tenants" class="flex-1 overflow-y-auto p-6 hidden">
             <div id="tenants-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                 <!-- Loading state -->
                 <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-600">
