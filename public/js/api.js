@@ -3,6 +3,15 @@
 const API_BASE = '/api';
 
 window.API = {
+    _getHeaders: (isJson = true) => {
+        const headers = {};
+        if (isJson) headers['Content-Type'] = 'application/json';
+        const tenantToken = localStorage.getItem('tenantToken');
+        if (tenantToken) { headers['Authorization'] = 'Tenant ' + tenantToken; return headers; }
+        const adminToken = localStorage.getItem('adminToken');
+        if (adminToken) { headers['Authorization'] = 'Tenant ' + adminToken; }
+        return headers;
+    },
     /**
      * Helper para extraer slug público
      */
@@ -11,6 +20,8 @@ window.API = {
         if (path.startsWith('/t/')) {
             return path.split('/t/')[1].split('/')[0];
         }
+        const tData = window.API.getTenantInfo ? window.API.getTenantInfo() : null;
+        if (tData && tData.slug) return tData.slug;
         return null;
     },
 
@@ -38,7 +49,7 @@ window.API = {
     crearCancha: async (data) => {
         const res = await fetch(`${API_BASE}/canchas`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: window.API._getHeaders(),
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error('Error creating cancha');
@@ -51,7 +62,7 @@ window.API = {
     actualizarCancha: async (id, data) => {
         const res = await fetch(`${API_BASE}/canchas/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: window.API._getHeaders(),
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error('Error updating cancha');
@@ -62,9 +73,7 @@ window.API = {
      * Elimina una cancha (Solo Admin)
      */
     eliminarCancha: async (id) => {
-        const res = await fetch(`${API_BASE}/canchas/${id}`, {
-            method: 'DELETE'
-        });
+        const res = await fetch(`${API_BASE}/canchas/${id}`, { method: 'DELETE', headers: window.API._getHeaders(false) });
         if (!res.ok) throw new Error('Error deleting cancha');
         return await res.json();
     },
@@ -110,7 +119,7 @@ window.API = {
     clientLogin: async (email, password) => {
         const res = await fetch(`${API_BASE}/auth/cliente/login`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: window.API._getHeaders(),
             body: JSON.stringify({ email, password })
         });
         const data = await res.json();
@@ -127,7 +136,7 @@ window.API = {
     clientRegister: async (userData) => {
         const res = await fetch(`${API_BASE}/auth/cliente/register`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: window.API._getHeaders(),
             body: JSON.stringify(userData)
         });
         const data = await res.json();
@@ -152,7 +161,7 @@ window.API = {
     crearReserva: async (data) => {
         const res = await fetch(`${API_BASE}/reservas`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: window.API._getHeaders(),
             body: JSON.stringify(data)
         });
         if (!res.ok) {
@@ -167,11 +176,7 @@ window.API = {
      * Actualiza el estado de una reserva
      */
     updateReservaStatus: async (id, status) => {
-        const res = await fetch(`${API_BASE}/reservas/${id}/status`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status })
-        });
+        const res = await fetch(`${API_BASE}/reservas/${id}/status`, { method: 'PUT', headers: window.API._getHeaders(), body: JSON.stringify({ status }) });
         if (!res.ok) {
             const err = await res.json();
             throw new Error(err.error || 'Error al actualizar reserva');
@@ -185,7 +190,7 @@ window.API = {
      */
     getReservasRecientesAdmin: async () => {
         try {
-            const res = await fetch(`${API_BASE}/reservas/recientes`);
+            const res = await fetch(`${API_BASE}/reservas/recientes`, { headers: window.API._getHeaders(false) });
             if (!res.ok) throw new Error('Error fetching recent reservas');
             const result = await res.json();
             return result.data || [];
@@ -207,7 +212,7 @@ window.API = {
             if (filtros.estado) params.set('estado', filtros.estado);
             if (filtros.desde) params.set('desde', filtros.desde);
             if (filtros.hasta) params.set('hasta', filtros.hasta);
-            const res = await fetch(`${API_BASE}/reservas/admin?${params.toString()}`);
+            const res = await fetch(`${API_BASE}/reservas/admin?${params.toString()}`, { headers: window.API._getHeaders(false) });
             if (!res.ok) throw new Error('Error fetching admin reservas');
             const result = await res.json();
             return result.data || [];
@@ -238,7 +243,7 @@ window.API = {
     updatePlataforma: async (data) => {
         const res = await fetch(`${API_BASE}/plataforma`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: window.API._getHeaders(),
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error('Error updating platform state');
@@ -252,7 +257,7 @@ window.API = {
         try {
             const res = await fetch(`${API_BASE}/auth/login`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: window.API._getHeaders(),
                 body: JSON.stringify({ username, password })
             });
             if (!res.ok) throw new Error('Credenciales incorrectas');
@@ -276,7 +281,7 @@ window.API = {
         try {
             const res = await fetch(`${API_BASE}/auth/masterlogin`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: window.API._getHeaders(),
                 body: JSON.stringify({ username, password })
             });
             if (!res.ok) throw new Error('Credenciales incorrectas');
@@ -294,6 +299,64 @@ window.API = {
         localStorage.removeItem('masterToken');
         localStorage.removeItem('masterUser');
         window.location.href = '/masterlogin.html';
+    },
+
+    // ==========================================
+    // TENANT AUTH (propietario del negocio)
+    // ==========================================
+
+    /**
+     * Login del tenant propietario
+     * @param {string} email
+     * @param {string} password
+     * @returns {Promise<Object>} { token, tenant }
+     */
+    tenantLogin: async (email, password) => {
+        try {
+            const res = await fetch(`${API_BASE}/tenants/login`, {
+                method: 'POST',
+                headers: window.API._getHeaders(),
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Error en login');
+            localStorage.setItem('tenantToken', data.token);
+            localStorage.setItem('tenantData', JSON.stringify(data.tenant));
+            return data;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    },
+
+    /**
+     * Cierra sesión del tenant propietario
+     */
+    tenantLogout: () => {
+        localStorage.removeItem('tenantToken');
+        localStorage.removeItem('tenantData');
+        window.location.href = '/login.html';
+    },
+
+    /**
+     * Obtiene los datos del tenant desde localStorage
+     * @returns {Object|null} datos del tenant o null si no hay sesión
+     */
+    getTenantInfo: () => {
+        try {
+            const data = localStorage.getItem('tenantData');
+            return data ? JSON.parse(data) : null;
+        } catch {
+            return null;
+        }
+    },
+
+    /**
+     * Verifica si hay sesión de tenant activa
+     * @returns {boolean}
+     */
+    isTenantLoggedIn: () => {
+        return !!localStorage.getItem('tenantToken') && !!localStorage.getItem('tenantData');
     },
 
     // ==========================================
@@ -318,7 +381,7 @@ window.API = {
         try {
             const res = await fetch(`${API_BASE}/ajustes`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: window.API._getHeaders(),
                 body: JSON.stringify(data)
             });
             if (!res.ok) throw new Error('Error al actualizar ajustes');
