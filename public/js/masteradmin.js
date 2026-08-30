@@ -28,10 +28,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const navTenants = document.getElementById('nav-tenants');
     const navRubros = document.getElementById('nav-rubros');
     const navPlanes = document.getElementById('nav-planes');
+    const navConfig = document.getElementById('nav-config');
+    const navLogs = document.getElementById('nav-logs');
+    const navPwa = document.getElementById('nav-pwa');
+
     const viewDashboard = document.getElementById('view-dashboard');
     const viewTenants = document.getElementById('view-tenants');
     const viewRubros = document.getElementById('view-rubros');
     const viewPlanes = document.getElementById('view-planes');
+    const viewConfig = document.getElementById('view-config');
+    const viewLogs = document.getElementById('view-logs');
+    const viewPwa = document.getElementById('view-pwa');
     const topBar = viewTenants.previousElementSibling; // The search/filter bar is only for tenants for now
 
     // Modal: Approve
@@ -47,6 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalCreateTenantContent = document.getElementById('modal-create-tenant-content');
     const formCreateTenant = document.getElementById('form-create-tenant');
     const btnCtCancel = document.getElementById('btn-ct-cancel');
+
+    // Modal: Edit Tenant
+    const modalEditTenant = document.getElementById('modal-edit-tenant');
+    const modalEditTenantContent = document.getElementById('modal-edit-tenant-content');
+    const formEditTenant = document.getElementById('form-edit-tenant');
+    const btnEtCancel = document.getElementById('btn-et-cancel');
     
     // Modal: Rubro
     const modalRubro = document.getElementById('modal-rubro');
@@ -104,12 +117,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await apiFetch('/api/rubros');
             renderRubros(result.data || []);
             
-            // Populate select in Create Tenant modal
-            const select = document.getElementById('ct-rubro');
-            select.innerHTML = '<option value="">Seleccionar Rubro...</option>';
-            (result.data || []).forEach(r => {
-                select.innerHTML += `<option value="${r.id}">${r.nombre}</option>`;
-            });
+            // Populate select in Create/Edit Tenant modal
+            const selectCt = document.getElementById('ct-rubro');
+            const selectEt = document.getElementById('et-rubro');
+            const options = '<option value="">Seleccionar Rubro...</option>' + 
+                (result.data || []).map(r => `<option value="${r.id}">${r.nombre}</option>`).join('');
+            
+            if (selectCt) selectCt.innerHTML = options;
+            if (selectEt) selectEt.innerHTML = options;
         } catch (err) {
             rubrosList.innerHTML = `<div class="text-center py-10 text-rose-400 font-bold">${err.message}</div>`;
         }
@@ -322,6 +337,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const suspendBtn = e.target.closest('.btn-suspend');
         const activateBtn = e.target.closest('.btn-activate');
         const renewOneBtn = e.target.closest('.btn-renew-one');
+        const editBtn = e.target.closest('.btn-edit');
+
+        if (editBtn) {
+            const id = editBtn.dataset.id;
+            const t = allTenants.find(tenant => tenant.id == id);
+            if (t) {
+                document.getElementById('et-id').value = t.id;
+                document.getElementById('et-nombre').value = t.nombre;
+                document.getElementById('et-telefono').value = t.telefono || '';
+                document.getElementById('et-email').value = t.email || '';
+                document.getElementById('et-ubicacion').value = t.ubicacion || '';
+                if (document.getElementById('et-rubro')) {
+                    document.getElementById('et-rubro').value = t.rubro_id || '';
+                }
+                openModal(modalEditTenant, modalEditTenantContent);
+            }
+        }
 
         if (approveBtn) {
             pendingApproveTenantId = approveBtn.dataset.id;
@@ -334,11 +366,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = impersonateBtn.dataset.id;
             try {
                 const res = await apiFetch(`/api/tenants/${id}/impersonate`, { method: 'POST' });
-                localStorage.setItem('adminToken', res.token);
-                localStorage.setItem('adminUser', res.tenant.nombre);
-                localStorage.setItem('tenantId', res.tenant.id);
-                localStorage.setItem('tenantSlug', res.tenant.slug);
-                window.open('/admin', '_blank');
+                localStorage.setItem('tenantToken', res.token);
+                localStorage.setItem('tenantData', JSON.stringify(res.tenant));
+                window.open('/admin.html', '_blank');
             } catch (err) {
                 showAlert('Error', err.message, 'error');
             }
@@ -495,6 +525,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ─── Modal Edit Tenant ────────────────────────────────────────────────────
+    if (btnEtCancel) btnEtCancel.addEventListener('click', () => closeModal(modalEditTenant, modalEditTenantContent));
+
+    if (formEditTenant) {
+        formEditTenant.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('et-id').value;
+            const body = {
+                nombre: document.getElementById('et-nombre').value,
+                telefono: document.getElementById('et-telefono').value,
+                email: document.getElementById('et-email').value,
+                ubicacion: document.getElementById('et-ubicacion').value,
+                rubro_id: document.getElementById('et-rubro').value
+            };
+            try {
+                await apiFetch(`/api/tenants/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+                showAlert('Actualizado', 'Datos del cliente actualizados', 'success');
+                closeModal(modalEditTenant, modalEditTenantContent);
+                await loadTenants();
+            } catch (err) {
+                showAlert('Error', err.message, 'error');
+            }
+        });
+    }
+
     // ─── Approve Modal ────────────────────────────────────────────────────────
     btnApproveCancel.addEventListener('click', () => closeModal(modalApprove, modalApproveContent));
     btnApproveConfirm.addEventListener('click', async () => {
@@ -555,19 +610,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ─── Nav switching ────────────────────────────────────────────────────────
     const switchNav = (activeNav, activeView) => {
-        [navDashboard, navTenants, navRubros, navPlanes].forEach(nav => {
+        const navs = [navDashboard, navTenants, navRubros, navPlanes, navConfig, navLogs, navPwa];
+        navs.forEach(nav => {
             if(nav) {
                 nav.classList.remove('active', 'text-indigo-400');
                 nav.classList.add('text-slate-400');
             }
         });
-        [viewDashboard, viewTenants, viewRubros, viewPlanes].forEach(view => {
+        
+        const views = [viewDashboard, viewTenants, viewRubros, viewPlanes, viewConfig, viewLogs, viewPwa];
+        views.forEach(view => {
             if(view) view.classList.add('hidden');
         });
         
-        activeNav.classList.add('active', 'text-indigo-400');
-        activeNav.classList.remove('text-slate-400');
-        activeView.classList.remove('hidden');
+        if (activeNav) {
+            activeNav.classList.add('active', 'text-indigo-400');
+            activeNav.classList.remove('text-slate-400');
+        }
+        if (activeView) {
+            activeView.classList.remove('hidden');
+        }
         
         if(activeView === viewTenants) topBar.classList.remove('hidden');
         else topBar.classList.add('hidden');
@@ -580,6 +642,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if(navTenants) navTenants.addEventListener('click', () => switchNav(navTenants, viewTenants));
     if(navRubros) navRubros.addEventListener('click', () => switchNav(navRubros, viewRubros));
     if(navPlanes) navPlanes.addEventListener('click', () => switchNav(navPlanes, viewPlanes));
+    if(navConfig) navConfig.addEventListener('click', () => switchNav(navConfig, viewConfig));
+    if(navLogs) navLogs.addEventListener('click', () => switchNav(navLogs, viewLogs));
+    if(navPwa) navPwa.addEventListener('click', () => switchNav(navPwa, viewPwa));
 
     // ─── Logout ───────────────────────────────────────────────────────────────
     btnLogout.addEventListener('click', () => {

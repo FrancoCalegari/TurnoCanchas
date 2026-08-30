@@ -150,6 +150,7 @@ const loginTenant = async (req, res) => {
                 estado: tenant.estado,
                 fecha_vencimiento: tenant.fecha_vencimiento,
                 dias_restantes: diasRestantes,
+                rubro_id: tenant.rubro_id
             }
         });
     } catch (error) {
@@ -200,7 +201,12 @@ const listTenants = async (req, res) => {
         }
 
         const tenants = await executeQuery(`
-            SELECT t.*, r.nombre as rubro_nombre 
+            SELECT 
+                t.*, 
+                r.nombre as rubro_nombre,
+                (SELECT COUNT(*) FROM canchas WHERE tenant_id = t.id) as canchas_count,
+                (SELECT COUNT(*) FROM reservas WHERE tenant_id = t.id AND estado != 'cancelada') as reservas_count,
+                (SELECT COUNT(*) FROM clientes WHERE tenant_id = t.id) as clientes_count
             FROM tenants t 
             LEFT JOIN rubros r ON t.rubro_id = r.id 
             ${whereClause} 
@@ -210,24 +216,21 @@ const listTenants = async (req, res) => {
             return res.json({ data: [] });
         }
 
-        // Agregar stats y días restantes a cada tenant
-        const tenantsWithStats = await Promise.all(tenants.map(async (t) => {
-            try {
-                const [canchasRes, reservasRes, clientesRes] = await Promise.all([
-                    executeQuery(`SELECT COUNT(*) as count FROM canchas WHERE tenant_id = ${t.id}`),
-                    executeQuery(`SELECT COUNT(*) as count FROM reservas WHERE tenant_id = ${t.id} AND estado != 'cancelada'`),
-                    executeQuery(`SELECT COUNT(*) as count FROM clientes WHERE tenant_id = ${t.id}`)
-                ]);
-                const canchas = Array.isArray(canchasRes) && canchasRes[0] ? parseInt(canchasRes[0].count) : 0;
-                const reservas = Array.isArray(reservasRes) && reservasRes[0] ? parseInt(reservasRes[0].count) : 0;
-                const clientes = Array.isArray(clientesRes) && clientesRes[0] ? parseInt(clientesRes[0].count) : 0;
-                const diasRestantes = calcDiasRestantes(t.fecha_vencimiento);
+        // Agregar stats y días restantes a cada tenant usando los datos que ya vienen de la consulta
+        const tenantsWithStats = tenants.map((t) => {
+            const canchas = parseInt(t.canchas_count) || 0;
+            const reservas = parseInt(t.reservas_count) || 0;
+            const clientes = parseInt(t.clientes_count) || 0;
+            const diasRestantes = calcDiasRestantes(t.fecha_vencimiento);
 
-                return { ...t, stats: { canchas, reservas, clientes }, dias_restantes: diasRestantes };
-            } catch (e) {
-                return { ...t, stats: { canchas: 0, reservas: 0, clientes: 0 }, dias_restantes: null };
-            }
-        }));
+            // Limpiamos los campos auxiliares de la respuesta final
+            const cleanT = { ...t };
+            delete cleanT.canchas_count;
+            delete cleanT.reservas_count;
+            delete cleanT.clientes_count;
+
+            return { ...cleanT, stats: { canchas, reservas, clientes }, dias_restantes: diasRestantes };
+        });
 
         // Filtrar por_vencer en JS (más preciso)
         let filtered = tenantsWithStats;
@@ -385,7 +388,7 @@ const renewAllTenants = async (req, res) => {
 const impersonateTenant = async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await executeQuery(`SELECT id, slug, nombre, estado FROM tenants WHERE id = ${parseInt(id)}`);
+        const result = await executeQuery(`SELECT id, slug, nombre, estado, rubro_id FROM tenants WHERE id = ${parseInt(id)}`);
         if (!result || result.length === 0) return res.status(404).json({ error: 'Tenant no encontrado' });
 
         const tenant = result[0];
@@ -394,7 +397,7 @@ const impersonateTenant = async (req, res) => {
 
         res.json({
             token,
-            tenant: { id: tenant.id, nombre: tenant.nombre, slug: tenant.slug }
+            tenant: { id: tenant.id, nombre: tenant.nombre, slug: tenant.slug, rubro_id: tenant.rubro_id }
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -404,20 +407,22 @@ const impersonateTenant = async (req, res) => {
 // ─── Estadísticas globales (Dashboard SuperAdmin) ──────────────────────────────
 const getTenantStats = async (req, res) => {
     try {
-        const [totalRes, activosRes, pendientesRes, suspendidosRes, planesRes] = await Promise.all([
-            executeQuery(`SELECT COUNT(*) as count FROM tenants`),
-            executeQuery(`SELECT COUNT(*) as count FROM tenants WHERE estado = 'activo'`),
-            executeQuery(`SELECT COUNT(*) as count FROM tenants WHERE estado = 'pendiente'`),
-            executeQuery(`SELECT COUNT(*) as count FROM tenants WHERE estado = 'suspendido'`),
-            executeQuery(`SELECT precio FROM planes WHERE activo = 1 LIMIT 1`)
-        ]);
+        const statsRes = await executeQuery(`
+            SELECT 
+                (SELECT COUNT(*) FROM tenants) as total,
+                (SELECT COUNT(*) FROM tenants WHERE estado = 'activo') as activos,
+                (SELECT COUNT(*) FROM tenants WHERE estado = 'pendiente') as pendientes,
+                (SELECT COUNT(*) FROM tenants WHERE estado = 'suspendido') as suspendidos,
+                (SELECT precio FROM planes WHERE activo = 1 LIMIT 1) as plan_precio
+        `);
 
-        const total = Array.isArray(totalRes) && totalRes[0] ? parseInt(totalRes[0].count) : 0;
-        const activos = Array.isArray(activosRes) && activosRes[0] ? parseInt(activosRes[0].count) : 0;
-        const pendientes = Array.isArray(pendientesRes) && pendientesRes[0] ? parseInt(pendientesRes[0].count) : 0;
-        const suspendidos = Array.isArray(suspendidosRes) && suspendidosRes[0] ? parseInt(suspendidosRes[0].count) : 0;
+        const stats = Array.isArray(statsRes) && statsRes[0] ? statsRes[0] : {};
+        const total = parseInt(stats.total) || 0;
+        const activos = parseInt(stats.activos) || 0;
+        const pendientes = parseInt(stats.pendientes) || 0;
+        const suspendidos = parseInt(stats.suspendidos) || 0;
+        const planBasePrecio = parseInt(stats.plan_precio) || 0;
         
-        const planBasePrecio = Array.isArray(planesRes) && planesRes[0] ? parseInt(planesRes[0].precio) : 0;
         const mrr = activos * planBasePrecio;
 
         res.json({ data: { total, activos, pendientes, suspendidos, mrr } });

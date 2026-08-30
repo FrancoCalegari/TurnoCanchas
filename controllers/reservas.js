@@ -1,4 +1,5 @@
 const { executeQuery } = require('../config/db');
+const { notifyReservationCreated, notifyReservationStatusChanged } = require('../utils/notifications');
 
 const getAll = async (req, res) => {
     try {
@@ -131,6 +132,21 @@ const create = async (req, res) => {
             message: 'Reserva creada con éxito', 
             data: { id, canchaId: safeCanchaId, fecha: safeFecha, hora: safeHora, cliente: safeCliente, cliente_id: safeClienteId !== 'NULL' ? safeClienteId : null, duracion: safeDuracion, precio: safePrecio }
         });
+
+        // Trigger Notification
+        if (safeClienteId !== 'NULL') {
+            try {
+                const cliRes = await executeQuery(`SELECT email, telefono, nombre FROM clientes WHERE id = ${safeClienteId}`);
+                if (cliRes && cliRes.length > 0) {
+                    await notifyReservationCreated({
+                        id, fecha: safeFecha, hora: safeHora, precio: safePrecio, cliente: safeCliente, estado: finalEstado
+                    }, cliRes[0]);
+                }
+            } catch (notiErr) {
+                console.error('Error enviando notificación (creación):', notiErr);
+            }
+        }
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -146,6 +162,24 @@ const updateStatus = async (req, res) => {
         await executeQuery(`UPDATE reservas SET estado = '${safeStatus}' WHERE id = '${id}' ${tenantFilter}`);
         
         res.json({ message: `Estado de la reserva ${id} actualizado a ${status}` });
+
+        // Trigger Notification
+        try {
+            const resData = await executeQuery(`
+                SELECT r.fecha, r.hora, r.cliente, c.email, c.telefono, c.nombre 
+                FROM reservas r 
+                LEFT JOIN clientes c ON r.cliente_id = c.id 
+                WHERE r.id = '${id}'
+            `);
+            if (resData && resData.length > 0) {
+                await notifyReservationStatusChanged({
+                    id, fecha: resData[0].fecha, hora: resData[0].hora, cliente: resData[0].cliente
+                }, resData[0], status);
+            }
+        } catch (notiErr) {
+            console.error('Error enviando notificación (update):', notiErr);
+        }
+        
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

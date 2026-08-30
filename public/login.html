@@ -165,7 +165,7 @@
 
             try {
                 await window.API.tenantLogin(email, pass);
-                window.location.href = '/tenant-dashboard.html';
+                window.location.href = '/admin.html';
             } catch (err) {
                 errorTxt.textContent = err.message || 'Error al iniciar sesión.';
                 errorMsg.classList.remove('hidden');
@@ -176,7 +176,7 @@
 
         // Si ya hay sesión activa, redirigir directo al dashboard
         if (window.API && window.API.isTenantLoggedIn && window.API.isTenantLoggedIn()) {
-            window.location.href = '/tenant-dashboard.html';
+            window.location.href = '/admin.html';
         }
     </script>
 </body>

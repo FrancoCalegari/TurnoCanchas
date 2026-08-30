@@ -32,22 +32,34 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!tableBody) return; // Ensure we are on admin page
         
         // 1. Check Authentication
-        const token = localStorage.getItem('adminToken');
-        if (!token) {
+        const token = localStorage.getItem('tenantToken');
+        if (!token || !window.API.isTenantLoggedIn()) {
             window.location.href = '/login.html';
             return;
         }
 
+        const tenantData = window.API.getTenantInfo();
+
         const usernameDisplay = document.getElementById('admin-username-display');
         if (usernameDisplay) {
-            usernameDisplay.innerText = localStorage.getItem('adminUser') || 'Admin';
+            usernameDisplay.innerText = tenantData ? tenantData.nombre : 'Admin';
         }
 
         const btnLogout = document.getElementById('btn-logout');
         if (btnLogout) {
             btnLogout.addEventListener('click', () => {
-                window.API.logout();
+                window.API.tenantLogout();
             });
+        }
+
+        // Lógica de Módulos Dinámicos según Rubro
+        if (tenantData && tenantData.rubro_id !== 1) {
+            // Ocultar módulo de Canchas
+            const navCanchas = document.getElementById('nav-canchas');
+            if (navCanchas) {
+                navCanchas.style.display = 'none';
+            }
+            // Módulos futuros irían aquí
         }
 
         
@@ -361,6 +373,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if(logoInput) logoInput.value = data.logo_url || '';
             const heroImageInput = document.getElementById('ajustes-hero-image');
             if(heroImageInput) heroImageInput.value = data.hero_image_url || '';
+            const heroImage2Input = document.getElementById('ajustes-hero-image-2');
+            if(heroImage2Input) heroImage2Input.value = data.hero_image_url_2 || '';
+            const heroImage3Input = document.getElementById('ajustes-hero-image-3');
+            if(heroImage3Input) heroImage3Input.value = data.hero_image_url_3 || '';
             const heroTitleInput = document.getElementById('ajustes-hero-title');
             if(heroTitleInput) heroTitleInput.value = data.hero_title || '';
             const canchasTitleInput = document.getElementById('ajustes-canchas-title');
@@ -388,6 +404,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         ubicacion_maps: document.getElementById('ajustes-maps') ? document.getElementById('ajustes-maps').value : '',
                         logo_url: document.getElementById('ajustes-logo') ? document.getElementById('ajustes-logo').value : '',
                         hero_image_url: document.getElementById('ajustes-hero-image') ? document.getElementById('ajustes-hero-image').value : '',
+                        hero_image_url_2: document.getElementById('ajustes-hero-image-2') ? document.getElementById('ajustes-hero-image-2').value : '',
+                        hero_image_url_3: document.getElementById('ajustes-hero-image-3') ? document.getElementById('ajustes-hero-image-3').value : '',
                         hero_title: document.getElementById('ajustes-hero-title') ? document.getElementById('ajustes-hero-title').value : '',
                         canchas_title: document.getElementById('ajustes-canchas-title') ? document.getElementById('ajustes-canchas-title').value : '',
                         nosotros_title: document.getElementById('ajustes-nosotros-title') ? document.getElementById('ajustes-nosotros-title').value : ''
