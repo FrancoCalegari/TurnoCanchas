@@ -89,4 +89,31 @@ const requireTenantActive = async (req, res, next) => {
     }
 };
 
-module.exports = { requireSuperAdmin, requireTenantAdmin, requireTenantActive };
+/**
+ * Verifica que el request venga de un cliente autenticado.
+ * Espera header: Authorization: Client <base64token>
+ * El token es: base64('client:{clientId}:{timestamp}') — generado por loginClient
+ * Inyecta req.clientId = clientId
+ */
+const requireClientAuth = (req, res, next) => {
+    const authHeader = req.headers['authorization'] || '';
+    if (!authHeader.startsWith('Client ')) {
+        return res.status(401).json({ error: 'Autenticación de cliente requerida' });
+    }
+    try {
+        const token = authHeader.replace('Client ', '');
+        const decoded = Buffer.from(token, 'base64').toString('utf8');
+        const parts = decoded.split(':');
+        if (parts[0] !== 'client' || !parts[1]) {
+            return res.status(401).json({ error: 'Token de cliente inválido' });
+        }
+        req.clientId = parseInt(parts[1]);
+        next();
+    } catch (e) {
+        return res.status(401).json({ error: 'Token inválido' });
+    }
+};
+
+module.exports = { requireSuperAdmin, requireTenantAdmin, requireTenantActive, requireClientAuth };
+
+

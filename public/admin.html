@@ -146,6 +146,13 @@
                 Reportes
               </button>
               <button
+                id="nav-mensajes"
+                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Mensajes
+              </button>
+              <button
                 id="nav-ajustes"
                 class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
               >
@@ -276,11 +283,11 @@
                     <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
                     <polyline points="16 7 22 7 22 13"></polyline>
                   </svg>
-                  12%
+                  <span id="kpi-reservas-tendencia">12%</span>
                 </span>
               </div>
-              <p class="text-xs text-slate-400 mt-1">
-                18 confirmadas, 6 pendientes
+              <p id="kpi-reservas-desglose" class="text-xs text-slate-400 mt-1">
+                0 confirmadas, 0 pendientes
               </p>
             </div>
 
@@ -466,11 +473,11 @@
                     <line x1="12" x2="12" y1="8" y2="12"></line>
                     <line x1="12" x2="12.01" y1="16" y2="16"></line>
                   </svg>
-                  1 Mantenimiento
+                  <span id="kpi-mantenimiento-text">0 Mantenimiento</span>
                 </span>
               </div>
-              <p class="text-xs text-slate-400 mt-1">
-                Servicio 3 inactivo
+              <p id="kpi-inactivos-text" class="text-xs text-slate-400 mt-1">
+                0 inactivos
               </p>
             </div>
           </div>
@@ -848,7 +855,44 @@
             </div>
         </div>
 
-        <!-- Vista de Reportes -->
+        <!-- CONTENIDO: MENSAJES -->
+        <div id="view-mensajes" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-blue-500"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Mensajes y Alertas
+              </h1>
+              <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">Chat con clientes y solicitudes de reprogramación.</p>
+            </div>
+            <button onclick="openQaModal('aviso')" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+              Nuevo Mensaje
+            </button>
+          </div>
+          
+          <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-left">
+                <thead class="text-xs text-slate-500 dark:text-slate-400 uppercase bg-slate-50/50 dark:bg-slate-800/50 font-bold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th class="px-6 py-4">Fecha</th>
+                    <th class="px-6 py-4">Asunto / Reserva</th>
+                    <th class="px-6 py-4">Mensaje</th>
+                    <th class="px-6 py-4">Estado</th>
+                    <th class="px-6 py-4">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="mensajes-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300 font-medium">
+                  <tr>
+                    <td colspan="5" class="p-8 text-center text-slate-500">Cargando mensajes...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- CONTENIDO: REPORTES -->
         <div id="view-reportes" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
             <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Reportes</h2>
             <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 text-center text-slate-500 font-bold">
@@ -860,7 +904,7 @@
         <div id="view-ajustes" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
             <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Ajustes del Complejo</h2>
             <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 max-w-2xl">
-                <form id="ajustes-form" class="space-y-4">
+                <form id="ajustes-form" class="space-y-4" novalidate>
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Nombre del Complejo</label>
                         <input type="text" id="ajustes-nombre" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
@@ -880,24 +924,59 @@
                         <input type="text" id="ajustes-wpp" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
                     </div>
                     <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Mensaje del Botón WhatsApp <span class="font-normal text-slate-400">(texto que aparece pre-cargado al abrir el chat)</span></label>
+                        <textarea id="ajustes-wpp-mensaje" rows="2" placeholder="Hola! Quisiera hacer una consulta sobre las canchas." class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm resize-none"></textarea>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">¿Devolver seña al cancelar reserva?</label>
+                        <select id="ajustes-devolver-sena" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm cursor-pointer">
+                            <option value="no">No (Informar al usuario que la seña no se devuelve)</option>
+                            <option value="si">Sí (Informar al usuario que se le devolverá en breve)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
                         <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Link de Google Maps (Ubicación)</label>
-                        <input type="url" id="ajustes-maps" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold" placeholder="https://maps.app.goo.gl/...">
+                        <input type="text" id="ajustes-maps" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold" placeholder="https://maps.app.goo.gl/...">
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">URL del Logo</label>
-                        <input type="url" id="ajustes-logo" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold" placeholder="https://ejemplo.com/logo.png">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Logo (Subir archivo o ingresar URL)</label>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="ajustes-logo" class="flex-1 px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm" placeholder="https://ejemplo.com/logo.png">
+                            <input type="file" id="ajustes-logo-file" accept="image/*" class="hidden">
+                            <button type="button" onclick="document.getElementById('ajustes-logo-file').click()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-sm font-bold transition-all border border-slate-200 dark:border-slate-700 whitespace-nowrap text-slate-700 dark:text-slate-300">
+                                Subir Archivo
+                            </button>
+                        </div>
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">URL de Imagen del Hero 1</label>
-                        <input type="url" id="ajustes-hero-image" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold" placeholder="https://ejemplo.com/cancha.jpg">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Imagen del Hero 1 (Subir archivo o ingresar URL)</label>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="ajustes-hero-image" class="flex-1 px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm" placeholder="https://ejemplo.com/cancha.jpg">
+                            <input type="file" id="ajustes-hero-image-file" accept="image/*" class="hidden">
+                            <button type="button" onclick="document.getElementById('ajustes-hero-image-file').click()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-sm font-bold transition-all border border-slate-200 dark:border-slate-700 whitespace-nowrap text-slate-700 dark:text-slate-300">
+                                Subir Archivo
+                            </button>
+                        </div>
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">URL de Imagen del Hero 2</label>
-                        <input type="url" id="ajustes-hero-image-2" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold" placeholder="https://ejemplo.com/cancha2.jpg">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Imagen del Hero 2 (Subir archivo o ingresar URL)</label>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="ajustes-hero-image-2" class="flex-1 px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm" placeholder="https://ejemplo.com/cancha2.jpg">
+                            <input type="file" id="ajustes-hero-image-2-file" accept="image/*" class="hidden">
+                            <button type="button" onclick="document.getElementById('ajustes-hero-image-2-file').click()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-sm font-bold transition-all border border-slate-200 dark:border-slate-700 whitespace-nowrap text-slate-700 dark:text-slate-300">
+                                Subir Archivo
+                            </button>
+                        </div>
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">URL de Imagen del Hero 3</label>
-                        <input type="url" id="ajustes-hero-image-3" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold" placeholder="https://ejemplo.com/cancha3.jpg">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Imagen del Hero 3 (Subir archivo o ingresar URL)</label>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="ajustes-hero-image-3" class="flex-1 px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm" placeholder="https://ejemplo.com/cancha3.jpg">
+                            <input type="file" id="ajustes-hero-image-3-file" accept="image/*" class="hidden">
+                            <button type="button" onclick="document.getElementById('ajustes-hero-image-3-file').click()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-sm font-bold transition-all border border-slate-200 dark:border-slate-700 whitespace-nowrap text-slate-700 dark:text-slate-300">
+                                Subir Archivo
+                            </button>
+                        </div>
                     </div>
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Título del Hero</label>

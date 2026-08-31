@@ -11,7 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: '60'
         },
         viewMode: 'grid',
-        clientData: null
+        clientData: null,
+        ajustes: null
     };
 
     // DOM Elements
@@ -64,12 +65,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fetch Ajustes para encabezado
         const ajustes = await window.API.getAjustes();
         if (ajustes) {
+            state.ajustes = ajustes;
             if (ajustes.wpp_contacto) {
+                const wppMsg = ajustes.wpp_mensaje
+                    ? encodeURIComponent(ajustes.wpp_mensaje)
+                    : 'Hola!';
+                const wppUrl = `https://api.whatsapp.com/send?phone=${ajustes.wpp_contacto}&text=${wppMsg}`;
+
                 const wppLink = document.getElementById('btn-whatsapp-header');
-                if (wppLink) {
-                    wppLink.href = `https://api.whatsapp.com/send?phone=${ajustes.wpp_contacto}&text=Hola!`;
-                }
+                if (wppLink) wppLink.href = wppUrl;
+
+                const wppFloat = document.getElementById('btn-whatsapp-flotante');
+                if (wppFloat) wppFloat.href = wppUrl;
             }
+
             if (ajustes.ubicacion_maps) {
                 const mapsLink = document.getElementById('btn-ubicacion-header');
                 if (mapsLink) {
@@ -345,7 +354,44 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                 </div>
+                <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+                    ${res.estado !== 'cancelada' ? `
+                    <button class="btn-cancelar-reserva px-4 py-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/30 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-bold transition-colors flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                        Cancelar
+                    </button>
+                    ` : ''}
+                    <button onclick="window.openClientMessageModal('${res.id}')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-colors flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                        Reprogramar / Consulta
+                    </button>
+                </div>
             `;
+            
+            const btnCancelar = card.querySelector('.btn-cancelar-reserva');
+            if (btnCancelar) {
+                btnCancelar.addEventListener('click', async () => {
+                    const devolver = state.ajustes?.devolver_sena === 'si';
+                    const warningHtml = devolver 
+                        ? `<br><br><span class="text-emerald-600 font-bold block bg-emerald-50 dark:bg-emerald-900/30 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">El dinero abonado por la seña se te devolverá en breve.</span>` 
+                        : `<br><br><span class="text-rose-600 font-bold block bg-rose-50 dark:bg-rose-900/30 p-3 rounded-lg border border-rose-200 dark:border-rose-800">Atención: El dinero abonado en concepto de seña no es reembolsable.</span>`;
+                        
+                    showConfirmModal(`¿Estás seguro de cancelar la reserva en ${cancha.nombre} el ${res.fecha.split('T')[0]} a las ${res.hora} hs?` + warningHtml, async () => {
+                        btnCancelar.disabled = true;
+                        btnCancelar.textContent = 'Cancelando...';
+                        try {
+                            await window.API.cancelarReservaCliente(res.id);
+                            // Refresh search results
+                            document.getElementById('buscar-form').dispatchEvent(new Event('submit'));
+                        } catch (err) {
+                            showAlertModal('Error', err.message || 'No se pudo cancelar la reserva', 'error');
+                            btnCancelar.disabled = false;
+                            btnCancelar.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> Cancelar`;
+                        }
+                    });
+                });
+            }
+            
             resultadosBuscar.appendChild(card);
         });
     }
@@ -419,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="px-5 py-3 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
                     <span class="flex items-center gap-1 text-[11px]">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock w-3.5 h-3.5 text-slate-400"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        Horario: 08:00 a 23:00 hs
+                        Horario: ${state.ajustes?.open_time || '08:00'} a ${state.ajustes?.close_time || '23:00'} hs
                     </span>
                     <span class="font-semibold text-blue-600 dark:text-blue-400">Seña: ${cancha.porcentaje_sena !== undefined ? cancha.porcentaje_sena : 50}%</span>
                 </div>
@@ -435,19 +481,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const isToday = formatDateToYMD(now) === formatDateToYMD(state.selectedDate);
             const currentHour = now.getHours();
             
-            for (let h = 8; h <= 22; h++) {
+            // Generate hours dynamically
+            let startHour = 8;
+            let endHour = 22; // 22 is the last block if it closes at 23
+            
+            if (state.ajustes && state.ajustes.open_time && state.ajustes.close_time) {
+                const openH = parseInt(state.ajustes.open_time.split(':')[0], 10);
+                const closeH = parseInt(state.ajustes.close_time.split(':')[0], 10);
+                if (!isNaN(openH)) startHour = openH;
+                if (!isNaN(closeH)) endHour = closeH > 0 ? closeH - 1 : 23; 
+            }
+            
+            for (let h = startHour; h <= endHour; h++) {
                 const hourStr = formatTime(h);
                 
                 // Check if reserved
                 let isReserved = canchaReservas.some(r => r.hora === hourStr);
                 
                 // If duration is 120, we need 2 consecutive free slots
-                if (duration === 120 && h < 22) {
+                if (duration === 120 && h < endHour) {
                     const nextHourStr = formatTime(h + 1);
                     if (canchaReservas.some(r => r.hora === nextHourStr)) {
                         isReserved = true; 
                     }
-                } else if (duration === 120 && h === 22) {
+                } else if (duration === 120 && h === endHour) {
                     isReserved = true; // Cannot fit 2 hours at the last slot
                 }
                 
@@ -575,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        textEl.innerText = text;
+        textEl.innerHTML = text;
         modal.classList.remove('hidden');
         
         // Trigger animation
@@ -651,6 +708,67 @@ document.addEventListener('DOMContentLoaded', () => {
         btnAccept.addEventListener('click', onAcceptClick);
     }
 
+    window.openClientMessageModal = (reservaId) => {
+        const modal = document.getElementById('client-message-modal');
+        const modalContent = document.getElementById('client-message-modal-content');
+        document.getElementById('client-message-reserva-id').value = reservaId;
+        
+        modal.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            modalContent.classList.remove('scale-95', 'opacity-0');
+            modalContent.classList.add('scale-100', 'opacity-100');
+        });
+    };
+
+    window.closeClientMessageModal = () => {
+        const modal = document.getElementById('client-message-modal');
+        const modalContent = document.getElementById('client-message-modal-content');
+        
+        modalContent.classList.remove('scale-100', 'opacity-100');
+        modalContent.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.getElementById('client-message-form').reset();
+        }, 300);
+    };
+
+    const formClientMessage = document.getElementById('client-message-form');
+    if (formClientMessage) {
+        formClientMessage.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.querySelector('button[form="client-message-form"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = 'Enviando...';
+            }
+            
+            try {
+                const reservaId = document.getElementById('client-message-reserva-id').value;
+                const asunto = document.getElementById('client-message-asunto').value;
+                const texto = document.getElementById('client-message-texto').value;
+                
+                let clienteId = state.clientData ? state.clientData.id : null;
+                
+                await window.API.createMensaje({
+                    cliente_id: clienteId,
+                    reserva_id: reservaId,
+                    asunto: asunto,
+                    mensaje: texto
+                });
+                
+                window.closeClientMessageModal();
+                showAlertModal('Mensaje Enviado', 'El complejo recibirá tu mensaje a la brevedad.', 'success');
+            } catch (err) {
+                showAlertModal('Error', 'No se pudo enviar el mensaje', 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = `Enviar Mensaje <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>`;
+                }
+            }
+        });
+    }
+
     // Reservation Handler
     function handleReserva(btn, cancha, hour, duration, price) {
         const now = new Date();
@@ -669,9 +787,9 @@ document.addEventListener('DOMContentLoaded', () => {
             nombreCliente = state.clientData.nombre;
             clienteId = state.clientData.id;
         } else {
-            const input = prompt('Por favor, ingresá tu nombre completo o teléfono para identificar la reserva:');
-            if (!input) return; // User cancelled
-            nombreCliente = input;
+            window.openRegisterModal();
+            showAlertModal('Atención', 'Por favor, creá una cuenta rápida o iniciá sesión para poder reservar.', 'warning');
+            return;
         }
 
         const text = `¿Confirmar reserva en ${cancha.nombre} el ${formatDateToYMD(state.selectedDate)} a las ${hour} hs por ${duration} minutos?\n\nA nombre de: ${nombreCliente}\nCosto total: $${price.toLocaleString('es-AR')}`;
@@ -707,17 +825,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!authSection) return;
 
         if (state.clientData) {
+            // Estado: logueado
             authSection.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <div class="text-right hidden sm:block">
-                        <p class="text-[10px] font-bold text-slate-400 leading-none">Bienvenido,</p>
-                        <p class="text-xs font-black text-white">${state.clientData.nombre}</p>
-                    </div>
-                    <button onclick="window.API.clientLogout()" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1.5 transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
-                        <span class="hidden sm:inline">Salir</span>
-                    </button>
-                </div>
+                <span class="hidden sm:block text-sm font-bold text-slate-700 dark:text-slate-300 truncate max-w-[120px]">${state.clientData.nombre}</span>
+                <button onclick="window.openMisReservas()" class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-black flex items-center gap-1.5 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+                    Mis Reservas
+                </button>
+                <button onclick="window.API.clientLogout()" class="px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs font-bold hover:bg-rose-50 dark:hover:bg-rose-900/20 flex items-center gap-1.5 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                    <span class="hidden sm:inline">Salir</span>
+                </button>
+            `;
+        } else {
+            // Estado: deslogueado
+            authSection.innerHTML = `
+                <button onclick="window.openRegisterModal()" class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Registrarse</button>
+                <button onclick="window.openLoginModal()" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black shadow-md shadow-blue-500/25 transition-colors flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg>
+                    Iniciar Sesión
+                </button>
             `;
         }
     }
@@ -802,6 +929,278 @@ document.addEventListener('DOMContentLoaded', () => {
             if (newIndex >= totalSlides) newIndex = 0;
             updateSlide(newIndex);
         }, 5000);
+    }
+
+    // ===== AUTH MODALS =====
+    function _openModal(id, contentId, isBottomSheet = false) {
+        const modal = document.getElementById(id);
+        const content = document.getElementById(contentId);
+        if (!modal || !content) return;
+        modal.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            if (isBottomSheet) {
+                content.classList.remove('translate-y-full');
+                content.classList.remove('sm:scale-95', 'sm:opacity-0');
+                content.classList.add('sm:scale-100', 'sm:opacity-100');
+            } else {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }
+        });
+    }
+
+    function _closeModal(id, contentId, isBottomSheet = false, cb = null) {
+        const modal = document.getElementById(id);
+        const content = document.getElementById(contentId);
+        if (!modal || !content) return;
+        if (isBottomSheet) {
+            content.classList.add('translate-y-full');
+            content.classList.add('sm:scale-95', 'sm:opacity-0');
+            content.classList.remove('sm:scale-100', 'sm:opacity-100');
+        } else {
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+        }
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            if (cb) cb();
+        }, 300);
+    }
+
+    window.openLoginModal = () => _openModal('modal-login', 'modal-login-content');
+    window.closeLoginModal = () => _closeModal('modal-login', 'modal-login-content', false, () => {
+        document.getElementById('form-login').reset();
+        document.getElementById('login-error').classList.add('hidden');
+    });
+
+    window.openRegisterModal = () => _openModal('modal-register', 'modal-register-content');
+    window.closeRegisterModal = () => _closeModal('modal-register', 'modal-register-content', false, () => {
+        document.getElementById('form-register').reset();
+        document.getElementById('register-error').classList.add('hidden');
+    });
+
+    window.openMisReservas = () => {
+        _openModal('modal-mis-reservas', 'modal-mis-reservas-content', true);
+        loadMisReservas();
+    };
+    window.closeMisReservas = () => _closeModal('modal-mis-reservas', 'modal-mis-reservas-content', true);
+
+    window.openTerminosModal = () => {
+        _openModal('modal-terminos', 'modal-terminos-content', false);
+    };
+    window.closeTerminosModal = () => {
+        _closeModal('modal-terminos', 'modal-terminos-content', false);
+    };
+
+    // Login form submit
+    const formLogin = document.getElementById('form-login');
+    if (formLogin) {
+        formLogin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-login-submit');
+            const errEl = document.getElementById('login-error');
+            btn.disabled = true;
+            btn.textContent = 'Ingresando...';
+            errEl.classList.add('hidden');
+
+            try {
+                const email = document.getElementById('login-email').value.trim();
+                const password = document.getElementById('login-password').value;
+                const data = await window.API.clientLogin(email, password);
+                state.clientData = data.user;
+                window.closeLoginModal();
+                updateHeaderAuth();
+                showAlertModal('¡Bienvenido!', `Hola ${data.user.nombre}, ya podés ver tus reservas.`, 'success');
+            } catch (err) {
+                errEl.textContent = err.message || 'Error al iniciar sesión';
+                errEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Ingresar';
+            }
+        });
+    }
+
+    // Register form submit
+    const formRegister = document.getElementById('form-register');
+    if (formRegister) {
+        formRegister.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-register-submit');
+            const errEl = document.getElementById('register-error');
+            btn.disabled = true;
+            btn.textContent = 'Creando cuenta...';
+            errEl.classList.add('hidden');
+
+            try {
+                const emailInput = document.getElementById('reg-email').value.trim();
+                const passInput = document.getElementById('reg-password').value;
+                
+                await window.API.clientRegister({
+                    nombre: document.getElementById('reg-nombre').value.trim(),
+                    email: emailInput,
+                    telefono: document.getElementById('reg-telefono').value.trim(),
+                    password: passInput,
+                    acepta_terminos: document.getElementById('reg-terminos').checked
+                });
+                
+                // Auto-login
+                const data = await window.API.clientLogin(emailInput, passInput);
+                state.clientData = data.user;
+                updateHeaderAuth();
+                
+                window.closeRegisterModal();
+                showAlertModal('¡Cuenta creada!', 'Iniciaste sesión automáticamente. Ya podés confirmar tu reserva.', 'success');
+            } catch (err) {
+                errEl.textContent = err.message || 'Error al registrarse';
+                errEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Crear cuenta';
+            }
+        });
+    }
+
+    // ===== MIS RESERVAS PANEL =====
+    async function loadMisReservas() {
+        const container = document.getElementById('lista-mis-reservas');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-12 text-slate-400">
+                <svg class="animate-spin h-8 w-8 mb-3 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <p class="text-sm font-bold">Cargando reservas...</p>
+            </div>`;
+
+        if (!state.clientData) {
+            container.innerHTML = `<p class="text-center text-slate-500 py-8 text-sm">Debes iniciar sesión para ver tus reservas.</p>`;
+            return;
+        }
+
+        try {
+            const reservas = await window.API.getReservasByUser(state.clientData.id);
+
+            if (!reservas || reservas.length === 0) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center py-12 text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-3"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+                        <p class="text-sm font-bold">No tenés reservas todavía</p>
+                        <p class="text-xs mt-1">Hacé tu primera reserva desde la grilla de horarios</p>
+                    </div>`;
+                return;
+            }
+
+            // Sort: future first
+            reservas.sort((a, b) => new Date(`${b.fecha}T${b.hora}`) - new Date(`${a.fecha}T${a.hora}`));
+
+            const statusConfig = {
+                confirmada:           { bg: 'bg-emerald-100 dark:bg-emerald-900/40', text: 'text-emerald-700 dark:text-emerald-400', label: 'Confirmada' },
+                'por confirmar':      { bg: 'bg-amber-100 dark:bg-amber-900/40',   text: 'text-amber-700 dark:text-amber-400',   label: 'Por confirmar' },
+                pendiente:            { bg: 'bg-amber-100 dark:bg-amber-900/40',   text: 'text-amber-700 dark:text-amber-400',   label: 'Pendiente' },
+                cancelada:            { bg: 'bg-rose-100 dark:bg-rose-900/40',     text: 'text-rose-700 dark:text-rose-400',     label: 'Cancelada' },
+                reprogramada:         { bg: 'bg-purple-100 dark:bg-purple-900/40', text: 'text-purple-700 dark:text-purple-400', label: 'Reprogramada' },
+                reprogramar_solicitado: { bg: 'bg-indigo-100 dark:bg-indigo-900/40', text: 'text-indigo-700 dark:text-indigo-400', label: 'Reprog. solicitada' }
+            };
+
+            container.innerHTML = '';
+
+            reservas.forEach(res => {
+                const cancha = state.canchas.find(c => c.id === res.canchaId) || { nombre: `Cancha #${res.canchaId}` };
+                const sc = statusConfig[res.estado] || { bg: 'bg-slate-100 dark:bg-slate-800', text: 'text-slate-600 dark:text-slate-400', label: res.estado };
+                const fechaStr = res.fecha ? String(res.fecha).split('T')[0] : '-';
+                const isFuture = new Date(`${fechaStr}T${res.hora}`) > new Date();
+                const isCancelada = res.estado === 'cancelada';
+
+                const card = document.createElement('div');
+                card.className = 'bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-4 shadow-sm';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${sc.bg} ${sc.text}">${sc.label}</span>
+                                <span class="text-[10px] font-bold text-slate-400">#${res.id}</span>
+                            </div>
+                            <h4 class="text-sm font-black text-slate-900 dark:text-white truncate">${cancha.nombre}</h4>
+                        </div>
+                        <div class="text-right shrink-0 ml-3">
+                            <p class="text-xs font-black text-emerald-600 dark:text-emerald-400">$${(res.precio || 0).toLocaleString('es-AR')}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-xl text-xs mb-3">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 mb-0.5">Fecha</p>
+                            <p class="font-bold text-slate-700 dark:text-slate-300">${fechaStr}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 mb-0.5">Horario</p>
+                            <p class="font-bold text-slate-700 dark:text-slate-300">${res.hora} hs <span class="font-normal text-slate-400">(${res.duracion || 60}min)</span></p>
+                        </div>
+                    </div>
+                    ${!isCancelada ? `
+                    <div class="flex gap-2">
+                        ${isFuture ? `
+                        <button
+                            class="btn-cancelar-reserva flex-1 py-2 rounded-xl border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs font-bold hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors flex items-center justify-center gap-1.5"
+                            data-id="${res.id}"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                            Cancelar
+                        </button>` : ''}
+                        <button
+                            class="btn-reprogramar-reserva flex-1 py-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors flex items-center justify-center gap-1.5"
+                            data-id="${res.id}"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                            Reprogramar
+                        </button>
+                    </div>` : `<p class="text-center text-xs text-slate-400 pt-1">Reserva cancelada</p>`}
+                `;
+
+                // Cancelar
+                const btnCancelar = card.querySelector('.btn-cancelar-reserva');
+                if (btnCancelar) {
+                    btnCancelar.addEventListener('click', async () => {
+                        const devolver = state.ajustes?.devolver_sena === 'si';
+                        const warningHtml = devolver 
+                            ? `<br><br><span class="text-emerald-600 font-bold block bg-emerald-50 dark:bg-emerald-900/30 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800">El dinero abonado por la seña se te devolverá en breve.</span>` 
+                            : `<br><br><span class="text-rose-600 font-bold block bg-rose-50 dark:bg-rose-900/30 p-3 rounded-lg border border-rose-200 dark:border-rose-800">Atención: El dinero abonado en concepto de seña no es reembolsable.</span>`;
+                            
+                        showConfirmModal(`¿Estás seguro de cancelar la reserva en ${cancha.nombre} el ${fechaStr} a las ${res.hora} hs?` + warningHtml, async () => {
+                            btnCancelar.disabled = true;
+                            btnCancelar.textContent = 'Cancelando...';
+                            try {
+                                await window.API.cancelarReservaCliente(res.id);
+                                loadMisReservas();
+                            } catch (err) {
+                                showAlertModal('Error', err.message || 'No se pudo cancelar la reserva', 'error');
+                                btnCancelar.disabled = false;
+                                btnCancelar.textContent = 'Cancelar';
+                            }
+                        });
+                    });
+                }
+
+                // Reprogramar → abre modal de mensaje
+                const btnReprogramar = card.querySelector('.btn-reprogramar-reserva');
+                if (btnReprogramar) {
+                    btnReprogramar.addEventListener('click', () => {
+                        window.closeMisReservas();
+                        setTimeout(() => {
+                            if (window.openClientMessageModal) {
+                                window.openClientMessageModal(res.id);
+                                // Pre-select asunto
+                                const sel = document.getElementById('client-message-asunto');
+                                if (sel) sel.value = 'Reprogramar Turno';
+                            }
+                        }, 350);
+                    });
+                }
+
+                container.appendChild(card);
+            });
+        } catch (err) {
+            container.innerHTML = `<p class="text-center text-rose-500 font-bold py-8 text-sm">Error al cargar las reservas.</p>`;
+        }
     }
 
     // Start

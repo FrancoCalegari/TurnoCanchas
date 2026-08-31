@@ -27,7 +27,7 @@ const getAjustes = async (req, res) => {
 
 const updateAjustes = async (req, res) => {
     try {
-        const { nombre_complejo, open_time, close_time, wpp_contacto, ubicacion_maps, logo_url, hero_image_url, hero_image_url_2, hero_image_url_3, hero_title, canchas_title, nosotros_title } = req.body;
+        const { nombre_complejo, open_time, close_time, wpp_contacto, wpp_mensaje, ubicacion_maps, logo_url, hero_image_url, hero_image_url_2, hero_image_url_3, hero_title, canchas_title, nosotros_title, devolver_sena } = req.body;
         
         let updates = [];
         if (nombre_complejo !== undefined) {
@@ -45,6 +45,14 @@ const updateAjustes = async (req, res) => {
         if (wpp_contacto !== undefined) {
             const safe = String(wpp_contacto).replace(/'/g, "''");
             updates.push(`wpp_contacto = '${safe}'`);
+        }
+        if (wpp_mensaje !== undefined) {
+            const safe = String(wpp_mensaje).replace(/'/g, "''");
+            updates.push(`wpp_mensaje = '${safe}'`);
+        }
+        if (devolver_sena !== undefined) {
+            const safe = String(devolver_sena).replace(/'/g, "''");
+            updates.push(`devolver_sena = '${safe}'`);
         }
         if (ubicacion_maps !== undefined) {
             const safe = String(ubicacion_maps).replace(/'/g, "''");

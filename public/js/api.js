@@ -390,5 +390,64 @@ window.API = {
             console.error(error);
             throw error;
         }
+    },
+
+    getMensajes: async () => {
+        try {
+            const res = await fetch(`${API_BASE}/mensajes`, { headers: window.API._getHeaders() });
+            if (!res.ok) throw new Error('Error fetch mensajes');
+            const data = await res.json();
+            return data.data;
+        } catch (error) {
+            console.error(error);
+            return [];
+        }
+    },
+
+    createMensaje: async (data) => {
+        try {
+            const res = await fetch(`${API_BASE}/mensajes`, {
+                method: 'POST',
+                headers: window.API._getHeaders(),
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) throw new Error('Error enviando mensaje');
+            return await res.json();
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    },
+
+    readMensaje: async (id) => {
+        try {
+            const res = await fetch(`${API_BASE}/mensajes/${id}/read`, {
+                method: 'PUT',
+                headers: window.API._getHeaders()
+            });
+            if (!res.ok) throw new Error('Error al marcar leído');
+            return await res.json();
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    },
+
+    /**
+     * Cancela una reserva propia del cliente logueado.
+     * Solo válida para reservas futuras.
+     */
+    cancelarReservaCliente: async (id) => {
+        const headers = { 'Content-Type': 'application/json' };
+        const clientToken = localStorage.getItem('clientToken');
+        if (clientToken) headers['Authorization'] = 'Client ' + clientToken;
+        const res = await fetch(`${API_BASE}/reservas/${id}/cancelar-cliente`, {
+            method: 'PUT',
+            headers
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error al cancelar reserva');
+        return data;
     }
 };
+

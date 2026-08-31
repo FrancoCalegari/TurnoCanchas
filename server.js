@@ -39,6 +39,10 @@ app.get('/register-tenant', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'register-tenant.html'));
 });
 
+app.get('/terminosycondiciones', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'terminosycondiciones.html'));
+});
+
 // Rutas de la API
 app.use('/api', routes);
 

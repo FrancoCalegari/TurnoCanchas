@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewReservas = document.getElementById('view-reservas');
     const viewReportes = document.getElementById('view-reportes');
     const viewAjustes = document.getElementById('view-ajustes');
+    const viewMensajes = document.getElementById('view-mensajes');
 
     // Nav Buttons
     const btnNavDashboard = document.getElementById('nav-dashboard');
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnNavCanchas = document.getElementById('nav-canchas');
     const btnNavReportes = document.getElementById('nav-reportes');
     const btnNavAjustes = document.getElementById('nav-ajustes');
+    const btnNavMensajes = document.getElementById('nav-mensajes');
 
     // Dashboard State
     let _dashboardReservas = [];
@@ -121,15 +123,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Calculate KPIs
             let reservasHoyCount = 0;
+            let reservasConfirmadas = 0;
+            let reservasPendientes = 0;
             let totalIngresos = 0;
             let ocupacion = 0;
             
             const canchasActivas = canchas.filter(c => c.estado === 'disponible').length;
+            const canchasMantenimiento = canchas.filter(c => c.estado === 'mantenimiento').length;
+            const canchasInactivas = canchas.filter(c => c.estado === 'inactiva').length;
             const totalCanchas = canchas.length;
 
             if (isDemo) {
                 // MOCK DATA for Demo
                 reservasHoyCount = reservasRecientes.length * 3; // Fake larger number
+                reservasConfirmadas = Math.floor(reservasHoyCount * 0.7);
+                reservasPendientes = reservasHoyCount - reservasConfirmadas;
                 reservasRecientes.forEach(r => {
                     const cancha = canchas.find(c => c.id === r.canchaId);
                     if(cancha) {
@@ -143,6 +151,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // REAL DATA
                 reservasHoyCount = reservasRecientes.length; // Assume we fetch today's reservations
                 reservasRecientes.forEach(r => {
+                    if (r.estado === 'confirmada') reservasConfirmadas++;
+                    if (r.estado === 'seña_pendiente' || r.estado === 'pendiente') reservasPendientes++;
+                    
                     // Only sum confirmed reservations for real income
                     if (r.estado === 'confirmada' || r.estado === 'seña_pendiente') {
                         const cancha = canchas.find(c => c.id === r.canchaId);
@@ -171,6 +182,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update DOM KPIs
             if (kpiReservasHoy) kpiReservasHoy.innerText = reservasHoyCount;
             
+            const kpiReservasDesglose = document.getElementById('kpi-reservas-desglose');
+            if (kpiReservasDesglose) {
+                kpiReservasDesglose.innerText = `${reservasConfirmadas} confirmadas, ${reservasPendientes} pendientes`;
+            }
+            
+            const kpiReservasTendencia = document.getElementById('kpi-reservas-tendencia');
+            if (kpiReservasTendencia && !isDemo) {
+                // Hide trend badge in real mode as we don't have historical data yet
+                const trendBadge = kpiReservasTendencia.parentElement;
+                if (trendBadge) trendBadge.style.display = 'none';
+            }
+            
             // Format Ingresos
             if (kpiIngresos) {
                 if (totalIngresos >= 1000) {
@@ -183,6 +206,26 @@ document.addEventListener('DOMContentLoaded', () => {
             if (kpiOcupacion) kpiOcupacion.innerText = `${ocupacion}%`;
             if (kpiCanchas) {
                 kpiCanchas.innerHTML = `${canchasActivas}<span class="text-lg text-slate-400 font-medium">/${totalCanchas}</span>`;
+            }
+            
+            const kpiMantenimientoText = document.getElementById('kpi-mantenimiento-text');
+            if (kpiMantenimientoText) {
+                kpiMantenimientoText.innerText = `${canchasMantenimiento} Mantenimiento`;
+                
+                // Hide badge if 0
+                const badgeElement = kpiMantenimientoText.parentElement;
+                if (badgeElement) {
+                    if (canchasMantenimiento === 0) {
+                        badgeElement.style.display = 'none';
+                    } else {
+                        badgeElement.style.display = 'flex';
+                    }
+                }
+            }
+            
+            const kpiInactivosText = document.getElementById('kpi-inactivos-text');
+            if (kpiInactivosText) {
+                kpiInactivosText.innerText = `${canchasInactivas} inactiva${canchasInactivas !== 1 ? 's' : ''}`;
             }
 
             _dashboardCanchas = canchas;
@@ -203,6 +246,58 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
     }
+
+    async function loadMensajesData() {
+        const table = document.getElementById('mensajes-table-body');
+        if (!table) return;
+
+        table.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">Cargando mensajes...</td></tr>`;
+        
+        try {
+            const mensajes = await window.API.getMensajes();
+            if (!mensajes || mensajes.length === 0) {
+                table.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">No hay mensajes recientes.</td></tr>`;
+                return;
+            }
+
+            table.innerHTML = mensajes.map(m => `
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${!m.leido ? 'font-bold bg-blue-50/50 dark:bg-blue-900/10' : ''}">
+                    <td class="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400">
+                        ${new Date(m.createdAt).toLocaleString()}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-slate-900 dark:text-white">${m.asunto || 'Sin Asunto'}</div>
+                        ${m.reserva_id ? `<div class="text-xs text-blue-500">Reserva: ${m.reserva_id}</div>` : ''}
+                    </td>
+                    <td class="px-6 py-4 max-w-xs truncate text-slate-600 dark:text-slate-400" title="${m.mensaje}">
+                        ${m.mensaje}
+                    </td>
+                    <td class="px-6 py-4">
+                        ${m.leido 
+                            ? '<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">Leído</span>'
+                            : '<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Nuevo</span>'
+                        }
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        ${!m.leido ? `<button onclick="marcarLeido(${m.id})" class="text-blue-600 hover:text-blue-900 text-sm">Marcar Leído</button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+
+        } catch (error) {
+            console.error(error);
+            table.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">Error al cargar mensajes.</td></tr>`;
+        }
+    }
+    
+    window.marcarLeido = async (id) => {
+        try {
+            await window.API.readMensaje(id);
+            loadMensajesData();
+        } catch (error) {
+            showAlertModal('Error', 'No se pudo marcar como leído', 'error');
+        }
+    };
 
     // Render Table
     function renderTable(reservas, canchas, isDemo = false) {
@@ -367,6 +462,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('ajustes-open').value = data.open_time || '';
             document.getElementById('ajustes-close').value = data.close_time || '';
             document.getElementById('ajustes-wpp').value = data.wpp_contacto || '';
+            const wppMensajeInput = document.getElementById('ajustes-wpp-mensaje');
+            if (wppMensajeInput) wppMensajeInput.value = data.wpp_mensaje || '';
+            const devolverSenaInput = document.getElementById('ajustes-devolver-sena');
+            if (devolverSenaInput) devolverSenaInput.value = data.devolver_sena || 'no';
             const mapInput = document.getElementById('ajustes-maps');
             if(mapInput) mapInput.value = data.ubicacion_maps || '';
             const logoInput = document.getElementById('ajustes-logo');
@@ -387,6 +486,54 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupAjustesLogic() {
+        // File Upload Handlers
+        const handleUpload = async (fileInputId, urlInputId) => {
+            const fileInput = document.getElementById(fileInputId);
+            const urlInput = document.getElementById(urlInputId);
+            if (!fileInput || !urlInput) return;
+            
+            fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const formData = new FormData();
+                formData.append('logo', file);
+                
+                // Show loading state
+                const originalPlaceholder = urlInput.placeholder;
+                urlInput.value = 'Subiendo...';
+                urlInput.disabled = true;
+                
+                try {
+                    const res = await fetch('/api/upload/logo', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Tenant ' + (localStorage.getItem('tenantToken') || localStorage.getItem('adminToken'))
+                        },
+                        body: formData
+                    });
+                    
+                    if (!res.ok) throw new Error('Error al subir imagen');
+                    const data = await res.json();
+                    
+                    urlInput.value = data.url;
+                    showAlertModal('Éxito', 'Imagen subida correctamente.', 'success');
+                } catch (err) {
+                    urlInput.value = '';
+                    showAlertModal('Error', err.message, 'error');
+                } finally {
+                    urlInput.disabled = false;
+                    urlInput.placeholder = originalPlaceholder;
+                    fileInput.value = ''; // Reset input
+                }
+            });
+        };
+
+        handleUpload('ajustes-logo-file', 'ajustes-logo');
+        handleUpload('ajustes-hero-image-file', 'ajustes-hero-image');
+        handleUpload('ajustes-hero-image-2-file', 'ajustes-hero-image-2');
+        handleUpload('ajustes-hero-image-3-file', 'ajustes-hero-image-3');
+
         const form = document.getElementById('ajustes-form');
         if (form) {
             form.addEventListener('submit', async (e) => {
@@ -397,18 +544,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 try {
                     await window.API.updateAjustes({
-                        nombre_complejo: document.getElementById('ajustes-nombre').value,
-                        open_time: document.getElementById('ajustes-open').value,
-                        close_time: document.getElementById('ajustes-close').value,
-                        wpp_contacto: document.getElementById('ajustes-wpp').value,
-                        ubicacion_maps: document.getElementById('ajustes-maps') ? document.getElementById('ajustes-maps').value : '',
-                        logo_url: document.getElementById('ajustes-logo') ? document.getElementById('ajustes-logo').value : '',
-                        hero_image_url: document.getElementById('ajustes-hero-image') ? document.getElementById('ajustes-hero-image').value : '',
-                        hero_image_url_2: document.getElementById('ajustes-hero-image-2') ? document.getElementById('ajustes-hero-image-2').value : '',
-                        hero_image_url_3: document.getElementById('ajustes-hero-image-3') ? document.getElementById('ajustes-hero-image-3').value : '',
-                        hero_title: document.getElementById('ajustes-hero-title') ? document.getElementById('ajustes-hero-title').value : '',
-                        canchas_title: document.getElementById('ajustes-canchas-title') ? document.getElementById('ajustes-canchas-title').value : '',
-                        nosotros_title: document.getElementById('ajustes-nosotros-title') ? document.getElementById('ajustes-nosotros-title').value : ''
+                        nombre_complejo: document.getElementById('ajustes-nombre') ? document.getElementById('ajustes-nombre').value : undefined,
+                        open_time: document.getElementById('ajustes-open') ? document.getElementById('ajustes-open').value : undefined,
+                        close_time: document.getElementById('ajustes-close') ? document.getElementById('ajustes-close').value : undefined,
+                        wpp_contacto: document.getElementById('ajustes-wpp') ? document.getElementById('ajustes-wpp').value : undefined,
+                        wpp_mensaje: document.getElementById('ajustes-wpp-mensaje') ? document.getElementById('ajustes-wpp-mensaje').value : undefined,
+                        devolver_sena: document.getElementById('ajustes-devolver-sena') ? document.getElementById('ajustes-devolver-sena').value : undefined,
+                        ubicacion_maps: document.getElementById('ajustes-maps') ? document.getElementById('ajustes-maps').value : undefined,
+                        logo_url: document.getElementById('ajustes-logo') ? document.getElementById('ajustes-logo').value : undefined,
+                        hero_image_url: document.getElementById('ajustes-hero-image') ? document.getElementById('ajustes-hero-image').value : undefined,
+                        hero_image_url_2: document.getElementById('ajustes-hero-image-2') ? document.getElementById('ajustes-hero-image-2').value : undefined,
+                        hero_image_url_3: document.getElementById('ajustes-hero-image-3') ? document.getElementById('ajustes-hero-image-3').value : undefined,
+                        hero_title: document.getElementById('ajustes-hero-title') ? document.getElementById('ajustes-hero-title').value : undefined,
+                        canchas_title: document.getElementById('ajustes-canchas-title') ? document.getElementById('ajustes-canchas-title').value : undefined,
+                        nosotros_title: document.getElementById('ajustes-nosotros-title') ? document.getElementById('ajustes-nosotros-title').value : undefined
                     });
                     showAlertModal('Éxito', 'Ajustes guardados correctamente.', 'success');
                 } catch (error) {
@@ -430,7 +579,8 @@ document.addEventListener('DOMContentLoaded', () => {
             { btn: btnNavReservas, view: viewReservas },
             { btn: btnNavCanchas, view: viewCanchas },
             { btn: btnNavReportes, view: viewReportes },
-            { btn: btnNavAjustes, view: viewAjustes }
+            { btn: btnNavAjustes, view: viewAjustes },
+            { btn: btnNavMensajes, view: viewMensajes }
         ];
 
         navs.forEach(nav => {
@@ -450,6 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (nav.btn === btnNavDashboard) loadDashboardData();
                 if (nav.btn === btnNavCanchas && typeof loadCanchas === 'function') loadCanchas();
                 if (nav.btn === btnNavReservas) loadReservasAdmin();
+                if (nav.btn === btnNavMensajes) loadMensajesData();
             });
         });
     }
@@ -755,7 +906,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     nombre: document.getElementById('qa-cliente-nombre').value,
                     email: document.getElementById('qa-cliente-email').value,
                     telefono: document.getElementById('qa-cliente-telefono').value,
-                    password: document.getElementById('qa-cliente-pass').value
+                    password: document.getElementById('qa-cliente-pass').value,
+                    acepta_terminos: true
                 });
                 showAlertModal('Cliente Creado', 'El cliente fue registrado exitosamente.', 'success');
                 closeQaModal('cliente');
@@ -790,12 +942,23 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const btn = fAvisos.querySelector('button[type="submit"]');
             btn.disabled = true; btn.innerText = 'Enviando...';
-            // Simulate network request
-            await new Promise(r => setTimeout(r, 1500));
-            showAlertModal('Avisos Enviados', 'Los mensajes han sido encolados y se enviarán en breve a través de WhatsApp/Email.', 'success');
-            closeQaModal('avisos');
-            btn.disabled = false; btn.innerText = 'Enviar Avisos';
-            fAvisos.reset();
+            try {
+                const text = document.getElementById('qa-avisos-texto').value;
+                await window.API.createMensaje({
+                    asunto: 'Aviso Importante',
+                    mensaje: text
+                });
+                showAlertModal('Avisos Enviados', 'El aviso ha sido guardado exitosamente.', 'success');
+                closeQaModal('avisos');
+                fAvisos.reset();
+                if (!document.getElementById('view-mensajes').classList.contains('hidden')) {
+                    loadMensajesData();
+                }
+            } catch (err) {
+                showAlertModal('Error', err.message || 'No se pudo enviar el aviso', 'error');
+            } finally {
+                btn.disabled = false; btn.innerText = 'Enviar Avisos';
+            }
         });
     }
 

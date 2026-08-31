@@ -15,6 +15,20 @@ async function patch() {
     } catch (e) {
         console.log("Error 3:", e.message);
     }
+    try {
+        await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN wpp_mensaje TEXT");
+        console.log("Columna wpp_mensaje añadida");
+    } catch (e) {
+        console.log("Error wpp_mensaje:", e.message);
+    }
+    try {
+        await executeQuery("ALTER TABLE ajustes_complejo ADD COLUMN devolver_sena VARCHAR(5) DEFAULT 'no'");
+        console.log("Columna devolver_sena añadida");
+    } catch (e) {
+        console.log("Error devolver_sena:", e.message);
+    }
     process.exit();
+
+
 }
 patch();

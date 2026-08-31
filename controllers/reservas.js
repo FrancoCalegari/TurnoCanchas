@@ -196,11 +196,41 @@ const getRecent = async (req, res) => {
     }
 };
 
+const cancelByClient = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const clientId = req.clientId; // inyectado por requireClientAuth
+
+        // Verificar que la reserva pertenezca al cliente
+        const result = await executeQuery(
+            `SELECT * FROM reservas WHERE id = '${String(id).replace(/'/g, "''")}' AND cliente_id = ${clientId}`
+        );
+        if (!result || result.length === 0) {
+            return res.status(403).json({ error: 'No tenés permiso para cancelar esta reserva o no existe' });
+        }
+
+        const reserva = result[0];
+
+        // Verificar que la reserva sea futura
+        const fechaHora = new Date(`${reserva.fecha.toISOString ? reserva.fecha.toISOString().split('T')[0] : String(reserva.fecha).split('T')[0]}T${reserva.hora}`);
+        if (fechaHora < new Date()) {
+            return res.status(400).json({ error: 'No se puede cancelar una reserva pasada' });
+        }
+
+        await executeQuery(`UPDATE reservas SET estado = 'cancelada' WHERE id = '${String(id).replace(/'/g, "''")}'`);
+        res.json({ message: 'Reserva cancelada exitosamente' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     getAll,
     getAdminReservas,
     getByUser,
     create,
     updateStatus,
-    getRecent
+    getRecent,
+    cancelByClient
 };
+

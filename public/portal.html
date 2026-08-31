@@ -38,6 +38,20 @@
       property="og:image"
       content="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200"
     />
+    <style>
+      @media (max-width: 768px) {
+        .text-sm {
+          font-size: 2.7vw !important;
+          line-height: 1.25rem !important;
+        }
+      }
+      @media (max-width: 379px) {
+        .text-sm {
+          font-size: 2.2vw !important;
+          line-height: 1.25rem !important;
+        }
+      }
+    </style>
   </head>
   <body
     class="h-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased font-sans"
@@ -47,173 +61,63 @@
       <div
         class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16"
       >
-        <div
-          class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white px-4 py-2.5 text-xs flex flex-wrap items-center justify-between gap-2 shadow-md"
-        >
-          <div class="flex items-center space-x-2">
-            <span
-              class="inline-flex items-center px-2.5 py-1 rounded-full bg-blue-500/30 text-blue-300 border border-blue-400/30 font-extrabold"
-              ><svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="lucide lucide-sparkles w-3.5 h-3.5 mr-1 text-amber-400"
-                aria-hidden="true"
-              >
-                <path
-                  d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"
-                ></path>
-                <path d="M20 2v4"></path>
-                <path d="M22 4h-4"></path>
-                <circle cx="4" cy="20" r="2"></circle></svg
-              >Portal de Reservas para Clientes</span
-            ><span class="text-slate-300 hidden md:inline font-medium"
-              >Vista previa interactiva del Portal de Reservas para Clientes de
-              Complejo Deportivo.</span
-            >
-          </div>
-          <div class="flex items-center space-x-2" id="client-auth-section">
-            <a
-              href="/loginuser.html"
-              class="px-3 py-1 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-xs flex items-center gap-1.5 transition-all shadow-md shadow-blue-500/20 cursor-pointer"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="lucide lucide-log-in w-3.5 h-3.5"
-                aria-hidden="true"
-              >
-                <path d="m10 17 5-5-5-5"></path>
-                <path d="M15 12H3"></path>
-                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path></svg
-              ><span>Ingresar / Registrarse</span>
-            </a>
-          </div>
-        </div>
-        <div class="max-w-5xl mx-auto px-4 py-6 space-y-6">
-          <div
-            class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6"
-          >
-            <div class="flex items-center space-x-4">
+        <!-- ===== NAVBAR PRINCIPAL ===== -->
+        <nav class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <!-- Logo + Nombre -->
+            <div class="flex items-center gap-3 min-w-0">
               <img
                 id="header-logo"
-                alt="Complejo Deportivo"
-                class="w-16 h-16 rounded-2xl object-cover ring-2 ring-blue-500/30 shadow-lg shadow-blue-500/10 shrink-0 bg-white dark:bg-slate-800"
+                alt="Logo del complejo"
+                class="w-10 h-10 rounded-xl object-cover ring-2 ring-blue-500/20 shadow-sm shrink-0 bg-slate-100 dark:bg-slate-800"
                 src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200"
               />
-              <div>
-                <h1
-                  id="header-title"
-                  class="text-2xl font-black text-slate-900 dark:text-white tracking-tight"
-                >
-                  Complejo Deportivo
-                </h1>
-                <div
-                  class="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-slate-600 dark:text-slate-300 mt-2 font-medium"
-                >
-                  <a
-                    id="btn-whatsapp-header"
-                    href="https://api.whatsapp.com/send?phone=5491140008888&amp;text=Hola%20*Complejo%20Deportivo*!%20%F0%9F%91%8B%20Quisiera%20hacer%20una%20consulta%20sobre%20las%20canchas.%20%F0%9F%8F%9F%EF%B8%8F%E2%9A%BD%F0%9F%8E%BE"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-sm shadow-emerald-600/20 transition-all cursor-pointer group hover:scale-[1.02] active:scale-95 border border-emerald-400/30"
-                    title="Enviar mensaje por WhatsApp"
-                    ><svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="lucide lucide-message-circle w-3.5 h-3.5 text-emerald-200 shrink-0 fill-current opacity-90"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"
-                      ></path></svg
-                    ><span>WhatsApp</span
-                    ><svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="lucide lucide-external-link w-3.5 h-3.5 opacity-80 group-hover:translate-x-0.5 transition-transform shrink-0"
-                      aria-hidden="true"
-                    >
-                      <path d="M15 3h6v6"></path>
-                      <path d="M10 14 21 3"></path>
-                      <path
-                        d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
-                      ></path></svg></a
-                  ><a
-                    id="btn-ubicacion-header"
-                    href="https://maps.google.com/?q=-34.5453,-58.4497"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-sm shadow-blue-600/20 transition-all cursor-pointer group hover:scale-[1.02] active:scale-95 border border-blue-400/30"
-                    title="Ver ubicación en Google Maps"
-                    ><svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="lucide lucide-map-pin w-3.5 h-3.5 text-amber-300 shrink-0"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
-                      ></path>
-                      <circle cx="12" cy="10" r="3"></circle></svg
-                    ><span>Ubicación</span
-                    ><svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="lucide lucide-external-link w-3.5 h-3.5 opacity-80 group-hover:translate-x-0.5 transition-transform shrink-0"
-                      aria-hidden="true"
-                    >
-                      <path d="M15 3h6v6"></path>
-                      <path d="M10 14 21 3"></path>
-                      <path
-                        d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
-                      ></path></svg
-                  ></a>
-                </div>
-              </div>
+              <span id="header-title" class="text-base font-black text-slate-900 dark:text-white tracking-tight truncate">Complejo Deportivo</span>
+            </div>
+
+            <!-- Auth Section -->
+            <div id="client-auth-section" class="flex items-center gap-2 shrink-0">
+              <!-- Estado deslogueado (default) -->
+              <button onclick="window.openRegisterModal()" class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                Registrarse
+              </button>
+              <button onclick="window.openLoginModal()" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black shadow-md shadow-blue-500/25 transition-colors flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg>
+                Iniciar Sesión
+              </button>
             </div>
           </div>
+        </nav>
+        <!-- ===== FIN NAVBAR ===== -->
+
+        <div class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+          <!-- Info card with WA + Maps buttons (keeps existing IDs for JS) -->
+          <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <a
+                id="btn-whatsapp-header"
+                href="https://api.whatsapp.com/send?phone=5491140008888&text=Hola!"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-sm transition-all cursor-pointer hover:scale-[1.02] active:scale-95"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fill-current opacity-90"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/></svg>
+                WhatsApp
+              </a>
+              <a
+                id="btn-ubicacion-header"
+                href="https://maps.google.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-sm transition-all cursor-pointer hover:scale-[1.02] active:scale-95"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+                Ubicación
+              </a>
+            </div>
+            <p class="text-xs text-slate-400 font-medium hidden sm:block">Reservas online 24/7 ✦ Sin llamadas</p>
+          </div>
+
           <div
             class="relative rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-md bg-slate-950 group h-52 sm:h-64 md:h-80 transition-all"
           >
@@ -715,7 +619,8 @@
           </div>
         </div>
         <a
-          href="https://api.whatsapp.com/send?phone=5491140008888&amp;text=Hola%20*Complejo%20Deportivo*!%20%F0%9F%91%8B%20Quisiera%20hacer%20una%20consulta%20sobre%20las%20canchas.%20%F0%9F%8F%9F%EF%B8%8F%E2%9A%BD%F0%9F%8E%BE"
+          id="btn-whatsapp-flotante"
+          href="https://api.whatsapp.com/send?phone=5491140008888&amp;text=Hola!"
           target="_blank"
           rel="noopener noreferrer"
           class="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 px-4 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-xl shadow-emerald-600/30 hover:scale-105 active:scale-95 transition-all border border-emerald-400/40"
@@ -740,10 +645,25 @@
             >WhatsApp</span
           ></a
         >
+
+        <footer class="mt-12 py-8 px-4 border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-center rounded-b-3xl">
+            <div class="max-w-5xl mx-auto flex flex-col items-center justify-center space-y-4">
+                <div class="text-xs font-semibold text-slate-400 dark:text-slate-500">
+                    Desarrollado por <span class="text-blue-500 font-bold">ServicioDigital</span>
+                </div>
+                <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                    <a href="#" onclick="event.preventDefault(); window.openTerminosModal();" class="hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors">Términos y Condiciones del Complejo</a>
+                    <a href="/terminosycondiciones" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors">Términos de Servicio Digital</a>
+                </div>
+                <div class="text-[10px] text-slate-400/80">
+                    &copy; 2026 ServicioDigital. Todos los derechos reservados.
+                </div>
+            </div>
+        </footer>
       </div>
     </div>
     <!-- Confirmation Modal -->
-    <div id="confirm-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="confirm-modal" class="fixed inset-0 z-[51] hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl w-full max-w-sm overflow-hidden scale-95 opacity-0 transition-all duration-300 transform" id="confirm-modal-content">
         <div class="p-6">
           <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4 mx-auto">
@@ -772,6 +692,162 @@
         </div>
         <div class="border-t border-slate-100 dark:border-slate-800">
           <button id="alert-btn-accept" class="w-full py-4 text-sm font-black text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">Aceptar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Client Message Modal -->
+    <div id="client-message-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl w-full max-w-md overflow-hidden scale-95 opacity-0 transition-all duration-300 transform flex flex-col" id="client-message-modal-content">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+            <h3 class="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                Enviar Mensaje al Complejo
+            </h3>
+            <button onclick="closeClientMessageModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <form id="client-message-form" class="p-6 space-y-4">
+            <input type="hidden" id="client-message-reserva-id">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Asunto</label>
+                <select id="client-message-asunto" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="Reprogramar Turno">Reprogramar Turno</option>
+                    <option value="Consulta General">Consulta General</option>
+                    <option value="Problema con la Reserva">Problema con la Reserva</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Mensaje</label>
+                <textarea id="client-message-texto" required rows="4" placeholder="Escribí acá tu mensaje..." class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
+            </div>
+        </form>
+        <div class="border-t border-slate-100 dark:border-slate-800 p-4 bg-slate-50/50 dark:bg-slate-900 flex justify-end gap-2">
+            <button type="button" onclick="closeClientMessageModal()" class="px-4 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Cancelar</button>
+            <button type="submit" form="client-message-form" class="px-6 py-2 rounded-xl text-sm font-black bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30 transition-colors flex items-center gap-2">
+                Enviar Mensaje
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            </button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Modal Términos y Condiciones -->
+    <div id="modal-terminos" class="hidden fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" style="z-index: 9999;">
+        <div id="modal-terminos-content" class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col scale-95 opacity-0 transition-all duration-300">
+            <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+                <h2 class="text-lg font-black text-slate-900 dark:text-white">Términos y Condiciones</h2>
+                <button type="button" onclick="window.closeTerminosModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-all cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="overflow-y-auto p-6 text-sm text-slate-600 dark:text-slate-300 space-y-5 leading-relaxed custom-scrollbar">
+                <h3 class="font-black text-slate-900 dark:text-white text-sm">1. Consideraciones Generales</h3>
+                <p>Las presentes Condiciones Generales rigen el uso del portal de reservas y la contratación de los servicios de alquiler de instalaciones deportivas, en el marco de la legislación de la República Argentina, incluyendo el Código Civil y Comercial de la Nación y la Ley de Defensa del Consumidor (Ley N° 24.240).</p>
+
+                <h3 class="font-black text-slate-900 dark:text-white text-sm mt-4">2. De las Reservas y Señas</h3>
+                <p>Toda reserva generada a través de este portal adquiere carácter de confirmada únicamente cuando se cumplan las condiciones estipuladas por el Complejo (por ejemplo, el pago de una seña o anticipo). Conforme a los usos y costumbres comerciales, <strong>las señas entregadas no tienen carácter devolutivo</strong> ante la inasistencia o cancelación unilateral por parte del usuario, entendiéndose las mismas como compensación por el lucro cesante del horario bloqueado.</p>
+
+                <h3 class="font-black text-slate-900 dark:text-white text-sm mt-4">3. Cancelaciones y Reprogramaciones</h3>
+                <p>Las cancelaciones por parte del usuario deberán gestionarse mediante la plataforma con la antelación mínima exigida por el Complejo. Las reprogramaciones de turnos que ya cuenten con pagos a cuenta estarán estrictamente sujetas a la disponibilidad de agenda del Complejo y a sus políticas internas.</p>
+
+                <h3 class="font-black text-slate-900 dark:text-white text-sm mt-4">4. Privacidad y Protección de Datos Personales</h3>
+                <p>En cumplimiento con la Ley de Protección de los Datos Personales (Ley N° 25.326), los datos recabados en este portal serán tratados con estricta confidencialidad y utilizados exclusivamente a los fines de la gestión de la reserva, facturación y comunicaciones transaccionales inherentes al servicio.</p>
+                
+                <h3 class="font-black text-slate-900 dark:text-white text-sm mt-4">5. Exención de Responsabilidad de la Plataforma</h3>
+                <p>Este sistema (ServicioDigital) actúa de manera exclusiva como un proveedor tecnológico de software de agenda (Software as a Service). Toda responsabilidad derivada del estado de las instalaciones, seguridad física, lesiones, robos, hurtos o incumplimientos contractuales recae pura, directa y exclusivamente sobre el Establecimiento / Complejo Deportivo que provee el servicio final.</p>
+            </div>
+            <div class="p-5 border-t border-slate-100 dark:border-slate-800 shrink-0">
+                <button type="button" onclick="window.closeTerminosModal()" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-sm transition-all cursor-pointer shadow-lg shadow-blue-500/20">
+                    Entendido y Aceptado
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ===== MODAL: INICIAR SESIÓN ===== -->
+    <div id="modal-login" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div id="modal-login-content" class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl w-full max-w-sm overflow-hidden scale-95 opacity-0 transition-all duration-300 transform">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+          <h2 class="text-lg font-black text-slate-900 dark:text-white">Iniciar Sesión</h2>
+          <button onclick="window.closeLoginModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+        <form id="form-login" class="p-6 space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Email</label>
+            <input type="email" id="login-email" required autocomplete="email" placeholder="tu@email.com" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"/>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Contraseña</label>
+            <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"/>
+          </div>
+          <p id="login-error" class="text-xs text-rose-500 font-bold hidden"></p>
+          <button type="submit" id="btn-login-submit" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-black shadow-lg shadow-blue-500/25 transition-colors">Ingresar</button>
+          <p class="text-center text-xs text-slate-500">¿No tenés cuenta? <button type="button" onclick="window.closeLoginModal(); window.openRegisterModal();" class="text-blue-600 dark:text-blue-400 font-bold hover:underline">Registrarse</button></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== MODAL: REGISTRARSE ===== -->
+    <div id="modal-register" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div id="modal-register-content" class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl w-full max-w-sm overflow-hidden scale-95 opacity-0 transition-all duration-300 transform">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+          <h2 class="text-lg font-black text-slate-900 dark:text-white">Crear cuenta</h2>
+          <button onclick="window.closeRegisterModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+        <form id="form-register" class="p-6 space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Nombre completo</label>
+            <input type="text" id="reg-nombre" required placeholder="Juan García" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"/>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Email</label>
+            <input type="email" id="reg-email" required placeholder="tu@email.com" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"/>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Teléfono <span class="font-normal text-slate-400">(opcional)</span></label>
+            <input type="tel" id="reg-telefono" placeholder="+54 9 11 ..." class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"/>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Contraseña</label>
+            <input type="password" id="reg-password" required placeholder="••••••••" autocomplete="new-password" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"/>
+          </div>
+          <label class="flex items-start gap-2 cursor-pointer">
+            <input type="checkbox" id="reg-terminos" required class="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"/>
+            <span class="text-xs text-slate-500">Acepto los <a href="#" onclick="event.preventDefault(); window.openTerminosModal();" class="text-blue-600 dark:text-blue-400 font-bold hover:underline">Términos y Condiciones</a></span>
+          </label>
+          <p id="register-error" class="text-xs text-rose-500 font-bold hidden"></p>
+          <button type="submit" id="btn-register-submit" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-black shadow-lg shadow-blue-500/25 transition-colors">Crear cuenta</button>
+          <p class="text-center text-xs text-slate-500">¿Ya tenés cuenta? <button type="button" onclick="window.closeRegisterModal(); window.openLoginModal();" class="text-blue-600 dark:text-blue-400 font-bold hover:underline">Iniciar Sesión</button></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== MODAL: MIS RESERVAS ===== -->
+    <div id="modal-mis-reservas" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center">
+      <div id="modal-mis-reservas-content" class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl w-full sm:max-w-lg max-h-[90vh] flex flex-col translate-y-full sm:translate-y-0 sm:scale-95 sm:opacity-0 transition-all duration-300 transform">
+        <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
+          <h2 class="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+            Mis Reservas
+          </h2>
+          <button onclick="window.closeMisReservas()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+        <div id="lista-mis-reservas" class="overflow-y-auto flex-1 p-4 space-y-3">
+          <!-- Tarjetas inyectadas por JS -->
+          <div class="flex flex-col items-center justify-center py-12 text-slate-400">
+            <svg class="animate-spin h-8 w-8 mb-3 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <p class="text-sm font-bold">Cargando reservas...</p>
+          </div>
         </div>
       </div>
     </div>
