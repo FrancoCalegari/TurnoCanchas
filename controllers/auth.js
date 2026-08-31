@@ -71,7 +71,7 @@ const masterLogin = async (req, res) => {
 
 const registerClient = async (req, res) => {
     try {
-        const { nombre, email, password, telefono, acepta_terminos } = req.body;
+        const { nombre, email, password, telefono, acepta_terminos, tenant } = req.body;
         
         if (!nombre || !email || !password) {
             return res.status(400).json({ error: 'Faltan campos obligatorios (nombre, email, password)' });
@@ -84,11 +84,18 @@ const registerClient = async (req, res) => {
         const safeNombre = String(nombre).replace(/'/g, "''");
         const safeEmail = String(email).replace(/'/g, "''").toLowerCase();
         const safeTelefono = telefono ? String(telefono).replace(/'/g, "''") : '';
+        
+        let tenantId = 0;
+        if (tenant) {
+            const safeTenant = String(tenant).replace(/'/g, "''");
+            const tRes = await executeQuery(`SELECT id FROM tenants WHERE slug = '${safeTenant}'`);
+            if (tRes && tRes.length > 0) tenantId = tRes[0].id;
+        }
 
-        // Verificar si el email ya existe
-        const existing = await executeQuery(`SELECT id FROM clientes WHERE email = '${safeEmail}'`);
+        // Verificar si el email ya existe en este tenant
+        const existing = await executeQuery(`SELECT id FROM clientes WHERE email = '${safeEmail}' AND tenant_id = ${tenantId}`);
         if (existing && existing.length > 0) {
-            return res.status(400).json({ error: 'El email ya está registrado' });
+            return res.status(400).json({ error: 'El email ya está registrado en este complejo' });
         }
 
         // Hashear la contraseña con bcryptjs
@@ -96,8 +103,8 @@ const registerClient = async (req, res) => {
         const safeHash = hashedPassword.replace(/'/g, "''");
 
         const query = `
-            INSERT INTO clientes (nombre, email, password, telefono) 
-            VALUES ('${safeNombre}', '${safeEmail}', '${safeHash}', '${safeTelefono}')
+            INSERT INTO clientes (nombre, email, password, telefono, tenant_id) 
+            VALUES ('${safeNombre}', '${safeEmail}', '${safeHash}', '${safeTelefono}', ${tenantId})
         `;
         
         await executeQuery(query);
@@ -110,14 +117,21 @@ const registerClient = async (req, res) => {
 
 const loginClient = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, tenant } = req.body;
         
         if (!email || !password) {
             return res.status(400).json({ error: 'Faltan credenciales' });
         }
+        
+        let tenantId = 0;
+        if (tenant) {
+            const safeTenant = String(tenant).replace(/'/g, "''");
+            const tRes = await executeQuery(`SELECT id FROM tenants WHERE slug = '${safeTenant}'`);
+            if (tRes && tRes.length > 0) tenantId = tRes[0].id;
+        }
 
         const safeEmail = String(email).replace(/'/g, "''").toLowerCase();
-        const query = `SELECT * FROM clientes WHERE email = '${safeEmail}'`;
+        const query = `SELECT * FROM clientes WHERE email = '${safeEmail}' AND tenant_id = ${tenantId}`;
         
         const result = await executeQuery(query);
         

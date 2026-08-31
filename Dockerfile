@@ -16,6 +16,9 @@ COPY . .
 # Exponemos el puerto que utiliza el servidor Express
 EXPOSE 3000
 
+# Aseguramos que la carpeta de subidas exista y tenga los permisos correctos para el usuario node
+RUN mkdir -p public/uploads && chown -R node:node public/uploads
+
 # Añadimos un usuario no root por seguridad (opcional, buena práctica)
 USER node
 

@@ -83,13 +83,24 @@ const getAdminReservas = async (req, res) => {
 const getByUser = async (req, res) => {
     try {
         const { userId } = req.params;
+        const { tenant } = req.query;
+
+        let tenantFilter = '';
+        if (tenant) {
+            const safeTenant = String(tenant).replace(/'/g, "''");
+            const tRes = await executeQuery(`SELECT id FROM tenants WHERE slug = '${safeTenant}'`);
+            if (tRes && tRes.length > 0) {
+                tenantFilter = `AND tenant_id = ${tRes[0].id}`;
+            }
+        }
+
         const safeUserId = String(userId).replace(/'/g, "''");
         
         let query;
         if (!isNaN(userId) && userId.trim() !== '') {
-            query = `SELECT * FROM reservas WHERE cliente = '${safeUserId}' OR cliente_id = ${parseInt(userId)}`;
+            query = `SELECT * FROM reservas WHERE (cliente = '${safeUserId}' OR cliente_id = ${parseInt(userId)}) ${tenantFilter}`;
         } else {
-            query = `SELECT * FROM reservas WHERE cliente = '${safeUserId}'`;
+            query = `SELECT * FROM reservas WHERE cliente = '${safeUserId}' ${tenantFilter}`;
         }
         
         const result = await executeQuery(query);

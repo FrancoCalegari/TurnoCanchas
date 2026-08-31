@@ -110,10 +110,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const heroImg3 = document.getElementById('hero-image-3');
                 if (heroImg3) heroImg3.src = ajustes.hero_image_url_3;
             }
-            if (ajustes.hero_title) {
-                const heroTitle = document.getElementById('header-title');
-                if (heroTitle) heroTitle.innerText = ajustes.hero_title;
-                document.title = ajustes.hero_title + ' - Reservas';
+            if (ajustes.nombre_complejo) {
+                const headerTitle = document.getElementById('header-title');
+                if (headerTitle) headerTitle.innerText = ajustes.nombre_complejo;
+                document.title = ajustes.nombre_complejo + ' - Reservas';
             }
             if (ajustes.nosotros_title) {
                 const infoTitle = document.getElementById('info-title');

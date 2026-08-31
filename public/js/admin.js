@@ -458,6 +458,23 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadAjustes() {
         const data = await window.API.getAjustes();
         if (data) {
+            if (data.logo_url) {
+                const headerLogo = document.getElementById('admin-header-logo');
+                if (headerLogo) {
+                    headerLogo.src = data.logo_url;
+                    headerLogo.classList.remove('hidden');
+                }
+                
+                // Update favicon
+                let favicon = document.querySelector('link[rel="icon"]');
+                if (!favicon) {
+                    favicon = document.createElement('link');
+                    favicon.rel = 'icon';
+                    document.head.appendChild(favicon);
+                }
+                favicon.href = data.logo_url;
+            }
+            
             document.getElementById('ajustes-nombre').value = data.nombre_complejo || '';
             document.getElementById('ajustes-open').value = data.open_time || '';
             document.getElementById('ajustes-close').value = data.close_time || '';

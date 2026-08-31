@@ -11,3 +11,6 @@ services:
       - .env
     environment:
       - NODE_ENV=production
+    volumes:
+      - ./public/uploads:/usr/src/app/public/uploads
+

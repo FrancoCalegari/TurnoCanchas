@@ -83,7 +83,10 @@ window.API = {
      */
     getReservasByUser: async (userId) => {
         try {
-            const res = await fetch(`${API_BASE}/reservas/usuario/${encodeURIComponent(userId)}`);
+            const tenant = window.API.getPublicTenant();
+            let url = `${API_BASE}/reservas/usuario/${encodeURIComponent(userId)}`;
+            if (tenant) url += `?tenant=${tenant}`;
+            const res = await fetch(url);
             if (!res.ok) throw new Error('Error fetching reservas by user');
             const result = await res.json();
             return result.data || [];
@@ -117,10 +120,14 @@ window.API = {
      * Inicia sesión como cliente
      */
     clientLogin: async (email, password) => {
+        const tenant = window.API.getPublicTenant();
+        const bodyData = { email, password };
+        if (tenant) bodyData.tenant = tenant;
+
         const res = await fetch(`${API_BASE}/auth/cliente/login`, {
             method: 'POST',
             headers: window.API._getHeaders(),
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify(bodyData)
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Error en login');
@@ -134,6 +141,9 @@ window.API = {
      * Registra a un nuevo cliente
      */
     clientRegister: async (userData) => {
+        const tenant = window.API.getPublicTenant();
+        if (tenant) userData.tenant = tenant;
+        
         const res = await fetch(`${API_BASE}/auth/cliente/register`, {
             method: 'POST',
             headers: window.API._getHeaders(),
