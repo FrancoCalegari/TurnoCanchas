@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Instalamos solo las dependencias de producción (omite devDependencies)
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # Copiamos el resto del código fuente al contenedor (se ignorará lo que esté en .dockerignore)
 COPY . .
