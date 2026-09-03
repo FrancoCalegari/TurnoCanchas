@@ -353,6 +353,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const realEstado = (r.estado || 'confirmada').toLowerCase();
                 if (realEstado === 'confirmada') {
                     stateObj = { class: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50', dot: 'bg-emerald-500', text: 'Confirmada' };
+                } else if (realEstado === 'comprobante_enviado') {
+                    stateObj = { class: 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400 border-blue-200 dark:border-blue-800/50', dot: 'bg-blue-500', text: 'Pago Pendiente' };
                 } else if (realEstado === 'seña_pendiente' || realEstado === 'pendiente' || realEstado === 'por confirmar') {
                     stateObj = { class: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400 border-amber-200 dark:border-amber-800/50', dot: 'bg-amber-500', text: 'Por Confirmar' };
                 } else if (realEstado === 'cancelada') {
@@ -364,7 +366,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let actionsHtml = '';
             const estadoActual = (r.estado || 'confirmada').toLowerCase();
-            if (estadoActual === 'por confirmar') {
+            if (estadoActual === 'comprobante_enviado' && r.comprobante_url) {
+                actionsHtml = `
+                    <div class="flex items-center justify-end gap-1">
+                        <button class="btn-action-ver-comp p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all cursor-pointer" data-id="${r.id}" data-url="${r.comprobante_url}" data-cliente="${r.cliente || ''}" data-fecha="${r.fecha || ''}" data-hora="${r.hora || ''}" title="Ver Comprobante">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                        </button>
+                    </div>
+                `;
+            } else if (estadoActual === 'por confirmar') {
                 actionsHtml = `
                     <div class="flex items-center justify-end gap-1">
                         <button class="btn-action-accept p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all cursor-pointer" data-id="${r.id}" title="Aceptar Reserva">
@@ -450,6 +460,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
         });
+
+        // Ver comprobante de pago (dashboard)
+        document.querySelectorAll('.btn-action-ver-comp').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const btn = e.currentTarget;
+                openComprobanteModal({
+                    id: btn.getAttribute('data-id'),
+                    comprobanteUrl: btn.getAttribute('data-url'),
+                    cliente: btn.getAttribute('data-cliente'),
+                    fecha: btn.getAttribute('data-fecha'),
+                    hora: btn.getAttribute('data-hora')
+                }, () => loadDashboardData());
+            });
+        });
     }
 
     // ==========================================
@@ -499,6 +523,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if(canchasTitleInput) canchasTitleInput.value = data.canchas_title || '';
             const nosotrosTitleInput = document.getElementById('ajustes-nosotros-title');
             if(nosotrosTitleInput) nosotrosTitleInput.value = data.nosotros_title || '';
+            const mpAliasInput = document.getElementById('ajustes-mp-alias');
+            if(mpAliasInput) mpAliasInput.value = data.mercadopago_alias || '';
         }
     }
 
@@ -574,7 +600,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         hero_image_url_3: document.getElementById('ajustes-hero-image-3') ? document.getElementById('ajustes-hero-image-3').value : undefined,
                         hero_title: document.getElementById('ajustes-hero-title') ? document.getElementById('ajustes-hero-title').value : undefined,
                         canchas_title: document.getElementById('ajustes-canchas-title') ? document.getElementById('ajustes-canchas-title').value : undefined,
-                        nosotros_title: document.getElementById('ajustes-nosotros-title') ? document.getElementById('ajustes-nosotros-title').value : undefined
+                        nosotros_title: document.getElementById('ajustes-nosotros-title') ? document.getElementById('ajustes-nosotros-title').value : undefined,
+                        mercadopago_alias: document.getElementById('ajustes-mp-alias') ? document.getElementById('ajustes-mp-alias').value : undefined
                     });
                     showAlertModal('Éxito', 'Ajustes guardados correctamente.', 'success');
                 } catch (error) {
@@ -655,12 +682,20 @@ document.addEventListener('DOMContentLoaded', () => {
             let stateObj;
             const est = (r.estado || 'por confirmar').toLowerCase();
             if (est === 'confirmada') stateObj = { cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50', dot: 'bg-emerald-500', text: 'Confirmada' };
+            else if (est === 'comprobante_enviado') stateObj = { cls: 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400 border-blue-200 dark:border-blue-800/50', dot: 'bg-blue-500', text: 'Pago Pendiente' };
             else if (est === 'cancelada') stateObj = { cls: 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-400 border-rose-200 dark:border-rose-800/50', dot: 'bg-rose-500', text: 'Cancelada' };
             else stateObj = { cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400 border-amber-200 dark:border-amber-800/50', dot: 'bg-amber-500', text: 'Por Confirmar' };
 
             let actionsHtml = '';
             if (!esPasada && est !== 'cancelada') {
-                if (est === 'por confirmar') {
+                if (est === 'comprobante_enviado' && r.comprobante_url) {
+                    actionsHtml = `
+                        <div class="flex items-center justify-end gap-1">
+                            <button class="res-btn-ver-comp p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all cursor-pointer" data-id="${r.id}" data-url="${r.comprobante_url}" data-cliente="${r.clientenombre || r.clienteNombre || r.cliente || ''}" data-fecha="${r.fecha || ''}" data-hora="${r.hora || ''}" title="Ver Comprobante">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                            </button>
+                        </div>`;
+                } else if (est === 'por confirmar') {
                     actionsHtml = `
                         <div class="flex items-center justify-end gap-1">
                             <button class="res-btn-accept p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all cursor-pointer" data-id="${r.id}" title="Aceptar">
@@ -734,6 +769,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         loadReservasAdmin(getCurrentFiltros());
                     } catch(e) { showAlertModal('Error', e.message, 'error'); }
                 });
+            });
+        });
+        // Ver comprobante (gestión de reservas)
+        tbody.querySelectorAll('.res-btn-ver-comp').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const b = e.currentTarget;
+                openComprobanteModal({
+                    id: b.getAttribute('data-id'),
+                    comprobanteUrl: b.getAttribute('data-url'),
+                    cliente: b.getAttribute('data-cliente'),
+                    fecha: b.getAttribute('data-fecha'),
+                    hora: b.getAttribute('data-hora')
+                }, () => loadReservasAdmin(getCurrentFiltros()));
             });
         });
     }
@@ -1213,6 +1261,121 @@ document.addEventListener('DOMContentLoaded', () => {
 
         btnCancel.addEventListener('click', onCancel);
         btnConfirm.addEventListener('click', onAccept);
+    }
+
+    // ==========================================
+    // MODAL: COMPROBANTE DE PAGO
+    // ==========================================
+    function openComprobanteModal({ id, comprobanteUrl, cliente, fecha, hora }, onAction) {
+        const modal = document.getElementById('modal-comprobante');
+        const modalContent = document.getElementById('modal-comprobante-content');
+        if (!modal || !modalContent) return;
+
+        // Set data
+        const reservaIdEl = document.getElementById('modal-comprobante-reserva-id');
+        const clienteEl = document.getElementById('modal-comp-cliente');
+        const fechaHoraEl = document.getElementById('modal-comp-fecha-hora');
+        const imgEl = document.getElementById('modal-comp-img');
+        const pdfIframe = document.getElementById('modal-comp-pdf-iframe');
+        const noArchivoEl = document.getElementById('modal-comp-no-archivo');
+        const openTabLink = document.getElementById('modal-comp-open-tab');
+        const hintEl = document.getElementById('modal-comp-hint');
+
+        if (reservaIdEl) reservaIdEl.innerText = 'Reserva: ' + id;
+        if (clienteEl) clienteEl.innerText = cliente || 'Cliente';
+        if (fechaHoraEl) fechaHoraEl.innerText = (fecha || '') + ' ' + ((hora || '').substring(0, 5));
+
+        // Reset
+        if (imgEl) { imgEl.classList.add('hidden'); imgEl.src = ''; }
+        if (pdfIframe) { pdfIframe.classList.add('hidden'); pdfIframe.src = ''; }
+        if (noArchivoEl) noArchivoEl.classList.remove('hidden');
+        if (openTabLink) openTabLink.classList.add('hidden');
+        if (hintEl) hintEl.classList.add('hidden');
+
+        if (comprobanteUrl) {
+            const isPdf = comprobanteUrl.toLowerCase().endsWith('.pdf');
+            if (noArchivoEl) noArchivoEl.classList.add('hidden');
+
+            // Show "open in new tab" button in header
+            if (openTabLink) {
+                openTabLink.href = comprobanteUrl;
+                openTabLink.classList.remove('hidden');
+                openTabLink.classList.add('flex');
+            }
+
+            if (isPdf) {
+                // Embed PDF via iframe
+                if (pdfIframe) {
+                    pdfIframe.src = comprobanteUrl;
+                    pdfIframe.classList.remove('hidden');
+                }
+            } else {
+                // Show image inline
+                if (imgEl) {
+                    imgEl.src = comprobanteUrl;
+                    imgEl.classList.remove('hidden');
+                    imgEl.onclick = () => window.open(comprobanteUrl, '_blank');
+                }
+                if (hintEl) hintEl.classList.remove('hidden');
+            }
+        }
+
+
+        // Show modal
+        modal.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            modalContent.classList.remove('scale-95', 'opacity-0');
+            modalContent.classList.add('scale-100', 'opacity-100');
+        });
+
+        const closeModal = () => {
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+            btnClose.removeEventListener('click', closeModal);
+            modal.removeEventListener('click', onOverlayClick);
+            btnConfirmar.removeEventListener('click', onConfirmar);
+            btnRechazar.removeEventListener('click', onRechazar);
+        };
+
+        const btnClose = document.getElementById('btn-close-comprobante');
+        const btnConfirmar = document.getElementById('modal-comp-btn-confirmar');
+        const btnRechazar = document.getElementById('modal-comp-btn-rechazar');
+
+        const onOverlayClick = (e) => { if (e.target === modal) closeModal(); };
+
+        const onConfirmar = async () => {
+            try {
+                btnConfirmar.disabled = true;
+                btnConfirmar.innerText = 'Confirmando...';
+                await window.API.updateReservaStatus(id, 'confirmada');
+                closeModal();
+                showAlertModal('¡Pago Confirmado!', 'La reserva fue confirmada correctamente.', 'success');
+                if (typeof onAction === 'function') onAction();
+            } catch (err) {
+                btnConfirmar.disabled = false;
+                btnConfirmar.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Confirmar Pago`;
+                showAlertModal('Error', err.message, 'error');
+            }
+        };
+
+        const onRechazar = async () => {
+            showConfirmModal('Rechazar Pago', '¿Rechazar el comprobante y cancelar la reserva?', async () => {
+                try {
+                    await window.API.updateReservaStatus(id, 'cancelada');
+                    closeModal();
+                    showAlertModal('Pago Rechazado', 'La reserva fue cancelada.', 'error');
+                    if (typeof onAction === 'function') onAction();
+                } catch (err) {
+                    showAlertModal('Error', err.message, 'error');
+                }
+            });
+        };
+
+        btnClose?.addEventListener('click', closeModal);
+        modal.addEventListener('click', onOverlayClick);
+        btnConfirmar?.addEventListener('click', onConfirmar);
+        btnRechazar?.addEventListener('click', onRechazar);
     }
 
     init();

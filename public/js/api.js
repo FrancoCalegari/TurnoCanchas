@@ -458,6 +458,24 @@ window.API = {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Error al cancelar reserva');
         return data;
+    },
+
+    /**
+     * Sube el comprobante de pago de una reserva.
+     * @param {string} reservaId - ID de la reserva
+     * @param {File} file - Archivo de imagen o PDF
+     */
+    uploadComprobante: async (reservaId, file) => {
+        const formData = new FormData();
+        formData.append('comprobante', file);
+        formData.append('reservaId', String(reservaId));
+        const res = await fetch('/api/upload/comprobante', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error al subir comprobante');
+        return data;
     }
 };
 

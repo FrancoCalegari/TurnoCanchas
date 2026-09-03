@@ -769,6 +769,137 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ==========================================
+    // MODAL: PAGO MERCADOPAGO (cliente)
+    // ==========================================
+    function openMPModal({ cancha, hour, duration, price, nombreCliente, clienteId }) {
+        const mpAlias = state.ajustes?.mercadopago_alias || '';
+        const porcentajeSena = cancha.porcentaje_sena !== undefined ? parseFloat(cancha.porcentaje_sena) : 50;
+        const montoSena = Math.round(price * (porcentajeSena / 100));
+
+        const modal = document.getElementById('modal-mp-pago');
+        if (!modal) {
+            // Fallback if modal doesn't exist
+            window.API.crearReserva({
+                canchaId: cancha.id,
+                fecha: formatDateToYMD(state.selectedDate),
+                hora: hour,
+                cliente: nombreCliente,
+                cliente_id: clienteId,
+                duracion: duration,
+                precio: price
+            }).then(res => {
+                showAlertModal('¡Reserva creada!', `Código: ${res.id.toUpperCase()}`, 'success');
+                loadData();
+            }).catch(() => showAlertModal('Error', 'No se pudo crear la reserva.', 'error'));
+            return;
+        }
+
+        // Fill data
+        const aliasEl = document.getElementById('mp-alias-display');
+        const montoEl = document.getElementById('mp-monto-display');
+        const montoTotalEl = document.getElementById('mp-monto-total');
+        const canchaInfoEl = document.getElementById('mp-cancha-info');
+        const fileInput = document.getElementById('mp-comprobante-file');
+        const fileNameEl = document.getElementById('mp-comprobante-name');
+        const btnConfirmar = document.getElementById('btn-mp-confirmar');
+        const btnCopyAlias = document.getElementById('btn-copy-alias');
+        const uploadArea = document.getElementById('mp-upload-area');
+
+        if (aliasEl) aliasEl.innerText = mpAlias || '(no configurado)';
+        if (montoEl) montoEl.innerText = '$' + montoSena.toLocaleString('es-AR');
+        if (montoTotalEl) montoTotalEl.innerText = '$' + price.toLocaleString('es-AR');
+        if (canchaInfoEl) canchaInfoEl.innerText = `${cancha.nombre} — ${formatDateToYMD(state.selectedDate)} a las ${hour} hs`;
+        if (fileInput) fileInput.value = '';
+        if (fileNameEl) fileNameEl.innerText = 'Ningún archivo seleccionado';
+        if (btnConfirmar) btnConfirmar.disabled = true;
+
+        // Show/hide alias section
+        const mpSection = document.getElementById('mp-alias-section');
+        if (mpSection) mpSection.classList.toggle('hidden', !mpAlias);
+
+        // Open
+        const modalContent = document.getElementById('modal-mp-pago-content');
+        modal.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            if (modalContent) {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }
+        });
+
+        const closeModal = () => {
+            if (modalContent) {
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                modalContent.classList.add('scale-95', 'opacity-0');
+            }
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        };
+
+        // Copy alias
+        if (btnCopyAlias) {
+            btnCopyAlias.onclick = () => {
+                if (mpAlias) {
+                    navigator.clipboard.writeText(mpAlias).then(() => {
+                        btnCopyAlias.innerText = '✅';
+                        setTimeout(() => { btnCopyAlias.innerText = '📋'; }, 1500);
+                    });
+                }
+            };
+        }
+
+        // File select
+        if (fileInput) {
+            fileInput.onchange = () => {
+                const file = fileInput.files[0];
+                if (fileNameEl) fileNameEl.innerText = file ? file.name : 'Ningún archivo seleccionado';
+                if (btnConfirmar) btnConfirmar.disabled = !file;
+            };
+        }
+        if (uploadArea) uploadArea.onclick = () => fileInput && fileInput.click();
+
+        // Cancel
+        const btnCancelar = document.getElementById('btn-mp-cancelar');
+        if (btnCancelar) btnCancelar.onclick = () => closeModal();
+        modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+        // Confirm
+        if (btnConfirmar) {
+            btnConfirmar.onclick = async () => {
+                const file = fileInput ? fileInput.files[0] : null;
+                if (!file) {
+                    showAlertModal('Atención', 'Debés subir el comprobante antes de confirmar.', 'error');
+                    return;
+                }
+                btnConfirmar.disabled = true;
+                btnConfirmar.innerHTML = '<span class="text-sm">Procesando...</span>';
+                try {
+                    const reserva = await window.API.crearReserva({
+                        canchaId: cancha.id,
+                        fecha: formatDateToYMD(state.selectedDate),
+                        hora: hour,
+                        cliente: nombreCliente,
+                        cliente_id: clienteId,
+                        duracion: duration,
+                        precio: price
+                    });
+                    await window.API.uploadComprobante(reserva.id, file);
+                    closeModal();
+                    showAlertModal(
+                        '¡Comprobante enviado!',
+                        `Reserva #${String(reserva.id).toUpperCase()} recibida. El complejo verificará tu pago y confirmará el turno pronto.`,
+                        'success'
+                    );
+                    loadData();
+                } catch (err) {
+                    showAlertModal('Error', err.message || 'No se pudo procesar la reserva.', 'error');
+                    btnConfirmar.disabled = false;
+                    btnConfirmar.innerHTML = 'Confirmar Reserva';
+                }
+            };
+        }
+    }
+
     // Reservation Handler
     function handleReserva(btn, cancha, hour, duration, price) {
         const now = new Date();
@@ -792,33 +923,38 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const text = `¿Confirmar reserva en ${cancha.nombre} el ${formatDateToYMD(state.selectedDate)} a las ${hour} hs por ${duration} minutos?\n\nA nombre de: ${nombreCliente}\nCosto total: $${price.toLocaleString('es-AR')}`;
-        
-        showConfirmModal(text, () => {
-            // Show loading state
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<span class="text-xs font-bold">Procesando...</span>';
-            btn.disabled = true;
+        const mpAlias = state.ajustes?.mercadopago_alias || '';
 
-            window.API.crearReserva({
-                canchaId: cancha.id,
-                fecha: formatDateToYMD(state.selectedDate),
-                hora: hour,
-                cliente: nombreCliente,
-                cliente_id: clienteId,
-                duracion: duration,
-                precio: price
-            }).then(res => {
-                showAlertModal('¡Reserva confirmada con éxito!', `Tu código de reserva es: ${res.id.toUpperCase()}\nTe esperamos en el complejo.`, 'success');
-                // Refresh data
-                loadData();
-            }).catch(err => {
-                showAlertModal('Error', "Hubo un error al procesar la reserva. Intente nuevamente.", 'error');
-                btn.innerHTML = originalHtml;
-                btn.disabled = false;
+        if (mpAlias) {
+            // MercadoPago flow: show payment modal
+            openMPModal({ cancha, hour, duration, price, nombreCliente, clienteId });
+        } else {
+            // Standard flow (no MP alias configured)
+            const text = `¿Confirmar reserva en ${cancha.nombre} el ${formatDateToYMD(state.selectedDate)} a las ${hour} hs por ${duration} minutos?\n\nA nombre de: ${nombreCliente}\nCosto total: $${price.toLocaleString('es-AR')}`;
+            showConfirmModal(text, () => {
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<span class="text-xs font-bold">Procesando...</span>';
+                btn.disabled = true;
+                window.API.crearReserva({
+                    canchaId: cancha.id,
+                    fecha: formatDateToYMD(state.selectedDate),
+                    hora: hour,
+                    cliente: nombreCliente,
+                    cliente_id: clienteId,
+                    duracion: duration,
+                    precio: price
+                }).then(res => {
+                    showAlertModal('¡Reserva confirmada con éxito!', `Tu código de reserva es: ${res.id.toUpperCase()}\nTe esperamos en el complejo.`, 'success');
+                    loadData();
+                }).catch(() => {
+                    showAlertModal('Error', 'Hubo un error al procesar la reserva. Intente nuevamente.', 'error');
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                });
             });
-        });
+        }
     }
+
 
     function updateHeaderAuth() {
         const authSection = document.getElementById('client-auth-section');

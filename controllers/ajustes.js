@@ -27,7 +27,7 @@ const getAjustes = async (req, res) => {
 
 const updateAjustes = async (req, res) => {
     try {
-        const { nombre_complejo, open_time, close_time, wpp_contacto, wpp_mensaje, ubicacion_maps, logo_url, hero_image_url, hero_image_url_2, hero_image_url_3, hero_title, canchas_title, nosotros_title, devolver_sena } = req.body;
+        const { nombre_complejo, open_time, close_time, wpp_contacto, wpp_mensaje, ubicacion_maps, logo_url, hero_image_url, hero_image_url_2, hero_image_url_3, hero_title, canchas_title, nosotros_title, devolver_sena, mercadopago_alias } = req.body;
         
         let updates = [];
         if (nombre_complejo !== undefined) {
@@ -85,6 +85,10 @@ const updateAjustes = async (req, res) => {
         if (nosotros_title !== undefined) {
             const safe = String(nosotros_title).replace(/'/g, "''");
             updates.push(`nosotros_title = '${safe}'`);
+        }
+        if (mercadopago_alias !== undefined) {
+            const safe = String(mercadopago_alias).replace(/'/g, "''");
+            updates.push(`mercadopago_alias = '${safe}'`);
         }
 
         if (updates.length === 0) {

@@ -61,6 +61,7 @@ const getAdminReservas = async (req, res) => {
 
         const query = `
             SELECT r.*, 
+                   r.comprobante_url,
                    c.nombre AS canchaName,
                    cl.nombre AS clienteNombre,
                    cl.telefono AS clienteTelefono,

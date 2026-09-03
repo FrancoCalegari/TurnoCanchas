@@ -24,6 +24,19 @@ const storage = multer.diskStorage({
     }
 });
 
+// Storage for comprobantes
+const comprobanteStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        const reservaId = req.body ? (req.body.reservaId || 'unknown') : 'unknown';
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname).toLowerCase();
+        cb(null, 'comprobante-' + reservaId + '-' + uniqueSuffix + ext);
+    }
+});
+
 // Allow only images
 const fileFilter = (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
@@ -33,10 +46,25 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
+// Allow images and PDFs for comprobantes
+const comprobanteFileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+        cb(null, true);
+    } else {
+        cb(new Error('Solo se permiten imágenes o PDF'), false);
+    }
+};
+
 const upload = multer({ 
     storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
     fileFilter: fileFilter
+});
+
+const uploadComprobante = multer({
+    storage: comprobanteStorage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: comprobanteFileFilter
 });
 
 // Endpoint for uploading logo
@@ -56,4 +84,35 @@ router.post('/logo', requireTenantAdmin, upload.single('logo'), (req, res) => {
     }
 });
 
+// Endpoint for uploading payment comprobante (no admin auth required — public client)
+const { executeQuery } = require('../config/db');
+
+router.post('/comprobante', uploadComprobante.single('comprobante'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No se subió ningún archivo' });
+        }
+
+        const reservaId = req.body && req.body.reservaId ? String(req.body.reservaId).replace(/'/g, "''") : null;
+        const fileUrl = '/uploads/' + req.file.filename;
+
+        // Update the reserva with the comprobante URL and mark as comprobante_enviado
+        if (reservaId) {
+            try {
+                await executeQuery(
+                    `UPDATE reservas SET comprobante_url = '${fileUrl}', estado = 'comprobante_enviado' WHERE id = '${reservaId}'`
+                );
+            } catch (dbErr) {
+                console.error('[Upload Comprobante] DB error:', dbErr.message);
+                // Still return success even if DB update fails; the file is saved
+            }
+        }
+
+        res.json({ message: 'Comprobante subido con éxito', url: fileUrl });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;
+
