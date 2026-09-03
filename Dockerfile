@@ -20,7 +20,7 @@ EXPOSE 3000
 RUN mkdir -p public/uploads && chown -R node:node public/uploads
 
 # Añadimos un usuario no root por seguridad (opcional, buena práctica)
-USER node
+# USER node
 
 # Comando por defecto para arrancar la aplicación
 CMD ["npm", "start"]
