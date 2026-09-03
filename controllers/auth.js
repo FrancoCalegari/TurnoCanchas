@@ -207,18 +207,18 @@ const forgotPasswordClient = async (req, res) => {
         const host = req.get('host');
         const resetLink = `${protocol}://${host}/reset-password.html?token=${token}`;
         
-        const emailHtml = \`
+        const emailHtml = `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
                 <h2 style="color: #333;">Recuperación de Contraseña</h2>
-                <p>Hola \${user.nombre},</p>
+                <p>Hola ${user.nombre},</p>
                 <p>Has solicitado restablecer tu contraseña. Haz clic en el botón de abajo para crear una nueva:</p>
                 <div style="text-align: center; margin: 30px 0;">
-                    <a href="\${resetLink}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Restablecer mi contraseña</a>
+                    <a href="${resetLink}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Restablecer mi contraseña</a>
                 </div>
                 <p style="color: #666; font-size: 14px;">Si no solicitaste este cambio, puedes ignorar este correo.</p>
                 <p style="color: #666; font-size: 14px;">El enlace expirará en 1 hora.</p>
             </div>
-        \`;
+        `;
 
         await sendEmail({
             to: user.email,
@@ -244,11 +244,11 @@ const resetPasswordClient = async (req, res) => {
         const safeToken = String(token).replace(/'/g, "''");
         
         // Buscar el token en DB
-        const result = await executeQuery(\`
+        const result = await executeQuery(`
             SELECT * FROM password_resets 
-            WHERE token = '\${safeToken}' 
+            WHERE token = '${safeToken}' 
             ORDER BY createdAt DESC LIMIT 1
-        \`);
+        `);
 
         if (!result || result.length === 0) {
             return res.status(400).json({ error: 'El enlace de recuperación es inválido o ha expirado.' });
@@ -265,7 +265,7 @@ const resetPasswordClient = async (req, res) => {
 
         // Encontrar cliente por email
         const safeEmail = resetRecord.email.replace(/'/g, "''");
-        const clientResult = await executeQuery(\`SELECT id FROM clientes WHERE email = '\${safeEmail}' LIMIT 1\`);
+        const clientResult = await executeQuery(`SELECT id FROM clientes WHERE email = '${safeEmail}' LIMIT 1`);
         
         if (!clientResult || clientResult.length === 0) {
             return res.status(404).json({ error: 'No se encontró el usuario asociado.' });
@@ -277,10 +277,10 @@ const resetPasswordClient = async (req, res) => {
         const hashedPassword = await bcrypt.hash(String(newPassword), SALT_ROUNDS);
         const safeHash = hashedPassword.replace(/'/g, "''");
         
-        await executeQuery(\`UPDATE clientes SET password = '\${safeHash}' WHERE id = \${clientId}\`);
+        await executeQuery(`UPDATE clientes SET password = '${safeHash}' WHERE id = ${clientId}`);
 
         // Invalidar el token para que no se re-utilice
-        await executeQuery(\`DELETE FROM password_resets WHERE token = '\${safeToken}'\`);
+        await executeQuery(`DELETE FROM password_resets WHERE token = '${safeToken}'`);
 
         res.json({ message: 'Contraseña actualizada con éxito. Ya puedes iniciar sesión.' });
     } catch (error) {
