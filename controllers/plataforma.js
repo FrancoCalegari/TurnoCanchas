@@ -96,9 +96,36 @@ const updateInfo = async (req, res) => {
     }
 };
 
+const fs = require('fs');
+const path = require('path');
+
+const uploadLogo = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No se subió ninguna imagen' });
+        }
+
+        const logoUrl = '/uploads/' + req.file.filename;
+        const faviconUrl = '/favicon.ico';
+        
+        // Copy the uploaded file to public/favicon.ico
+        const uploadedPath = req.file.path;
+        const faviconPath = path.join(__dirname, '../public/favicon.ico');
+        fs.copyFileSync(uploadedPath, faviconPath);
+
+        // Update database
+        await executeQuery(`UPDATE plataforma_config SET logo_url = '${logoUrl}', favicon_url = '${faviconUrl}' WHERE id = 1`);
+
+        res.json({ message: 'Logo subido con éxito', logo_url: logoUrl, favicon_url: faviconUrl });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     getStatus,
     updateStatus,
     getInfo,
-    updateInfo
+    updateInfo,
+    uploadLogo
 };

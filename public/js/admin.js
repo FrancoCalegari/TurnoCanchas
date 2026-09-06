@@ -54,6 +54,33 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        const btnShareWhatsapp = document.getElementById('btn-share-whatsapp');
+        const btnCopyLink = document.getElementById('btn-copy-link');
+
+        if (btnShareWhatsapp && tenantData) {
+            btnShareWhatsapp.addEventListener('click', () => {
+                const publicUrl = `${window.location.origin}/t/${tenantData.slug}`;
+                const text = `¡Reserva tu turno en ${tenantData.nombre}!\nIngresa aquí: ${publicUrl}`;
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+            });
+        }
+
+        if (btnCopyLink && tenantData) {
+            btnCopyLink.addEventListener('click', async () => {
+                const publicUrl = `${window.location.origin}/t/${tenantData.slug}`;
+                try {
+                    await navigator.clipboard.writeText(publicUrl);
+                    const originalHTML = btnCopyLink.innerHTML;
+                    btnCopyLink.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M20 6 9 17l-5-5"/></svg> ¡Copiado!`;
+                    setTimeout(() => {
+                        btnCopyLink.innerHTML = originalHTML;
+                    }, 2000);
+                } catch (err) {
+                    alert(`El enlace es: ${publicUrl}`);
+                }
+            });
+        }
+
         // Lógica de Módulos Dinámicos según Rubro
         if (tenantData && tenantData.rubro_id !== 1) {
             // Ocultar módulo de Canchas

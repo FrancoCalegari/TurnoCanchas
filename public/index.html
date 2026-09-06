@@ -62,8 +62,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <div class="flex items-center gap-3">
-                    <img src="/img/logo.jpg" alt="Logo ServicioDigital" class="w-10 h-10 rounded-xl shadow-lg shadow-primary/20 object-cover">
-                    <span class="text-xl font-black tracking-tight text-white">Servicio<span class="text-indigo-400">Digital</span></span>
+                    <img id="nav-logo" src="/img/logo.jpg" alt="Logo Plataforma" class="w-10 h-10 rounded-xl shadow-lg shadow-primary/20 object-cover">
+                    <span id="nav-title" class="text-xl font-black tracking-tight text-white">Servicio<span class="text-indigo-400">Digital</span></span>
                 </div>
                 <div class="hidden md:flex items-center gap-8">
                     <a href="#caracteristicas" class="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Características</a>
@@ -101,7 +101,7 @@
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">forma inteligente</span>
             </h1>
             
-            <p class="mt-4 text-lg md:text-xl text-slate-400 max-w-2xl mx-auto font-medium mb-10">
+            <p id="hero-tagline" class="mt-4 text-lg md:text-xl text-slate-400 max-w-2xl mx-auto font-medium mb-10">
                 Turnos, reservas, clientes y administración en un solo lugar. Adaptable a canchas, salones, clínicas y cualquier servicio que requiera organización.
             </p>
             
@@ -147,10 +147,13 @@
     <footer class="border-t border-slate-800/60 bg-[#060e18] py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2">
-                <img src="/img/logo.jpg" alt="Logo ServicioDigital" class="w-6 h-6 rounded-lg object-cover">
-                <span class="text-sm font-bold text-slate-300">Servicio Digital</span>
+                <img id="footer-logo" src="/img/logo.jpg" alt="Logo Plataforma" class="w-6 h-6 rounded-lg object-cover">
+                <span id="footer-title" class="text-sm font-bold text-slate-300">Servicio Digital</span>
             </div>
-            <p class="text-xs text-slate-500 font-medium">© 2026 Plataforma Multi-Rubro. Todos los derechos reservados.</p>
+            <div class="flex flex-col md:flex-row items-center gap-4">
+                <a href="/terminos.html" class="text-xs text-slate-400 hover:text-white transition-colors">Términos y Condiciones</a>
+                <p class="text-xs text-slate-500 font-medium">© 2026 <span id="footer-copyright">Plataforma Multi-Rubro</span>. Todos los derechos reservados.</p>
+            </div>
         </div>
     </footer>
     <script>
@@ -213,6 +216,47 @@
         
         // Llamar directamente ya que el script está al final
         loadPlanes();
+        
+        async function loadPlataformaConfig() {
+            try {
+                const res = await fetch('/api/plataforma/info');
+                const { data } = await res.json();
+                
+                if (data) {
+                    if (data.nombre_plataforma) {
+                        document.title = data.nombre_plataforma + (data.tagline ? ' - ' + data.tagline : '');
+                        
+                        const navTitle = document.getElementById('nav-title');
+                        if (navTitle) navTitle.innerHTML = `<span class="text-white">${data.nombre_plataforma}</span>`;
+                        
+                        const footerTitle = document.getElementById('footer-title');
+                        if (footerTitle) footerTitle.textContent = data.nombre_plataforma;
+                        
+                        const footerCopyright = document.getElementById('footer-copyright');
+                        if (footerCopyright) footerCopyright.textContent = data.nombre_plataforma;
+                    }
+                    
+                    if (data.tagline) {
+                        const heroTagline = document.getElementById('hero-tagline');
+                        if (heroTagline) heroTagline.textContent = data.tagline;
+                        
+                        // Buscamos meta description (podemos añadir una si no hay, pero en general ya existe una o no)
+                    }
+                    
+                    if (data.logo_url) {
+                        const navLogo = document.getElementById('nav-logo');
+                        if (navLogo) navLogo.src = data.logo_url;
+                        
+                        const footerLogo = document.getElementById('footer-logo');
+                        if (footerLogo) footerLogo.src = data.logo_url;
+                    }
+                }
+            } catch (err) {
+                console.error("Error al cargar la info de la plataforma:", err);
+            }
+        }
+        
+        loadPlataformaConfig();
     </script>
 </body>
 </html>

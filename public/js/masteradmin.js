@@ -561,7 +561,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ─── Modal Edit Tenant ────────────────────────────────────────────────────
-    if (btnEtCancel) btnEtCancel.addEventListener('click', () => closeModal(modalEditTenant, modalEditTenantContent));
+    if (modalEditTenant) {
+        const etCloseBtn = document.getElementById('btn-et-close');
+        if (etCloseBtn) etCloseBtn.addEventListener('click', () => closeModal(modalEditTenant, modalEditTenantContent));
+        
+        const allCancelBtns = modalEditTenant.querySelectorAll('button');
+        allCancelBtns.forEach(btn => {
+            if (btn.textContent.trim() === 'Cerrar') {
+                btn.addEventListener('click', () => closeModal(modalEditTenant, modalEditTenantContent));
+            }
+        });
+    }
 
     if (formEditTenant) {
         formEditTenant.addEventListener('submit', async (e) => {
@@ -939,14 +949,32 @@ document.addEventListener('DOMContentLoaded', () => {
         return json.url;
     };
 
+    const uploadPlatformLogo = async (file) => {
+        const fd = new FormData();
+        fd.append('logo', file);
+        const res = await fetch('/api/plataforma/logo', { method: 'POST', headers: { 'Authorization': `SuperAdmin ${token}` }, body: fd });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Error al subir logo');
+        return { logo_url: json.logo_url, favicon_url: json.favicon_url };
+    };
+
     const cfgLogoFile = document.getElementById('cfg-logo-file');
     const cfgFaviconFile = document.getElementById('cfg-favicon-file');
     if (cfgLogoFile) cfgLogoFile.addEventListener('change', async (e) => {
         const file = e.target.files[0]; if (!file) return;
         try {
-            const url = await uploadFile(file);
-            document.getElementById('cfg-logo-url').value = url;
-            document.getElementById('cfg-logo-preview').innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+            const result = await uploadPlatformLogo(file);
+            
+            // Update both logo and favicon fields since the backend updates both
+            document.getElementById('cfg-logo-url').value = result.logo_url;
+            document.getElementById('cfg-logo-preview').innerHTML = `<img src="${result.logo_url}" class="w-full h-full object-cover">`;
+            
+            if (document.getElementById('cfg-favicon-url')) {
+                document.getElementById('cfg-favicon-url').value = result.favicon_url;
+                document.getElementById('cfg-favicon-preview').innerHTML = `<img src="${result.favicon_url}" class="w-full h-full object-cover">`;
+            }
+            
+            // Re-fetch info so it updates UI? It's fine, the URLs are updated.
         } catch (err) { showAlert('Error', err.message, 'error'); }
     });
     if (cfgFaviconFile) cfgFaviconFile.addEventListener('change', async (e) => {
