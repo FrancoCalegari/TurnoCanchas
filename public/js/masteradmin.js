@@ -33,13 +33,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const navPwa = document.getElementById('nav-pwa');
 
     const viewDashboard = document.getElementById('view-dashboard');
-    const viewTenants = document.getElementById('view-tenants');
+    
     const viewRubros = document.getElementById('view-rubros');
     const viewPlanes = document.getElementById('view-planes');
     const viewConfig = document.getElementById('view-config');
     const viewLogs = document.getElementById('view-logs');
     const viewPwa = document.getElementById('view-pwa');
-    const topBar = viewTenants.previousElementSibling; // The search/filter bar is only for tenants for now
+    
 
     // Modal: Approve
     const modalApprove = document.getElementById('modal-approve');
@@ -348,7 +348,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (document.getElementById('et-rubro')) {
                     document.getElementById('et-rubro').value = t.rubro_id || '';
                 }
+                
+                if (document.getElementById('btn-tab-general')) {
+                    document.getElementById('btn-tab-general').click();
+                }
                 openModal(modalEditTenant, modalEditTenantContent);
+
             }
         }
 
@@ -521,7 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ─── Modal Create Tenant ──────────────────────────────────────────────────
-    btnCreateTenant.addEventListener('click', () => {
+    if (btnCreateTenant) btnCreateTenant.addEventListener('click', () => {
         formCreateTenant.reset();
         openModal(modalCreateTenant, modalCreateTenantContent);
     });
@@ -567,7 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 telefono: document.getElementById('et-telefono').value,
                 email: document.getElementById('et-email').value,
                 ubicacion: document.getElementById('et-ubicacion').value,
-                rubro_id: document.getElementById('et-rubro').value
+                rubro_id: (document.getElementById('et-rubro') ? document.getElementById('et-rubro').value : null)
             };
             try {
                 await apiFetch(`/api/tenants/${id}`, { method: 'PUT', body: JSON.stringify(body) });
@@ -648,7 +653,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        const views = [viewDashboard, viewTenants, viewRubros, viewPlanes, viewConfig, viewLogs, viewPwa];
+        const views = [viewDashboard, viewRubros, viewPlanes, viewConfig, viewLogs, viewPwa];
         views.forEach(view => {
             if(view) view.classList.add('hidden');
         });
@@ -660,16 +665,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeView) {
             activeView.classList.remove('hidden');
         }
-        
-        if(activeView === viewTenants) topBar.classList.remove('hidden');
-        else topBar.classList.add('hidden');
     };
 
     if(navDashboard) navDashboard.addEventListener('click', () => {
         switchNav(navDashboard, viewDashboard);
         loadDashboardStats();
     });
-    if(navTenants) navTenants.addEventListener('click', () => switchNav(navTenants, viewTenants));
+    if(navTenants) navTenants.addEventListener('click', () => switchNav(navDashboard, viewDashboard));
     if(navRubros) navRubros.addEventListener('click', () => switchNav(navRubros, viewRubros));
     if(navPlanes) navPlanes.addEventListener('click', () => switchNav(navPlanes, viewPlanes));
     if(navConfig) navConfig.addEventListener('click', () => {
@@ -1028,4 +1030,33 @@ document.addEventListener('DOMContentLoaded', () => {
     if (navDashboard && viewDashboard && !viewDashboard.classList.contains('hidden')) {
         loadDashboardStats();
     }
+
+    // Tab switching for Edit Tenant Modal
+    const tabs = [
+        { btn: document.getElementById('btn-tab-general'), form: document.getElementById('form-edit-tenant') },
+        { btn: document.getElementById('btn-tab-credenciales'), form: document.getElementById('form-tab-credenciales') },
+        { btn: document.getElementById('btn-tab-canchas'), form: document.getElementById('form-tab-canchas') },
+        { btn: document.getElementById('btn-tab-cobros'), form: document.getElementById('form-tab-cobros') },
+        { btn: document.getElementById('btn-tab-licencia'), form: document.getElementById('form-tab-licencia') }
+    ];
+
+    tabs.forEach(tab => {
+        if (tab.btn) {
+            tab.btn.addEventListener('click', () => {
+                // Remove active classes from all buttons
+                tabs.forEach(t => {
+                    if (t.btn) {
+                        t.btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/30', 'scale-100');
+                        t.btn.classList.add('text-slate-300', 'hover:bg-slate-800/80', 'hover:text-white');
+                    }
+                    if (t.form) t.form.classList.add('hidden');
+                });
+                // Add active class to clicked button
+                tab.btn.classList.remove('text-slate-300', 'hover:bg-slate-800/80', 'hover:text-white');
+                tab.btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/30', 'scale-100');
+                if (tab.form) tab.form.classList.remove('hidden');
+            });
+        }
+    });
+
 });
