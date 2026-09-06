@@ -15,6 +15,17 @@ const getAjustes = async (req, res) => {
             }
         }
 
+
+        // Asegurar que las columnas existan
+        const columns = [
+            "ALTER TABLE ajustes_complejo ADD COLUMN info_wifi_ssid VARCHAR(100)",
+            "ALTER TABLE ajustes_complejo ADD COLUMN info_wifi_pass VARCHAR(100)",
+            "ALTER TABLE ajustes_complejo ADD COLUMN info_buffet VARCHAR(255)",
+            "ALTER TABLE ajustes_complejo ADD COLUMN info_reglas TEXT"
+        ];
+        for (const sql of columns) {
+            try { await executeQuery(sql); } catch (e) {}
+        }
         const result = await executeQuery(`SELECT * FROM ajustes_complejo WHERE ${tenantFilter}`);
         if (!result || result.length === 0) {
             return res.status(404).json({ error: 'Configuración no encontrada' });
@@ -27,7 +38,7 @@ const getAjustes = async (req, res) => {
 
 const updateAjustes = async (req, res) => {
     try {
-        const { nombre_complejo, open_time, close_time, wpp_contacto, wpp_mensaje, ubicacion_maps, logo_url, hero_image_url, hero_image_url_2, hero_image_url_3, hero_title, canchas_title, nosotros_title, devolver_sena, mercadopago_alias } = req.body;
+        const { nombre_complejo, open_time, close_time, wpp_contacto, wpp_mensaje, ubicacion_maps, logo_url, hero_image_url, hero_image_url_2, hero_image_url_3, hero_title, canchas_title, nosotros_title, devolver_sena, mercadopago_alias , info_wifi_ssid, info_wifi_pass, info_buffet, info_reglas } = req.body;
         
         let updates = [];
         if (nombre_complejo !== undefined) {
@@ -90,6 +101,24 @@ const updateAjustes = async (req, res) => {
             const safe = String(mercadopago_alias).replace(/'/g, "''");
             updates.push(`mercadopago_alias = '${safe}'`);
         }
+
+        if (info_wifi_ssid !== undefined) {
+            const safe = String(info_wifi_ssid).replace(/'/g, "''");
+            updates.push(`info_wifi_ssid = '${safe}'`);
+        }
+        if (info_wifi_pass !== undefined) {
+            const safe = String(info_wifi_pass).replace(/'/g, "''");
+            updates.push(`info_wifi_pass = '${safe}'`);
+        }
+        if (info_buffet !== undefined) {
+            const safe = String(info_buffet).replace(/'/g, "''");
+            updates.push(`info_buffet = '${safe}'`);
+        }
+        if (info_reglas !== undefined) {
+            const safe = String(info_reglas).replace(/'/g, "''");
+            updates.push(`info_reglas = '${safe}'`);
+        }
+
 
         if (updates.length === 0) {
             return res.status(400).json({ error: 'No data to update' });

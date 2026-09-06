@@ -84,7 +84,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (mapsLink) {
                     mapsLink.href = ajustes.ubicacion_maps;
                 }
+                const infoMapsLink = document.getElementById('info-ubicacion');
+                if (infoMapsLink) infoMapsLink.href = ajustes.ubicacion_maps;
             }
+
+            if (document.getElementById('info-wifi-ssid')) document.getElementById('info-wifi-ssid').textContent = ajustes.info_wifi_ssid || 'No disponible';
+            if (document.getElementById('info-wifi-pass')) document.getElementById('info-wifi-pass').textContent = ajustes.info_wifi_pass || 'No disponible';
+            if (document.getElementById('info-buffet')) document.getElementById('info-buffet').textContent = ajustes.info_buffet || 'Servicios no especificados.';
+            if (document.getElementById('info-reglas')) document.getElementById('info-reglas').textContent = ajustes.info_reglas || 'No hay reglamento especificado.';
+
             if (ajustes.logo_url) {
                 const logoImg = document.getElementById('header-logo');
                 if (logoImg) logoImg.src = ajustes.logo_url;
