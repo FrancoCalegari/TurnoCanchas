@@ -179,10 +179,118 @@
             </div>
         </div>
 
-        <div id="view-config" class="flex-1 overflow-y-auto p-6 hidden flex flex-col items-center justify-center text-center">
-            <svg class="w-16 h-16 text-slate-600 mb-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-            <h2 class="text-xl font-black text-white mb-2">Configuración General</h2>
-            <p class="text-slate-400">Esta sección está en desarrollo y estará disponible próximamente.</p>
+        <div id="view-config" class="flex-1 overflow-y-auto p-6 hidden">
+            <h2 class="text-xl font-black text-white mb-1">Administrar Información</h2>
+            <p class="text-slate-400 text-sm mb-6">Configura la identidad visual y los links públicos de la plataforma.</p>
+
+            <!-- Sub-tabs -->
+            <div class="flex items-center gap-2 mb-6 border-b border-slate-700/60 pb-1">
+                <button id="cfg-tab-identidad" class="cfg-tab active px-4 py-2 text-sm font-bold rounded-t-lg text-indigo-400 border-b-2 border-indigo-400 -mb-[1px] transition-all">Identidad</button>
+                <button id="cfg-tab-links" class="cfg-tab px-4 py-2 text-sm font-bold rounded-t-lg text-slate-400 hover:text-white border-b-2 border-transparent -mb-[1px] transition-all">Links de Servicios</button>
+            </div>
+
+            <!-- Tab: Identidad -->
+            <div id="cfg-view-identidad" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Logo -->
+                    <div class="bg-[#1a1f2e] border border-slate-700/60 rounded-2xl p-5">
+                        <h3 class="text-sm font-black text-white mb-4 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                            Logo Principal (Index)
+                        </h3>
+                        <div id="cfg-logo-preview" class="w-24 h-24 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mb-4 overflow-hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                        </div>
+                        <label class="text-xs font-bold text-slate-400 mb-1.5 block">URL del Logo</label>
+                        <input type="text" id="cfg-logo-url" placeholder="https://... o sube un archivo" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50 mb-2">
+                        <label class="flex items-center gap-2 px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl cursor-pointer hover:border-indigo-500/50 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                            <span class="text-xs text-slate-400 font-semibold">Subir imagen</span>
+                            <input type="file" id="cfg-logo-file" accept="image/*" class="hidden">
+                        </label>
+                    </div>
+
+                    <!-- Favicon -->
+                    <div class="bg-[#1a1f2e] border border-slate-700/60 rounded-2xl p-5">
+                        <h3 class="text-sm font-black text-white mb-4 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                            Favicon / ICO
+                        </h3>
+                        <div id="cfg-favicon-preview" class="w-16 h-16 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center mb-4 overflow-hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                        </div>
+                        <label class="text-xs font-bold text-slate-400 mb-1.5 block">URL del Favicon</label>
+                        <input type="text" id="cfg-favicon-url" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50 mb-2">
+                        <label class="flex items-center gap-2 px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl cursor-pointer hover:border-indigo-500/50 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                            <span class="text-xs text-slate-400 font-semibold">Subir ícono</span>
+                            <input type="file" id="cfg-favicon-file" accept="image/*,.ico" class="hidden">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Nombre y Tagline -->
+                <div class="bg-[#1a1f2e] border border-slate-700/60 rounded-2xl p-5 space-y-4">
+                    <h3 class="text-sm font-black text-white flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        Nombre y Descripción
+                    </h3>
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 mb-1.5 block">Nombre de la Plataforma</label>
+                        <input type="text" id="cfg-nombre" placeholder="ej: TurnoCanchas" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 mb-1.5 block">Tagline / Slogan</label>
+                        <input type="text" id="cfg-tagline" placeholder="ej: Reservá tu cancha en segundos" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50">
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button id="btn-save-identidad" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-black rounded-xl shadow-lg shadow-indigo-500/20 transition-all">
+                        Guardar Identidad
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab: Links de Servicios -->
+            <div id="cfg-view-links" class="hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-slate-400 text-sm">Links que aparecen en la sección de servicios del sitio principal.</p>
+                    <button id="btn-add-link" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-black rounded-xl transition-all flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        Agregar Link
+                    </button>
+                </div>
+                <div id="cfg-links-list" class="space-y-2">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Form agregar/editar link -->
+                <div id="cfg-link-form" class="hidden mt-4 bg-[#1a1f2e] border border-indigo-500/30 rounded-2xl p-5 space-y-3">
+                    <h3 class="text-sm font-black text-white">Nuevo Link de Servicio</h3>
+                    <input type="hidden" id="cfg-link-editing-idx">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 mb-1 block">Nombre del Servicio</label>
+                            <input type="text" id="cfg-link-nombre" placeholder="ej: Sitio Web, App Móvil" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 mb-1 block">URL</label>
+                            <input type="text" id="cfg-link-url" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50">
+                        </div>
+                    </div>
+                    <div class="flex gap-2 justify-end">
+                        <button id="btn-link-cancel" class="px-4 py-2 text-sm font-bold text-slate-400 hover:text-white border border-slate-700 rounded-xl transition-all">Cancelar</button>
+                        <button id="btn-link-save" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-black rounded-xl transition-all">Guardar Link</button>
+                    </div>
+                </div>
+
+                <div class="flex justify-end mt-6">
+                    <button id="btn-save-links" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-black rounded-xl shadow-lg shadow-emerald-500/20 transition-all">
+                        Guardar Todos los Links
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div id="view-logs" class="flex-1 overflow-y-auto p-6 hidden flex flex-col items-center justify-center text-center">

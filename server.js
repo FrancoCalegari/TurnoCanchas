@@ -22,9 +22,20 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Ruta dinámica para el portal del tenant
-app.get('/t/:slug', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'portal.html'));
+// Ruta dinámica para el portal del tenant — valida existencia y estado
+app.get('/t/:slug', async (req, res) => {
+    try {
+        const { executeQuery } = require('./config/db');
+        const safeSlug = String(req.params.slug).replace(/[^a-z0-9-]/gi, '').toLowerCase();
+        const result = await executeQuery(`SELECT estado FROM tenants WHERE slug = '${safeSlug}'`);
+        if (!result || result.length === 0 || result[0].estado !== 'activo') {
+            return res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+        }
+        res.sendFile(path.join(__dirname, 'public', 'portal.html'));
+    } catch (err) {
+        console.error('[/t/:slug]', err.message);
+        res.status(500).send('Error interno del servidor');
+    }
 });
 
 app.get('/admin', (req, res) => {

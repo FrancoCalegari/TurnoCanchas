@@ -618,13 +618,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // NAVEGACION
     // ==========================================
     function setupNavigation() {
+        const viewMiWeb = document.getElementById('view-miweb');
+        const btnNavMiWeb = document.getElementById('nav-miweb');
+
         const navs = [
             { btn: btnNavDashboard, view: viewDashboard },
             { btn: btnNavReservas, view: viewReservas },
             { btn: btnNavCanchas, view: viewCanchas },
             { btn: btnNavReportes, view: viewReportes },
             { btn: btnNavAjustes, view: viewAjustes },
-            { btn: btnNavMensajes, view: viewMensajes }
+            { btn: btnNavMensajes, view: viewMensajes },
+            { btn: btnNavMiWeb, view: viewMiWeb }
         ];
 
         navs.forEach(nav => {
@@ -645,8 +649,116 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (nav.btn === btnNavCanchas && typeof loadCanchas === 'function') loadCanchas();
                 if (nav.btn === btnNavReservas) loadReservasAdmin();
                 if (nav.btn === btnNavMensajes) loadMensajesData();
+                if (nav.btn === btnNavMiWeb) initMiWeb();
             });
         });
+    }
+
+    // ==========================================
+    // MI WEB — Compartir Link + Preview
+    // ==========================================
+    let _miWebInitialized = false;
+
+    function initMiWeb() {
+        const tenantData = window.API.getTenantInfo();
+        if (!tenantData || !tenantData.slug) return;
+
+        const slug = tenantData.slug;
+        const baseUrl = `${window.location.protocol}//${window.location.host}`;
+        const portalUrl = `${baseUrl}/t/${slug}`;
+
+        // Set URL display and links
+        const urlDisplay = document.getElementById('miweb-url');
+        const btnOpenLink = document.getElementById('btn-open-link');
+        const btnPreviewNewTab = document.getElementById('btn-preview-newtab');
+        const previewIframe = document.getElementById('preview-iframe');
+
+        if (urlDisplay) urlDisplay.textContent = portalUrl;
+        if (btnOpenLink) btnOpenLink.href = portalUrl;
+        if (btnPreviewNewTab) btnPreviewNewTab.href = portalUrl;
+
+        // Load iframe
+        if (previewIframe && !_miWebInitialized) {
+            previewIframe.src = portalUrl;
+        }
+
+        // Copy link
+        const btnCopy = document.getElementById('btn-copy-link');
+        const copySuccess = document.getElementById('copy-success');
+        if (btnCopy) {
+            btnCopy.onclick = async () => {
+                try {
+                    await navigator.clipboard.writeText(portalUrl);
+                    if (copySuccess) {
+                        copySuccess.classList.remove('hidden');
+                        copySuccess.classList.add('flex');
+                        setTimeout(() => {
+                            copySuccess.classList.add('hidden');
+                            copySuccess.classList.remove('flex');
+                        }, 3000);
+                    }
+                } catch (e) {
+                    // Fallback for older browsers
+                    const ta = document.createElement('textarea');
+                    ta.value = portalUrl;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    if (copySuccess) {
+                        copySuccess.classList.remove('hidden');
+                        copySuccess.classList.add('flex');
+                        setTimeout(() => {
+                            copySuccess.classList.add('hidden');
+                            copySuccess.classList.remove('flex');
+                        }, 3000);
+                    }
+                }
+            };
+        }
+
+        // Generate QR Code
+        if (!_miWebInitialized) {
+            const qrContainer = document.getElementById('qr-container');
+            if (qrContainer && window.QRCode) {
+                qrContainer.innerHTML = '';
+                new window.QRCode(qrContainer, {
+                    text: portalUrl,
+                    width: 160,
+                    height: 160,
+                    colorDark: '#1e293b',
+                    colorLight: '#ffffff',
+                    correctLevel: window.QRCode.CorrectLevel.M
+                });
+            }
+        }
+
+        // Preview toggle mobile/desktop
+        const btnMobile = document.getElementById('btn-preview-mobile');
+        const btnDesktop = document.getElementById('btn-preview-desktop');
+
+        const setPreviewMode = (mode) => {
+            const iframe = document.getElementById('preview-iframe');
+            if (!iframe) return;
+            if (mode === 'mobile') {
+                iframe.style.width = '375px';
+                iframe.style.height = '600px';
+                btnMobile && (btnMobile.className = btnMobile.className.replace('bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300', 'bg-blue-600 text-white'));
+                btnDesktop && (btnDesktop.className = btnDesktop.className.replace('bg-blue-600 text-white', 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'));
+            } else {
+                iframe.style.width = '100%';
+                iframe.style.height = '700px';
+                btnDesktop && (btnDesktop.className = btnDesktop.className.replace('bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300', 'bg-blue-600 text-white'));
+                btnMobile && (btnMobile.className = btnMobile.className.replace('bg-blue-600 text-white', 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'));
+            }
+        };
+
+        if (!_miWebInitialized) {
+            if (btnMobile) btnMobile.addEventListener('click', () => setPreviewMode('mobile'));
+            if (btnDesktop) btnDesktop.addEventListener('click', () => setPreviewMode('desktop'));
+        }
+
+        _miWebInitialized = true;
     }
 
     // ==========================================

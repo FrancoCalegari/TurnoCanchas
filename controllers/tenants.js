@@ -431,6 +431,31 @@ const getTenantStats = async (req, res) => {
     }
 };
 
+// ─── Eliminar tenant y todos sus datos ────────────────────────────────────────
+const deleteTenant = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const tenantId = parseInt(id);
+
+        const result = await executeQuery(`SELECT id, nombre FROM tenants WHERE id = ${tenantId}`);
+        if (!result || result.length === 0) {
+            return res.status(404).json({ error: 'Tenant no encontrado' });
+        }
+
+        // Eliminar datos relacionados en orden
+        await executeQuery(`DELETE FROM reservas WHERE tenant_id = ${tenantId}`);
+        await executeQuery(`DELETE FROM canchas WHERE tenant_id = ${tenantId}`);
+        await executeQuery(`DELETE FROM clientes WHERE tenant_id = ${tenantId}`);
+        await executeQuery(`DELETE FROM admin_users WHERE tenant_id = ${tenantId}`);
+        await executeQuery(`DELETE FROM ajustes_complejo WHERE tenant_id = ${tenantId}`);
+        await executeQuery(`DELETE FROM tenants WHERE id = ${tenantId}`);
+
+        res.json({ message: `Tenant eliminado correctamente junto con todos sus datos.` });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     registerTenant,
     loginTenant,
@@ -443,5 +468,6 @@ module.exports = {
     renewAllTenants,
     impersonateTenant,
     superCreateTenant,
-    getTenantStats
+    getTenantStats,
+    deleteTenant
 };

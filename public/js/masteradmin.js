@@ -279,6 +279,10 @@ document.addEventListener('DOMContentLoaded', () => {
             primaryBtn = `<button class="btn-impersonate flex-1 py-2.5 bg-indigo-600/80 hover:bg-indigo-600 text-white text-xs font-bold rounded-xl transition-colors" data-id="${t.id}" data-name="${t.nombre}">Acceder al Panel ›</button>`;
         }
 
+        const deleteBtn = `<button class="btn-delete-tenant absolute top-10 right-3 p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-400/10 transition-colors" data-id="${t.id}" data-name="${t.nombre}" title="Eliminar cliente">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+        </button>`;
+
         const secondaryBtn = `<button class="btn-renew-one py-2.5 px-3.5 bg-amber-400 hover:bg-amber-300 text-slate-900 text-xs font-black rounded-xl transition-colors flex items-center gap-1" data-id="${t.id}">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-6h2v6zm0-8h-2v-2h2v2z"/></svg>
             +30 Días
@@ -311,6 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             ${suspendBtn}
+            ${deleteBtn}
             <button class="btn-edit absolute top-3 right-3 p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-700/50 transition-colors" data-id="${t.id}" title="Editar">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
@@ -338,6 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const activateBtn = e.target.closest('.btn-activate');
         const renewOneBtn = e.target.closest('.btn-renew-one');
         const editBtn = e.target.closest('.btn-edit');
+        const deleteTenantBtn = e.target.closest('.btn-delete-tenant');
 
         if (editBtn) {
             const id = editBtn.dataset.id;
@@ -401,6 +407,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 showAlert('Renovado', '+30 días añadidos', 'success');
                 await loadTenants();
             } catch (err) { showAlert('Error', err.message, 'error'); }
+        }
+
+        if (deleteTenantBtn) {
+            const id = deleteTenantBtn.dataset.id;
+            const name = deleteTenantBtn.dataset.name;
+            showConfirm(
+                '⚠️ Eliminar Cliente',
+                `¿Eliminar a "${name}" y TODOS sus datos (canchas, reservas, clientes)? Esta acción es permanente e irreversible.`,
+                async () => {
+                    try {
+                        await apiFetch(`/api/tenants/${id}`, { method: 'DELETE' });
+                        showAlert('Eliminado', `Cliente "${name}" eliminado correctamente.`, 'success');
+                        await loadTenants();
+                    } catch (err) { showAlert('Error', err.message, 'error'); }
+                }
+            );
         }
     });
 
@@ -642,7 +664,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if(navTenants) navTenants.addEventListener('click', () => switchNav(navTenants, viewTenants));
     if(navRubros) navRubros.addEventListener('click', () => switchNav(navRubros, viewRubros));
     if(navPlanes) navPlanes.addEventListener('click', () => switchNav(navPlanes, viewPlanes));
-    if(navConfig) navConfig.addEventListener('click', () => switchNav(navConfig, viewConfig));
+    if(navConfig) navConfig.addEventListener('click', () => {
+        switchNav(navConfig, viewConfig);
+        loadPlatformInfo();
+    });
     if(navLogs) navLogs.addEventListener('click', () => switchNav(navLogs, viewLogs));
     if(navPwa) navPwa.addEventListener('click', () => switchNav(navPwa, viewPwa));
 
@@ -802,6 +827,169 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // ─── Platform Info / Administrar Información ──────────────────────────────
+    let serviceLinks = [];
+
+    const loadPlatformInfo = async () => {
+        try {
+            const res = await apiFetch('/api/plataforma/info');
+            const data = res.data || {};
+            if (data.logo_url) {
+                document.getElementById('cfg-logo-url').value = data.logo_url;
+                document.getElementById('cfg-logo-preview').innerHTML =
+                    `<img src="${data.logo_url}" class="w-full h-full object-cover" onerror="this.style.display='none'">`;
+            }
+            if (data.favicon_url) {
+                document.getElementById('cfg-favicon-url').value = data.favicon_url;
+                document.getElementById('cfg-favicon-preview').innerHTML =
+                    `<img src="${data.favicon_url}" class="w-full h-full object-cover" onerror="this.style.display='none'">`;
+            }
+            if (data.nombre_plataforma) document.getElementById('cfg-nombre').value = data.nombre_plataforma;
+            if (data.tagline) document.getElementById('cfg-tagline').value = data.tagline;
+            serviceLinks = Array.isArray(data.links_servicios) ? data.links_servicios : [];
+            renderServiceLinks();
+        } catch (err) {
+            console.warn('No se pudo cargar info de plataforma:', err.message);
+        }
+    };
+
+    const renderServiceLinks = () => {
+        const container = document.getElementById('cfg-links-list');
+        if (!container) return;
+        if (serviceLinks.length === 0) {
+            container.innerHTML = `<div class="text-center py-8 text-slate-500 font-bold bg-slate-800/30 rounded-xl border border-dashed border-slate-700">No hay links configurados.</div>`;
+            return;
+        }
+        container.innerHTML = serviceLinks.map((link, idx) => `
+            <div class="flex items-center justify-between bg-slate-800/40 border border-slate-700/60 rounded-xl px-4 py-3">
+                <div>
+                    <p class="font-bold text-white text-sm">${link.nombre}</p>
+                    <p class="text-xs text-slate-400">${link.url}</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors btn-edit-link" data-idx="${idx}" title="Editar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors btn-remove-link" data-idx="${idx}" title="Eliminar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+        container.querySelectorAll('.btn-edit-link').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const idx = parseInt(btn.dataset.idx);
+                const link = serviceLinks[idx];
+                document.getElementById('cfg-link-editing-idx').value = idx;
+                document.getElementById('cfg-link-nombre').value = link.nombre;
+                document.getElementById('cfg-link-url').value = link.url;
+                document.getElementById('cfg-link-form').classList.remove('hidden');
+            });
+        });
+        container.querySelectorAll('.btn-remove-link').forEach(btn => {
+            btn.addEventListener('click', () => {
+                serviceLinks.splice(parseInt(btn.dataset.idx), 1);
+                renderServiceLinks();
+            });
+        });
+    };
+
+    // Sub-tabs dentro de config
+    const cfgTabIdentidad = document.getElementById('cfg-tab-identidad');
+    const cfgTabLinks = document.getElementById('cfg-tab-links');
+    const cfgViewIdentidad = document.getElementById('cfg-view-identidad');
+    const cfgViewLinks = document.getElementById('cfg-view-links');
+
+    const switchCfgTab = (tab) => {
+        [cfgTabIdentidad, cfgTabLinks].forEach(t => {
+            t && t.classList.remove('text-indigo-400', 'border-indigo-400');
+            t && t.classList.add('text-slate-400', 'border-transparent');
+        });
+        cfgViewIdentidad && cfgViewIdentidad.classList.add('hidden');
+        cfgViewLinks && cfgViewLinks.classList.add('hidden');
+        if (tab === 'identidad') {
+            cfgTabIdentidad && cfgTabIdentidad.classList.add('text-indigo-400', 'border-indigo-400');
+            cfgViewIdentidad && cfgViewIdentidad.classList.remove('hidden');
+        } else {
+            cfgTabLinks && cfgTabLinks.classList.add('text-indigo-400', 'border-indigo-400');
+            cfgViewLinks && cfgViewLinks.classList.remove('hidden');
+        }
+    };
+    if (cfgTabIdentidad) cfgTabIdentidad.addEventListener('click', () => switchCfgTab('identidad'));
+    if (cfgTabLinks) cfgTabLinks.addEventListener('click', () => switchCfgTab('links'));
+
+    // File upload helper
+    const uploadFile = async (file) => {
+        const fd = new FormData();
+        fd.append('image', file);
+        const res = await fetch('/api/upload/image', { method: 'POST', headers: { 'Authorization': `SuperAdmin ${token}` }, body: fd });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Error al subir imagen');
+        return json.url;
+    };
+
+    const cfgLogoFile = document.getElementById('cfg-logo-file');
+    const cfgFaviconFile = document.getElementById('cfg-favicon-file');
+    if (cfgLogoFile) cfgLogoFile.addEventListener('change', async (e) => {
+        const file = e.target.files[0]; if (!file) return;
+        try {
+            const url = await uploadFile(file);
+            document.getElementById('cfg-logo-url').value = url;
+            document.getElementById('cfg-logo-preview').innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+        } catch (err) { showAlert('Error', err.message, 'error'); }
+    });
+    if (cfgFaviconFile) cfgFaviconFile.addEventListener('change', async (e) => {
+        const file = e.target.files[0]; if (!file) return;
+        try {
+            const url = await uploadFile(file);
+            document.getElementById('cfg-favicon-url').value = url;
+            document.getElementById('cfg-favicon-preview').innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+        } catch (err) { showAlert('Error', err.message, 'error'); }
+    });
+
+    const btnSaveIdentidad = document.getElementById('btn-save-identidad');
+    if (btnSaveIdentidad) btnSaveIdentidad.addEventListener('click', async () => {
+        try {
+            await apiFetch('/api/plataforma/info', { method: 'PUT', body: JSON.stringify({
+                logo_url: document.getElementById('cfg-logo-url').value,
+                favicon_url: document.getElementById('cfg-favicon-url').value,
+                nombre_plataforma: document.getElementById('cfg-nombre').value,
+                tagline: document.getElementById('cfg-tagline').value,
+            }) });
+            showAlert('Guardado', 'Identidad de la plataforma actualizada.', 'success');
+        } catch (err) { showAlert('Error', err.message, 'error'); }
+    });
+
+    const btnSaveLinks = document.getElementById('btn-save-links');
+    if (btnSaveLinks) btnSaveLinks.addEventListener('click', async () => {
+        try {
+            await apiFetch('/api/plataforma/info', { method: 'PUT', body: JSON.stringify({ links_servicios: serviceLinks }) });
+            showAlert('Guardado', 'Links de servicios actualizados.', 'success');
+        } catch (err) { showAlert('Error', err.message, 'error'); }
+    });
+
+    const btnAddLink = document.getElementById('btn-add-link');
+    const cfgLinkForm = document.getElementById('cfg-link-form');
+    const btnLinkCancel = document.getElementById('btn-link-cancel');
+    const btnLinkSave = document.getElementById('btn-link-save');
+    if (btnAddLink) btnAddLink.addEventListener('click', () => {
+        document.getElementById('cfg-link-editing-idx').value = '';
+        document.getElementById('cfg-link-nombre').value = '';
+        document.getElementById('cfg-link-url').value = '';
+        cfgLinkForm && cfgLinkForm.classList.remove('hidden');
+    });
+    if (btnLinkCancel) btnLinkCancel.addEventListener('click', () => cfgLinkForm && cfgLinkForm.classList.add('hidden'));
+    if (btnLinkSave) btnLinkSave.addEventListener('click', () => {
+        const nombre = document.getElementById('cfg-link-nombre').value.trim();
+        const url = document.getElementById('cfg-link-url').value.trim();
+        if (!nombre || !url) { showAlert('Error', 'Completá el nombre y la URL.', 'error'); return; }
+        const idx = document.getElementById('cfg-link-editing-idx').value;
+        if (idx !== '') { serviceLinks[parseInt(idx)] = { nombre, url }; }
+        else { serviceLinks.push({ nombre, url }); }
+        cfgLinkForm && cfgLinkForm.classList.add('hidden');
+        renderServiceLinks();
+    });
 
     // ─── Init ─────────────────────────────────────────────────────────────────
     const loadDashboardStats = async () => {

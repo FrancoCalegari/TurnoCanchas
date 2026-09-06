@@ -19,5 +19,6 @@ router.put('/:id/activate', requireSuperAdmin, tenantsController.activateTenant)
 router.put('/:id/renew', requireSuperAdmin, tenantsController.renewTenant);
 router.put('/renew-all', requireSuperAdmin, tenantsController.renewAllTenants);
 router.post('/:id/impersonate', requireSuperAdmin, tenantsController.impersonateTenant);
+router.delete('/:id', requireSuperAdmin, tenantsController.deleteTenant);
 
 module.exports = router;
