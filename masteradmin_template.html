@@ -1,0 +1,2648 @@
+implementar al /masteradmin lo siguiente:
+
+<html
+  lang="es"
+  class="h-full"
+  style="
+    --brand-primary: #4f46e5;
+    --brand-primary-rgb: 79, 70, 229;
+    --brand-secondary: #6366f1;
+    --brand-secondary-rgb: 99, 102, 241;
+  "
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Complejo Deportivo Central - Sistema de Reservas</title>
+    <meta
+      name="description"
+      content="Portal de reservas online 24/7 de Complejo Deportivo Central."
+    />
+    <meta
+      property="og:title"
+      content="Complejo Deportivo Central - Sistema de Reservas"
+    />
+    <meta property="og:site_name" content="Complejo Deportivo Central" />
+    <meta
+      property="og:description"
+      content="Portal de reservas 24/7 de Complejo Deportivo Central. Reservá tu cancha en segundos."
+    />
+    <link
+      rel="icon"
+      type="image/jpeg"
+      href="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script
+      type="module"
+      crossorigin=""
+      src="/assets/index-DIqGDIAe.js"
+    ></script>
+    <link rel="stylesheet" crossorigin="" href="/assets/index-BH7cwsVh.css" />
+    <meta name="theme-color" content="#4f46e5" />
+    <meta
+      property="og:image"
+      content="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200"
+    />
+  </head>
+  <body
+    class="h-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased font-sans"
+    cz-shortcut-listen="true"
+  >
+    <div id="root" class="h-full">
+      <div
+        class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white"
+      >
+        <header
+          class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-indigo-500/20 px-4 sm:px-8 py-3.5 shadow-xl shadow-black/40"
+        >
+          <div
+            class="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap"
+          >
+            <div class="flex items-center space-x-3.5">
+              <div
+                class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-400 via-indigo-500 to-purple-600 p-0.5 shadow-lg shadow-indigo-500/30 shrink-0"
+              >
+                <div
+                  class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-shield-check w-6 h-6 text-amber-400"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+                    ></path>
+                    <path d="m9 12 2 2 4-4"></path>
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h1
+                    class="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-1.5"
+                  >
+                    <span>ReservaMaster</span
+                    ><span
+                      class="px-2 py-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[10px] font-extrabold uppercase tracking-wider shadow-sm"
+                      >SuperAdmin</span
+                    >
+                  </h1>
+                </div>
+                <p class="text-xs text-indigo-300 font-medium hidden sm:block">
+                  Consola Maestra de Gestión Multi-Complejo &amp; Licencias
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+              <button
+                class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                title="Copiar URL directa de esta página independiente de SuperAdmin"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-copy w-3.5 h-3.5 text-indigo-400"
+                  aria-hidden="true"
+                >
+                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                  <path
+                    d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                  ></path></svg
+                ><span class="hidden md:inline"
+                  >Copiar Enlace SuperAdmin</span
+                ></button
+              ><button
+                class="px-3.5 py-1.5 rounded-xl bg-indigo-600/90 hover:bg-indigo-600 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-md shadow-indigo-600/20 active:scale-95"
+                title="Ir al panel del complejo seleccionado"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-left w-3.5 h-3.5"
+                  aria-hidden="true"
+                >
+                  <path d="m12 19-7-7 7-7"></path>
+                  <path d="M19 12H5"></path></svg
+                ><span
+                  >Ir al Panel de
+                  <strong class="font-extrabold underline underline-offset-2"
+                    >Complejo Deportivo Central</strong
+                  ></span
+                ></button
+              ><button
+                class="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                title="Cerrar sesión de Super Administrador"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-log-out w-3.5 h-3.5"
+                  aria-hidden="true"
+                >
+                  <path d="m16 17 5-5-5-5"></path>
+                  <path d="M21 12H9"></path>
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path></svg
+                ><span class="hidden sm:inline">Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+        </header>
+        <main class="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8">
+          <div class="space-y-6 pb-12 animate-fadeIn max-w-7xl mx-auto">
+            <div
+              class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 border border-indigo-500/30 text-white relative overflow-hidden shadow-2xl"
+            >
+              <div
+                class="absolute -right-10 -bottom-10 w-72 h-72 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"
+              ></div>
+              <div
+                class="absolute top-0 right-1/4 w-40 h-40 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"
+              ></div>
+              <div
+                class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6"
+              >
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span
+                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-black uppercase tracking-wider border border-indigo-500/40"
+                      ><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-sparkles w-3.5 h-3.5 text-amber-400"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"
+                        ></path>
+                        <path d="M20 2v4"></path>
+                        <path d="M22 4h-4"></path>
+                        <circle cx="4" cy="20" r="2"></circle></svg
+                      >Panel Maestro Multi-Cliente</span
+                    ><span
+                      class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30"
+                      ><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-shield-check w-3.5 h-3.5"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+                        ></path>
+                        <path d="m9 12 2 2 4-4"></path></svg
+                      >SuperAdmin</span
+                    ><span
+                      class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30"
+                      ><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-zap w-3 h-3 text-emerald-400 fill-emerald-400"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"
+                        ></path></svg
+                      >Control de 30 Días</span
+                    >
+                  </div>
+                  <h1
+                    class="text-2xl sm:text-3xl font-black tracking-tight text-white"
+                  >
+                    Gestión de Paneles de Administrador de Clientes
+                  </h1>
+                  <p class="text-sm text-slate-300 max-w-2xl">
+                    Crea, edita y administra múltiples paneles de administración
+                    independientes. Habilita o desactiva el acceso mensual de 30
+                    días para cada cliente en un clic.
+                  </p>
+                </div>
+                <div class="flex items-center gap-3 shrink-0 flex-wrap">
+                  <button
+                    class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-black shadow-lg shadow-emerald-600/30 transition-all cursor-pointer flex items-center gap-2"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-plus w-4 h-4"
+                      aria-hidden="true"
+                    >
+                      <path d="M5 12h14"></path>
+                      <path d="M12 5v14"></path></svg
+                    ><span>Nuevo Panel de Cliente</span></button
+                  ><button
+                    class="px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-800 border border-slate-700 text-slate-200 text-sm font-bold transition-all cursor-pointer flex items-center gap-2"
+                  >
+                    <span>Ir al Panel Activo</span
+                    ><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-arrow-right w-4 h-4"
+                      aria-hidden="true"
+                    >
+                      <path d="M5 12h14"></path>
+                      <path d="m12 5 7 7-7 7"></path>
+                    </svg></button
+                  ><button
+                    class="px-4 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-sm font-bold transition-all cursor-pointer flex items-center gap-2"
+                    title="Cerrar sesión de Super Administrador"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-log-out w-4 h-4"
+                      aria-hidden="true"
+                    >
+                      <path d="m16 17 5-5-5-5"></path>
+                      <path d="M21 12H9"></path>
+                      <path
+                        d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+                      ></path></svg
+                    ><span>Cerrar Sesión</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div
+                class="p-5 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 shadow-xs"
+              >
+                <div class="flex items-center justify-between">
+                  <span
+                    class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                    >Paneles de Clientes</span
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-building2 lucide-building-2 w-5 h-5 text-indigo-500"
+                    aria-hidden="true"
+                  >
+                    <path d="M10 12h4"></path>
+                    <path d="M10 8h4"></path>
+                    <path d="M14 21v-3a2 2 0 0 0-4 0v3"></path>
+                    <path
+                      d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"
+                    ></path>
+                    <path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"></path>
+                  </svg>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span
+                    class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono"
+                    >3</span
+                  ><span
+                    class="text-xs font-bold text-emerald-600 dark:text-emerald-400"
+                    >(2 activos)</span
+                  >
+                </div>
+                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
+                  Complejos deportivos creados
+                </p>
+              </div>
+              <div
+                class="p-5 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 shadow-xs"
+              >
+                <div class="flex items-center justify-between">
+                  <span
+                    class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                    >Canchas en la Red</span
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-layers w-5 h-5 text-emerald-500"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"
+                    ></path>
+                    <path
+                      d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"
+                    ></path>
+                    <path
+                      d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"
+                    ></path>
+                  </svg>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span
+                    class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono"
+                    >12</span
+                  ><span class="text-xs text-slate-500">canchas</span>
+                </div>
+                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
+                  Pádel, Fútbol, Tenis
+                </p>
+              </div>
+              <div
+                class="p-5 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 shadow-xs"
+              >
+                <div class="flex items-center justify-between">
+                  <span
+                    class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                    >Reservas Totales</span
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-calendar-check w-5 h-5 text-purple-500"
+                    aria-hidden="true"
+                  >
+                    <path d="M8 2v4"></path>
+                    <path d="M16 2v4"></path>
+                    <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                    <path d="M3 10h18"></path>
+                    <path d="m9 16 2 2 4-4"></path>
+                  </svg>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span
+                    class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono"
+                    >8</span
+                  ><span class="text-xs text-slate-500">turnos</span>
+                </div>
+                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
+                  En todas las sedes
+                </p>
+              </div>
+              <div
+                class="p-5 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 shadow-xs"
+              >
+                <div class="flex items-center justify-between">
+                  <span
+                    class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                    >Recaudación Global</span
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-dollar-sign w-5 h-5 text-amber-500"
+                    aria-hidden="true"
+                  >
+                    <line x1="12" x2="12" y1="2" y2="22"></line>
+                    <path
+                      d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                    ></path>
+                  </svg>
+                </div>
+                <div class="mt-2">
+                  <span
+                    class="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono"
+                    >$ 120.000</span
+                  >
+                </div>
+                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
+                  Facturación acumulada
+                </p>
+              </div>
+            </div>
+            <div
+              class="bg-white dark:bg-slate-800 rounded-3xl p-4 sm:p-5 border border-slate-200 dark:border-slate-700/80 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4"
+            >
+              <div class="relative flex-1">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-search w-4 h-4 text-slate-400 absolute left-3.5 top-3"
+                  aria-hidden="true"
+                >
+                  <path d="m21 21-4.34-4.34"></path>
+                  <circle cx="11" cy="11" r="8"></circle></svg
+                ><input
+                  placeholder="Buscar por complejo, propietario, teléfono o localidad..."
+                  class="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                  type="text"
+                  value=""
+                />
+              </div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <div
+                  class="flex items-center bg-slate-100 dark:bg-slate-900/60 p-1 rounded-2xl border border-slate-200 dark:border-slate-700"
+                >
+                  <button
+                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs"
+                  >
+                    Todos (3)</button
+                  ><button
+                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                  >
+                    Habilitados (2)</button
+                  ><button
+                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                  >
+                    Por Vencer (≤ 7d)</button
+                  ><button
+                    class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                  >
+                    Vencidos / Bloqueados
+                  </button>
+                </div>
+                <button
+                  class="px-3.5 py-2 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
+                  title="Sumar 30 días a todos los clientes a la vez"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-zap w-3.5 h-3.5 text-amber-500 fill-amber-500"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"
+                    ></path></svg
+                  ><span>+30 Días a Todos</span>
+                </button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div
+                class="bg-white dark:bg-slate-800 rounded-3xl border transition-all duration-200 overflow-hidden flex flex-col justify-between shadow-xs hover:shadow-md border-indigo-500 ring-2 ring-indigo-500/30"
+              >
+                <div class="p-5 sm:p-6 space-y-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center space-x-3 min-w-0">
+                      <img
+                        alt="Complejo Deportivo Central"
+                        class="w-11 h-11 rounded-xl object-cover ring-2 ring-slate-200 dark:ring-slate-700 shadow-sm shrink-0 bg-white dark:bg-slate-800"
+                        src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200"
+                      />
+                      <div class="space-y-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <span
+                            class="text-[11px] font-black uppercase tracking-wider text-slate-400 font-mono"
+                            >complejo-central</span
+                          ><span
+                            class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800"
+                            >Panel en Uso</span
+                          >
+                        </div>
+                        <h3
+                          class="text-lg font-black text-slate-900 dark:text-white leading-tight truncate"
+                        >
+                          Complejo Deportivo Central
+                        </h3>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                      <button
+                        class="p-2 rounded-xl text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition-colors cursor-pointer"
+                        title="Editar datos y configuraciones del cliente"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-pen-line w-4 h-4"
+                          aria-hidden="true"
+                        >
+                          <path d="M13 21h8"></path>
+                          <path
+                            d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
+                          ></path>
+                        </svg></button
+                      ><button
+                        class="p-2 rounded-xl text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                        title='Eliminar panel de cliente "Complejo Deportivo Central"'
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-trash2 lucide-trash-2 w-4 h-4"
+                          aria-hidden="true"
+                        >
+                          <path d="M10 11v6"></path>
+                          <path d="M14 11v6"></path>
+                          <path
+                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
+                          ></path>
+                          <path d="M3 6h18"></path>
+                          <path
+                            d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                          ></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="p-3.5 rounded-2xl border flex items-center justify-between gap-3 bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
+                  >
+                    <div class="flex items-center gap-2.5">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-circle-check w-5 h-5 text-emerald-500 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="m9 12 2 2 4-4"></path>
+                      </svg>
+                      <div>
+                        <div class="text-xs font-black">30 días restantes</div>
+                        <div class="text-[11px] opacity-80">
+                          Vence: 05/10/2026, 11:04 p. m.
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      class="p-2 rounded-xl transition-all cursor-pointer text-slate-500 hover:text-rose-600 hover:bg-rose-500/10"
+                      title="Pausar / Bloquear acceso a este panel"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-lock w-4 h-4"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="11"
+                          x="3"
+                          y="11"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div
+                    class="space-y-2 text-xs text-slate-600 dark:text-slate-300 pt-1"
+                  >
+                    <div class="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-users w-3.5 h-3.5 text-indigo-500 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                        ></path>
+                        <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <circle cx="9" cy="7" r="4"></circle></svg
+                      ><span
+                        class="font-semibold text-slate-800 dark:text-slate-200"
+                        >Carlos Rodríguez</span
+                      >
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-phone w-3.5 h-3.5 text-emerald-500 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"
+                        ></path></svg
+                      ><a
+                        href="https://wa.me/5491140008888"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="hover:underline text-slate-700 dark:text-slate-300"
+                        >+54 9 11 4000-8888</a
+                      >
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-map-pin w-3.5 h-3.5 text-slate-400 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
+                        ></path>
+                        <circle cx="12" cy="10" r="3"></circle></svg
+                      ><span class="truncate"
+                        >Av. Libertador 4500, Buenos Aires</span
+                      >
+                    </div>
+                  </div>
+                  <div
+                    class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/60 text-center"
+                  >
+                    <div
+                      class="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50"
+                    >
+                      <div
+                        class="text-sm font-black text-slate-900 dark:text-white font-mono"
+                      >
+                        6
+                      </div>
+                      <div
+                        class="text-[10px] text-slate-500 uppercase font-bold"
+                      >
+                        Canchas
+                      </div>
+                    </div>
+                    <div
+                      class="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50"
+                    >
+                      <div
+                        class="text-sm font-black text-slate-900 dark:text-white font-mono"
+                      >
+                        6
+                      </div>
+                      <div
+                        class="text-[10px] text-slate-500 uppercase font-bold"
+                      >
+                        Reservas
+                      </div>
+                    </div>
+                    <div
+                      class="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50"
+                    >
+                      <div
+                        class="text-sm font-black text-slate-900 dark:text-white font-mono"
+                      >
+                        5
+                      </div>
+                      <div
+                        class="text-[10px] text-slate-500 uppercase font-bold"
+                      >
+                        Clientes
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/70 space-y-2 text-xs"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span
+                        class="font-extrabold text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                        >Enlaces Oficiales</span
+                      ><button
+                        type="button"
+                        class="text-indigo-600 dark:text-indigo-400 hover:underline font-bold text-[11px] flex items-center gap-1 cursor-pointer"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-share2 lucide-share-2 w-3 h-3"
+                          aria-hidden="true"
+                        >
+                          <circle cx="18" cy="5" r="3"></circle>
+                          <circle cx="6" cy="12" r="3"></circle>
+                          <circle cx="18" cy="19" r="3"></circle>
+                          <line
+                            x1="8.59"
+                            x2="15.42"
+                            y1="13.51"
+                            y2="17.49"
+                          ></line>
+                          <line
+                            x1="15.41"
+                            x2="8.59"
+                            y1="6.51"
+                            y2="10.49"
+                          ></line></svg
+                        ><span>Compartir Ambos</span>
+                      </button>
+                    </div>
+                    <div
+                      class="flex items-center justify-between gap-1.5 p-2 bg-white dark:bg-slate-800 rounded-xl border border-indigo-200/80 dark:border-indigo-900/80 shadow-xs"
+                    >
+                      <div class="flex items-center gap-1.5 min-w-0">
+                        <span
+                          class="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 shrink-0 font-bold"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-shield-check w-4 h-4"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+                            ></path>
+                            <path d="m9 12 2 2 4-4"></path></svg
+                        ></span>
+                        <div class="min-w-0">
+                          <div class="flex items-center gap-1.5">
+                            <span
+                              class="font-extrabold text-[11px] text-slate-800 dark:text-slate-100"
+                              >Portal Administrador</span
+                            ><span
+                              class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold uppercase"
+                              >Privado</span
+                            >
+                          </div>
+                          <div
+                            class="font-mono text-[10px] text-slate-500 dark:text-slate-400 truncate"
+                          >
+                            ?view=admin&amp;c=complejo-deportivo-central
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-[11px] transition-colors cursor-pointer flex items-center gap-1 border border-indigo-200/60 dark:border-indigo-800/60"
+                          title="Copiar Enlace de Administrador"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-copy w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <rect
+                              width="14"
+                              height="14"
+                              x="8"
+                              y="8"
+                              rx="2"
+                              ry="2"
+                            ></rect>
+                            <path
+                              d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                            ></path></svg
+                          ><span>Copiar</span></button
+                        ><a
+                          href="https://api.whatsapp.com/send?phone=5491140008888&amp;text=%C2%A1Hola%20Carlos%20Rodr%C3%ADguez!%20%F0%9F%91%8B%20Te%20compartimos%20el%20link%20directo%20a%20tu%20*Panel%20de%20Administrador*%20de%20*Complejo%20Deportivo%20Central*%20%F0%9F%8F%9F%EF%B8%8F%3A%0A%0A%F0%9F%91%89%20https%3A%2F%2Fturnos-canchas-final.vercel.app%2F%3Fview%3Dadmin%26c%3Dcomplejo-deportivo-central%0A%0ADesde%20aqu%C3%AD%20pod%C3%A9s%20administrar%20tus%20canchas%2C%20reservas%20y%20caja."
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 transition-colors cursor-pointer border border-emerald-200/60 dark:border-emerald-800/60 inline-flex items-center justify-center"
+                          title="Compartir link de Administrador al dueño por WhatsApp"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-send w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"
+                            ></path>
+                            <path
+                              d="m21.854 2.147-10.94 10.939"
+                            ></path></svg></a
+                        ><a
+                          href="https://turnos-canchas-final.vercel.app/?view=admin&amp;c=complejo-deportivo-central"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer inline-flex items-center justify-center"
+                          title="Abrir Panel Administrador en nueva pestaña"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-external-link w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <path d="M15 3h6v6"></path>
+                            <path d="M10 14 21 3"></path>
+                            <path
+                              d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                            ></path></svg
+                        ></a>
+                      </div>
+                    </div>
+                    <div
+                      class="flex items-center justify-between gap-1.5 p-2 bg-white dark:bg-slate-800 rounded-xl border border-emerald-200/80 dark:border-emerald-900/80 shadow-xs"
+                    >
+                      <div class="flex items-center gap-1.5 min-w-0">
+                        <span
+                          class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 shrink-0 font-bold"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-globe w-4 h-4"
+                            aria-hidden="true"
+                          >
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path
+                              d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"
+                            ></path>
+                            <path d="M2 12h20"></path></svg
+                        ></span>
+                        <div class="min-w-0">
+                          <div class="flex items-center gap-1.5">
+                            <span
+                              class="font-extrabold text-[11px] text-slate-800 dark:text-slate-100"
+                              >Portal de Clientes</span
+                            ><span
+                              class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold uppercase"
+                              >Público 24/7</span
+                            >
+                          </div>
+                          <div
+                            class="font-mono text-[10px] text-slate-500 dark:text-slate-400 truncate"
+                          >
+                            ?view=portal&amp;c=complejo-deportivo-central
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          class="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] transition-colors cursor-pointer flex items-center gap-1 border border-emerald-200/60 dark:border-emerald-800/60"
+                          title="Copiar Enlace del Portal de Clientes"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-copy w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <rect
+                              width="14"
+                              height="14"
+                              x="8"
+                              y="8"
+                              rx="2"
+                              ry="2"
+                            ></rect>
+                            <path
+                              d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                            ></path></svg
+                          ><span>Copiar</span></button
+                        ><a
+                          href="https://api.whatsapp.com/send?text=%C2%A1Hola!%20%F0%9F%91%8B%20Reserv%C3%A1%20tu%20cancha%20online%20en%20*Complejo%20Deportivo%20Central*%20%F0%9F%8F%9F%EF%B8%8F%20de%20forma%20r%C3%A1pida%20ingresando%20a%20nuestro%20portal%20de%20reservas%3A%0A%0A%F0%9F%91%89%20https%3A%2F%2Fturnos-canchas-final.vercel.app%2F%3Fview%3Dportal%26c%3Dcomplejo-deportivo-central%0A%0A%C2%A1Eleg%C3%AD%20fecha%2C%20cancha%20y%20horario%20en%20segundos!%20%E2%9A%BD%F0%9F%8E%BE"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="p-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 hover:bg-teal-100 text-teal-700 dark:text-teal-300 transition-colors cursor-pointer border border-teal-200/60 dark:border-teal-800/60 inline-flex items-center justify-center"
+                          title="Compartir link del portal de clientes por WhatsApp"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-send w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"
+                            ></path>
+                            <path
+                              d="m21.854 2.147-10.94 10.939"
+                            ></path></svg></a
+                        ><a
+                          href="https://turnos-canchas-final.vercel.app/?view=portal&amp;c=complejo-deportivo-central"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer inline-flex items-center justify-center"
+                          title="Abrir Portal de Clientes en nueva pestaña"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-external-link w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <path d="M15 3h6v6"></path>
+                            <path d="M10 14 21 3"></path>
+                            <path
+                              d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                            ></path></svg
+                        ></a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="p-4 bg-slate-50/80 dark:bg-slate-900/40 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-2 flex-wrap"
+                >
+                  <div class="flex items-center gap-1.5">
+                    <button
+                      class="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow-xs transition-all cursor-pointer flex items-center gap-1 active:scale-95"
+                      title="Sumar 30 días a este cliente"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-zap w-3.5 h-3.5 text-amber-300 fill-amber-300"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"
+                        ></path></svg
+                      ><span>+30 Días</span></button
+                    ><button
+                      class="px-2.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                      title="Ver y compartir enlaces de Administrador y Cliente"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-share2 lucide-share-2 w-3.5 h-3.5 text-indigo-500"
+                        aria-hidden="true"
+                      >
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line>
+                        <line
+                          x1="15.41"
+                          x2="8.59"
+                          y1="6.51"
+                          y2="10.49"
+                        ></line></svg
+                      ><span>Enlaces</span>
+                    </button>
+                  </div>
+                  <button
+                    class="px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200"
+                  >
+                    <span>Panel Actual</span
+                    ><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-chevron-right w-3.5 h-3.5"
+                      aria-hidden="true"
+                    >
+                      <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div
+                class="bg-white dark:bg-slate-800 rounded-3xl border transition-all duration-200 overflow-hidden flex flex-col justify-between shadow-xs hover:shadow-md border-slate-200 dark:border-slate-700/80"
+              >
+                <div class="p-5 sm:p-6 space-y-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center space-x-3 min-w-0">
+                      <img
+                        alt="Pádel Club San Isidro"
+                        class="w-11 h-11 rounded-xl object-cover ring-2 ring-slate-200 dark:ring-slate-700 shadow-sm shrink-0 bg-white dark:bg-slate-800"
+                        src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=200"
+                      />
+                      <div class="space-y-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <span
+                            class="text-[11px] font-black uppercase tracking-wider text-slate-400 font-mono"
+                            >padel-san-isidro</span
+                          >
+                        </div>
+                        <h3
+                          class="text-lg font-black text-slate-900 dark:text-white leading-tight truncate"
+                        >
+                          Pádel Club San Isidro
+                        </h3>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                      <button
+                        class="p-2 rounded-xl text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition-colors cursor-pointer"
+                        title="Editar datos y configuraciones del cliente"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-pen-line w-4 h-4"
+                          aria-hidden="true"
+                        >
+                          <path d="M13 21h8"></path>
+                          <path
+                            d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
+                          ></path>
+                        </svg></button
+                      ><button
+                        class="p-2 rounded-xl text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                        title='Eliminar panel de cliente "Pádel Club San Isidro"'
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-trash2 lucide-trash-2 w-4 h-4"
+                          aria-hidden="true"
+                        >
+                          <path d="M10 11v6"></path>
+                          <path d="M14 11v6"></path>
+                          <path
+                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
+                          ></path>
+                          <path d="M3 6h18"></path>
+                          <path
+                            d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                          ></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="p-3.5 rounded-2xl border flex items-center justify-between gap-3 bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
+                  >
+                    <div class="flex items-center gap-2.5">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-circle-check w-5 h-5 text-emerald-500 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="m9 12 2 2 4-4"></path>
+                      </svg>
+                      <div>
+                        <div class="text-xs font-black">24 días restantes</div>
+                        <div class="text-[11px] opacity-80">
+                          Vence: 29/09/2026, 11:04 p. m.
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      class="p-2 rounded-xl transition-all cursor-pointer text-slate-500 hover:text-rose-600 hover:bg-rose-500/10"
+                      title="Pausar / Bloquear acceso a este panel"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-lock w-4 h-4"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="11"
+                          x="3"
+                          y="11"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div
+                    class="space-y-2 text-xs text-slate-600 dark:text-slate-300 pt-1"
+                  >
+                    <div class="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-users w-3.5 h-3.5 text-indigo-500 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                        ></path>
+                        <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <circle cx="9" cy="7" r="4"></circle></svg
+                      ><span
+                        class="font-semibold text-slate-800 dark:text-slate-200"
+                        >Gonzalo Fernández</span
+                      >
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-phone w-3.5 h-3.5 text-emerald-500 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"
+                        ></path></svg
+                      ><a
+                        href="https://wa.me/5491155667788"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="hover:underline text-slate-700 dark:text-slate-300"
+                        >+54 9 11 5566-7788</a
+                      >
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-map-pin w-3.5 h-3.5 text-slate-400 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
+                        ></path>
+                        <circle cx="12" cy="10" r="3"></circle></svg
+                      ><span class="truncate"
+                        >Calle Dardo Rocha 1250, San Isidro</span
+                      >
+                    </div>
+                  </div>
+                  <div
+                    class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/60 text-center"
+                  >
+                    <div
+                      class="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50"
+                    >
+                      <div
+                        class="text-sm font-black text-slate-900 dark:text-white font-mono"
+                      >
+                        4
+                      </div>
+                      <div
+                        class="text-[10px] text-slate-500 uppercase font-bold"
+                      >
+                        Canchas
+                      </div>
+                    </div>
+                    <div
+                      class="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50"
+                    >
+                      <div
+                        class="text-sm font-black text-slate-900 dark:text-white font-mono"
+                      >
+                        2
+                      </div>
+                      <div
+                        class="text-[10px] text-slate-500 uppercase font-bold"
+                      >
+                        Reservas
+                      </div>
+                    </div>
+                    <div
+                      class="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50"
+                    >
+                      <div
+                        class="text-sm font-black text-slate-900 dark:text-white font-mono"
+                      >
+                        2
+                      </div>
+                      <div
+                        class="text-[10px] text-slate-500 uppercase font-bold"
+                      >
+                        Clientes
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/70 space-y-2 text-xs"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span
+                        class="font-extrabold text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                        >Enlaces Oficiales</span
+                      ><button
+                        type="button"
+                        class="text-indigo-600 dark:text-indigo-400 hover:underline font-bold text-[11px] flex items-center gap-1 cursor-pointer"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-share2 lucide-share-2 w-3 h-3"
+                          aria-hidden="true"
+                        >
+                          <circle cx="18" cy="5" r="3"></circle>
+                          <circle cx="6" cy="12" r="3"></circle>
+                          <circle cx="18" cy="19" r="3"></circle>
+                          <line
+                            x1="8.59"
+                            x2="15.42"
+                            y1="13.51"
+                            y2="17.49"
+                          ></line>
+                          <line
+                            x1="15.41"
+                            x2="8.59"
+                            y1="6.51"
+                            y2="10.49"
+                          ></line></svg
+                        ><span>Compartir Ambos</span>
+                      </button>
+                    </div>
+                    <div
+                      class="flex items-center justify-between gap-1.5 p-2 bg-white dark:bg-slate-800 rounded-xl border border-indigo-200/80 dark:border-indigo-900/80 shadow-xs"
+                    >
+                      <div class="flex items-center gap-1.5 min-w-0">
+                        <span
+                          class="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 shrink-0 font-bold"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-shield-check w-4 h-4"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+                            ></path>
+                            <path d="m9 12 2 2 4-4"></path></svg
+                        ></span>
+                        <div class="min-w-0">
+                          <div class="flex items-center gap-1.5">
+                            <span
+                              class="font-extrabold text-[11px] text-slate-800 dark:text-slate-100"
+                              >Portal Administrador</span
+                            ><span
+                              class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold uppercase"
+                              >Privado</span
+                            >
+                          </div>
+                          <div
+                            class="font-mono text-[10px] text-slate-500 dark:text-slate-400 truncate"
+                          >
+                            ?view=admin&amp;c=padel-club-san-isidro
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-[11px] transition-colors cursor-pointer flex items-center gap-1 border border-indigo-200/60 dark:border-indigo-800/60"
+                          title="Copiar Enlace de Administrador"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-copy w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <rect
+                              width="14"
+                              height="14"
+                              x="8"
+                              y="8"
+                              rx="2"
+                              ry="2"
+                            ></rect>
+                            <path
+                              d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                            ></path></svg
+                          ><span>Copiar</span></button
+                        ><a
+                          href="https://api.whatsapp.com/send?phone=5491155667788&amp;text=%C2%A1Hola%20Gonzalo%20Fern%C3%A1ndez!%20%F0%9F%91%8B%20Te%20compartimos%20el%20link%20directo%20a%20tu%20*Panel%20de%20Administrador*%20de%20*P%C3%A1del%20Club%20San%20Isidro*%20%F0%9F%8F%9F%EF%B8%8F%3A%0A%0A%F0%9F%91%89%20https%3A%2F%2Fturnos-canchas-final.vercel.app%2F%3Fview%3Dadmin%26c%3Dpadel-club-san-isidro%0A%0ADesde%20aqu%C3%AD%20pod%C3%A9s%20administrar%20tus%20canchas%2C%20reservas%20y%20caja."
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 transition-colors cursor-pointer border border-emerald-200/60 dark:border-emerald-800/60 inline-flex items-center justify-center"
+                          title="Compartir link de Administrador al dueño por WhatsApp"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-send w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"
+                            ></path>
+                            <path
+                              d="m21.854 2.147-10.94 10.939"
+                            ></path></svg></a
+                        ><a
+                          href="https://turnos-canchas-final.vercel.app/?view=admin&amp;c=padel-club-san-isidro"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer inline-flex items-center justify-center"
+                          title="Abrir Panel Administrador en nueva pestaña"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-external-link w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <path d="M15 3h6v6"></path>
+                            <path d="M10 14 21 3"></path>
+                            <path
+                              d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                            ></path></svg
+                        ></a>
+                      </div>
+                    </div>
+                    <div
+                      class="flex items-center justify-between gap-1.5 p-2 bg-white dark:bg-slate-800 rounded-xl border border-emerald-200/80 dark:border-emerald-900/80 shadow-xs"
+                    >
+                      <div class="flex items-center gap-1.5 min-w-0">
+                        <span
+                          class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 shrink-0 font-bold"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-globe w-4 h-4"
+                            aria-hidden="true"
+                          >
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path
+                              d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"
+                            ></path>
+                            <path d="M2 12h20"></path></svg
+                        ></span>
+                        <div class="min-w-0">
+                          <div class="flex items-center gap-1.5">
+                            <span
+                              class="font-extrabold text-[11px] text-slate-800 dark:text-slate-100"
+                              >Portal de Clientes</span
+                            ><span
+                              class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold uppercase"
+                              >Público 24/7</span
+                            >
+                          </div>
+                          <div
+                            class="font-mono text-[10px] text-slate-500 dark:text-slate-400 truncate"
+                          >
+                            ?view=portal&amp;c=padel-club-san-isidro
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          class="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] transition-colors cursor-pointer flex items-center gap-1 border border-emerald-200/60 dark:border-emerald-800/60"
+                          title="Copiar Enlace del Portal de Clientes"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-copy w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <rect
+                              width="14"
+                              height="14"
+                              x="8"
+                              y="8"
+                              rx="2"
+                              ry="2"
+                            ></rect>
+                            <path
+                              d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                            ></path></svg
+                          ><span>Copiar</span></button
+                        ><a
+                          href="https://api.whatsapp.com/send?text=%C2%A1Hola!%20%F0%9F%91%8B%20Reserv%C3%A1%20tu%20cancha%20online%20en%20*P%C3%A1del%20Club%20San%20Isidro*%20%F0%9F%8F%9F%EF%B8%8F%20de%20forma%20r%C3%A1pida%20ingresando%20a%20nuestro%20portal%20de%20reservas%3A%0A%0A%F0%9F%91%89%20https%3A%2F%2Fturnos-canchas-final.vercel.app%2F%3Fview%3Dportal%26c%3Dpadel-club-san-isidro%0A%0A%C2%A1Eleg%C3%AD%20fecha%2C%20cancha%20y%20horario%20en%20segundos!%20%E2%9A%BD%F0%9F%8E%BE"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="p-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 hover:bg-teal-100 text-teal-700 dark:text-teal-300 transition-colors cursor-pointer border border-teal-200/60 dark:border-teal-800/60 inline-flex items-center justify-center"
+                          title="Compartir link del portal de clientes por WhatsApp"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-send w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"
+                            ></path>
+                            <path
+                              d="m21.854 2.147-10.94 10.939"
+                            ></path></svg></a
+                        ><a
+                          href="https://turnos-canchas-final.vercel.app/?view=portal&amp;c=padel-club-san-isidro"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer inline-flex items-center justify-center"
+                          title="Abrir Portal de Clientes en nueva pestaña"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-external-link w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <path d="M15 3h6v6"></path>
+                            <path d="M10 14 21 3"></path>
+                            <path
+                              d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                            ></path></svg
+                        ></a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="p-4 bg-slate-50/80 dark:bg-slate-900/40 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-2 flex-wrap"
+                >
+                  <div class="flex items-center gap-1.5">
+                    <button
+                      class="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow-xs transition-all cursor-pointer flex items-center gap-1 active:scale-95"
+                      title="Sumar 30 días a este cliente"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-zap w-3.5 h-3.5 text-amber-300 fill-amber-300"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"
+                        ></path></svg
+                      ><span>+30 Días</span></button
+                    ><button
+                      class="px-2.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                      title="Ver y compartir enlaces de Administrador y Cliente"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-share2 lucide-share-2 w-3.5 h-3.5 text-indigo-500"
+                        aria-hidden="true"
+                      >
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line>
+                        <line
+                          x1="15.41"
+                          x2="8.59"
+                          y1="6.51"
+                          y2="10.49"
+                        ></line></svg
+                      ><span>Enlaces</span>
+                    </button>
+                  </div>
+                  <button
+                    class="px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20"
+                  >
+                    <span>Acceder</span
+                    ><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-chevron-right w-3.5 h-3.5"
+                      aria-hidden="true"
+                    >
+                      <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div
+                class="bg-white dark:bg-slate-800 rounded-3xl border transition-all duration-200 overflow-hidden flex flex-col justify-between shadow-xs hover:shadow-md border-slate-200 dark:border-slate-700/80"
+              >
+                <div class="p-5 sm:p-6 space-y-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center space-x-3 min-w-0">
+                      <img
+                        alt="Arena Sport Club Nordelta"
+                        class="w-11 h-11 rounded-xl object-cover ring-2 ring-slate-200 dark:ring-slate-700 shadow-sm shrink-0 bg-white dark:bg-slate-800"
+                        src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200"
+                      />
+                      <div class="space-y-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <span
+                            class="text-[11px] font-black uppercase tracking-wider text-slate-400 font-mono"
+                            >arena-nordelta</span
+                          >
+                        </div>
+                        <h3
+                          class="text-lg font-black text-slate-900 dark:text-white leading-tight truncate"
+                        >
+                          Arena Sport Club Nordelta
+                        </h3>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                      <button
+                        class="p-2 rounded-xl text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition-colors cursor-pointer"
+                        title="Editar datos y configuraciones del cliente"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-pen-line w-4 h-4"
+                          aria-hidden="true"
+                        >
+                          <path d="M13 21h8"></path>
+                          <path
+                            d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
+                          ></path>
+                        </svg></button
+                      ><button
+                        class="p-2 rounded-xl text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                        title='Eliminar panel de cliente "Arena Sport Club Nordelta"'
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-trash2 lucide-trash-2 w-4 h-4"
+                          aria-hidden="true"
+                        >
+                          <path d="M10 11v6"></path>
+                          <path d="M14 11v6"></path>
+                          <path
+                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
+                          ></path>
+                          <path d="M3 6h18"></path>
+                          <path
+                            d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                          ></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="p-3.5 rounded-2xl border flex items-center justify-between gap-3 bg-rose-500/10 border-rose-500/30 text-rose-700 dark:text-rose-300"
+                  >
+                    <div class="flex items-center gap-2.5">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-circle-x w-5 h-5 text-rose-500 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="m15 9-6 6"></path>
+                        <path d="m9 9 6 6"></path>
+                      </svg>
+                      <div>
+                        <div class="text-xs font-black">Panel Bloqueado</div>
+                        <div class="text-[11px] opacity-80">
+                          Vence: 02/09/2026, 11:04 p. m.
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      class="p-2 rounded-xl transition-all cursor-pointer text-emerald-600 hover:bg-emerald-500/20"
+                      title="Habilitar acceso a este panel"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-lock-open w-4 h-4"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="11"
+                          x="3"
+                          y="11"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div
+                    class="space-y-2 text-xs text-slate-600 dark:text-slate-300 pt-1"
+                  >
+                    <div class="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-users w-3.5 h-3.5 text-indigo-500 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                        ></path>
+                        <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <circle cx="9" cy="7" r="4"></circle></svg
+                      ><span
+                        class="font-semibold text-slate-800 dark:text-slate-200"
+                        >Martín Benítez</span
+                      >
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-phone w-3.5 h-3.5 text-emerald-500 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"
+                        ></path></svg
+                      ><a
+                        href="https://wa.me/5491167890123"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="hover:underline text-slate-700 dark:text-slate-300"
+                        >+54 9 11 6789-0123</a
+                      >
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-map-pin w-3.5 h-3.5 text-slate-400 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
+                        ></path>
+                        <circle cx="12" cy="10" r="3"></circle></svg
+                      ><span class="truncate"
+                        >Av. de los Lagos 200, Nordelta</span
+                      >
+                    </div>
+                  </div>
+                  <div
+                    class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/60 text-center"
+                  >
+                    <div
+                      class="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50"
+                    >
+                      <div
+                        class="text-sm font-black text-slate-900 dark:text-white font-mono"
+                      >
+                        2
+                      </div>
+                      <div
+                        class="text-[10px] text-slate-500 uppercase font-bold"
+                      >
+                        Canchas
+                      </div>
+                    </div>
+                    <div
+                      class="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50"
+                    >
+                      <div
+                        class="text-sm font-black text-slate-900 dark:text-white font-mono"
+                      >
+                        0
+                      </div>
+                      <div
+                        class="text-[10px] text-slate-500 uppercase font-bold"
+                      >
+                        Reservas
+                      </div>
+                    </div>
+                    <div
+                      class="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50"
+                    >
+                      <div
+                        class="text-sm font-black text-slate-900 dark:text-white font-mono"
+                      >
+                        0
+                      </div>
+                      <div
+                        class="text-[10px] text-slate-500 uppercase font-bold"
+                      >
+                        Clientes
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/70 space-y-2 text-xs"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span
+                        class="font-extrabold text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400"
+                        >Enlaces Oficiales</span
+                      ><button
+                        type="button"
+                        class="text-indigo-600 dark:text-indigo-400 hover:underline font-bold text-[11px] flex items-center gap-1 cursor-pointer"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-share2 lucide-share-2 w-3 h-3"
+                          aria-hidden="true"
+                        >
+                          <circle cx="18" cy="5" r="3"></circle>
+                          <circle cx="6" cy="12" r="3"></circle>
+                          <circle cx="18" cy="19" r="3"></circle>
+                          <line
+                            x1="8.59"
+                            x2="15.42"
+                            y1="13.51"
+                            y2="17.49"
+                          ></line>
+                          <line
+                            x1="15.41"
+                            x2="8.59"
+                            y1="6.51"
+                            y2="10.49"
+                          ></line></svg
+                        ><span>Compartir Ambos</span>
+                      </button>
+                    </div>
+                    <div
+                      class="flex items-center justify-between gap-1.5 p-2 bg-white dark:bg-slate-800 rounded-xl border border-indigo-200/80 dark:border-indigo-900/80 shadow-xs"
+                    >
+                      <div class="flex items-center gap-1.5 min-w-0">
+                        <span
+                          class="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 shrink-0 font-bold"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-shield-check w-4 h-4"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+                            ></path>
+                            <path d="m9 12 2 2 4-4"></path></svg
+                        ></span>
+                        <div class="min-w-0">
+                          <div class="flex items-center gap-1.5">
+                            <span
+                              class="font-extrabold text-[11px] text-slate-800 dark:text-slate-100"
+                              >Portal Administrador</span
+                            ><span
+                              class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold uppercase"
+                              >Privado</span
+                            >
+                          </div>
+                          <div
+                            class="font-mono text-[10px] text-slate-500 dark:text-slate-400 truncate"
+                          >
+                            ?view=admin&amp;c=arena-sport-club-nordelta
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-[11px] transition-colors cursor-pointer flex items-center gap-1 border border-indigo-200/60 dark:border-indigo-800/60"
+                          title="Copiar Enlace de Administrador"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-copy w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <rect
+                              width="14"
+                              height="14"
+                              x="8"
+                              y="8"
+                              rx="2"
+                              ry="2"
+                            ></rect>
+                            <path
+                              d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                            ></path></svg
+                          ><span>Copiar</span></button
+                        ><a
+                          href="https://api.whatsapp.com/send?phone=5491167890123&amp;text=%C2%A1Hola%20Mart%C3%ADn%20Ben%C3%ADtez!%20%F0%9F%91%8B%20Te%20compartimos%20el%20link%20directo%20a%20tu%20*Panel%20de%20Administrador*%20de%20*Arena%20Sport%20Club%20Nordelta*%20%F0%9F%8F%9F%EF%B8%8F%3A%0A%0A%F0%9F%91%89%20https%3A%2F%2Fturnos-canchas-final.vercel.app%2F%3Fview%3Dadmin%26c%3Darena-sport-club-nordelta%0A%0ADesde%20aqu%C3%AD%20pod%C3%A9s%20administrar%20tus%20canchas%2C%20reservas%20y%20caja."
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 transition-colors cursor-pointer border border-emerald-200/60 dark:border-emerald-800/60 inline-flex items-center justify-center"
+                          title="Compartir link de Administrador al dueño por WhatsApp"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-send w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"
+                            ></path>
+                            <path
+                              d="m21.854 2.147-10.94 10.939"
+                            ></path></svg></a
+                        ><a
+                          href="https://turnos-canchas-final.vercel.app/?view=admin&amp;c=arena-sport-club-nordelta"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer inline-flex items-center justify-center"
+                          title="Abrir Panel Administrador en nueva pestaña"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-external-link w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <path d="M15 3h6v6"></path>
+                            <path d="M10 14 21 3"></path>
+                            <path
+                              d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                            ></path></svg
+                        ></a>
+                      </div>
+                    </div>
+                    <div
+                      class="flex items-center justify-between gap-1.5 p-2 bg-white dark:bg-slate-800 rounded-xl border border-emerald-200/80 dark:border-emerald-900/80 shadow-xs"
+                    >
+                      <div class="flex items-center gap-1.5 min-w-0">
+                        <span
+                          class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 shrink-0 font-bold"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-globe w-4 h-4"
+                            aria-hidden="true"
+                          >
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path
+                              d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"
+                            ></path>
+                            <path d="M2 12h20"></path></svg
+                        ></span>
+                        <div class="min-w-0">
+                          <div class="flex items-center gap-1.5">
+                            <span
+                              class="font-extrabold text-[11px] text-slate-800 dark:text-slate-100"
+                              >Portal de Clientes</span
+                            ><span
+                              class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold uppercase"
+                              >Público 24/7</span
+                            >
+                          </div>
+                          <div
+                            class="font-mono text-[10px] text-slate-500 dark:text-slate-400 truncate"
+                          >
+                            ?view=portal&amp;c=arena-sport-club-nordelta
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          class="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] transition-colors cursor-pointer flex items-center gap-1 border border-emerald-200/60 dark:border-emerald-800/60"
+                          title="Copiar Enlace del Portal de Clientes"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-copy w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <rect
+                              width="14"
+                              height="14"
+                              x="8"
+                              y="8"
+                              rx="2"
+                              ry="2"
+                            ></rect>
+                            <path
+                              d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                            ></path></svg
+                          ><span>Copiar</span></button
+                        ><a
+                          href="https://api.whatsapp.com/send?text=%C2%A1Hola!%20%F0%9F%91%8B%20Reserv%C3%A1%20tu%20cancha%20online%20en%20*Arena%20Sport%20Club%20Nordelta*%20%F0%9F%8F%9F%EF%B8%8F%20de%20forma%20r%C3%A1pida%20ingresando%20a%20nuestro%20portal%20de%20reservas%3A%0A%0A%F0%9F%91%89%20https%3A%2F%2Fturnos-canchas-final.vercel.app%2F%3Fview%3Dportal%26c%3Darena-sport-club-nordelta%0A%0A%C2%A1Eleg%C3%AD%20fecha%2C%20cancha%20y%20horario%20en%20segundos!%20%E2%9A%BD%F0%9F%8E%BE"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="p-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 hover:bg-teal-100 text-teal-700 dark:text-teal-300 transition-colors cursor-pointer border border-teal-200/60 dark:border-teal-800/60 inline-flex items-center justify-center"
+                          title="Compartir link del portal de clientes por WhatsApp"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-send w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"
+                            ></path>
+                            <path
+                              d="m21.854 2.147-10.94 10.939"
+                            ></path></svg></a
+                        ><a
+                          href="https://turnos-canchas-final.vercel.app/?view=portal&amp;c=arena-sport-club-nordelta"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer inline-flex items-center justify-center"
+                          title="Abrir Portal de Clientes en nueva pestaña"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-external-link w-3.5 h-3.5"
+                            aria-hidden="true"
+                          >
+                            <path d="M15 3h6v6"></path>
+                            <path d="M10 14 21 3"></path>
+                            <path
+                              d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                            ></path></svg
+                        ></a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="p-4 bg-slate-50/80 dark:bg-slate-900/40 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-2 flex-wrap"
+                >
+                  <div class="flex items-center gap-1.5">
+                    <button
+                      class="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow-xs transition-all cursor-pointer flex items-center gap-1 active:scale-95"
+                      title="Sumar 30 días a este cliente"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-zap w-3.5 h-3.5 text-amber-300 fill-amber-300"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"
+                        ></path></svg
+                      ><span>+30 Días</span></button
+                    ><button
+                      class="px-2.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                      title="Ver y compartir enlaces de Administrador y Cliente"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-share2 lucide-share-2 w-3.5 h-3.5 text-indigo-500"
+                        aria-hidden="true"
+                      >
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line>
+                        <line
+                          x1="15.41"
+                          x2="8.59"
+                          y1="6.51"
+                          y2="10.49"
+                        ></line></svg
+                      ><span>Enlaces</span>
+                    </button>
+                  </div>
+                  <button
+                    class="px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20"
+                  >
+                    <span>Acceder</span
+                    ><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-chevron-right w-3.5 h-3.5"
+                      aria-hidden="true"
+                    >
+                      <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+        <footer
+          class="border-t border-slate-900 bg-slate-950 py-4 px-6 text-center text-xs text-slate-500"
+        >
+          <div
+            class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2"
+          >
+            <span
+              >Página Independiente de Super Administrador • Control
+              centralizado</span
+            ><span class="font-mono text-[11px] text-slate-400"
+              >Acceso:
+              <strong class="text-slate-300">?view=superadmin</strong></span
+            >
+          </div>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
+
+css: /*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */ @layer
+properties { @supports (((-webkit-hyphens: none)) and (not
+(margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g
+b)))) { *,:before,:after,::backdrop { --tw-translate-x:0; --tw-translate-y: 0;
+--tw-translate-z: 0; --tw-scale-x: 1; --tw-scale-y: 1; --tw-scale-z: 1;
+--tw-scrollbar-thumb: #0000; --tw-scrollbar-track: #0000; --tw-space-y-reverse:
+0; --tw-space-x-reverse: 0; --tw-divide-y-reverse: 0; --tw-border-style: solid;
+--tw-gradient-position: initial; --tw-gradient-from: #0000; --tw-gradient-via:
+#0000; --tw-gradient-to: #0000; --tw-gradient-stops: initial;
+--tw-gradient-via-stops: initial; --tw-gradient-from-position: 0%;
+--tw-gradient-via-position: 50%; --tw-gradient-to-position: 100%; --tw-leading:
+initial; --tw-font-weight: initial; --tw-tracking: initial; --tw-shadow: 0 0
+#0000; --tw-shadow-color: initial; --tw-shadow-alpha: 100%; --tw-inset-shadow: 0
+0 #0000; --tw-inset-shadow-color: initial; --tw-inset-shadow-alpha: 100%;
+--tw-ring-color: initial; --tw-ring-shadow: 0 0 #0000; --tw-inset-ring-color:
+initial; --tw-inset-ring-shadow: 0 0 #0000; --tw-ring-inset: initial;
+--tw-ring-offset-width: 0px; --tw-ring-offset-color: #fff;
+--tw-ring-offset-shadow: 0 0 #0000; --tw-blur: initial; --tw-brightness:
+initial; --tw-contrast: initial; --tw-grayscale: initial; --tw-hue-rotate:
+initial; --tw-invert: initial; --tw-opacity: initial; --tw-saturate: initial;
+--tw-sepia: initial; --tw-drop-shadow: initial; --tw-drop-shadow-color: initial;
+--tw-drop-shadow-alpha: 100%; --tw-drop-shadow-size: initial;
+--tw-backdrop-blur: initial; --tw-backdrop-brightness: initial;
+--tw-backdrop-contrast: initial; --tw-backdrop-grayscale: initial;
+--tw-backdrop-hue-rotate: initial; --tw-backdrop-invert: initial;
+--tw-backdrop-opacity: initial; --tw-backdrop-saturate: initial;
+--tw-backdrop-sepia: initial; --tw-duration: initial; --tw-ease: initial } } }
+@layer theme { :root,:host { --font-sans: -apple-system, BlinkMacSystemFont,
+"Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif, "Apple
+Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+--font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation
+Mono", "Courier New", monospace; --color-red-700: oklch(50.5% .213 27.518);
+--color-red-950: oklch(25.8% .092 26.042); --color-orange-700: oklch(55.3% .195
+38.402); --color-orange-950: oklch(26.6% .079 36.259); --color-amber-50:
+oklch(98.7% .022 95.277); --color-amber-100: oklch(96.2% .059 95.617);
+--color-amber-200: oklch(92.4% .12 95.746); --color-amber-300: oklch(87.9% .169
+91.605); --color-amber-400: oklch(82.8% .189 84.429); --color-amber-500:
+oklch(76.9% .188 70.08); --color-amber-600: oklch(66.6% .179 58.318);
+--color-amber-700: oklch(55.5% .163 48.998); --color-amber-800: oklch(47.3% .137
+46.201); --color-amber-900: oklch(41.4% .112 45.904); --color-amber-950:
+oklch(27.9% .077 45.635); --color-emerald-50: oklch(97.9% .021 166.113);
+--color-emerald-100: oklch(95% .052 163.051); --color-emerald-200: oklch(90.5%
+.093 164.15); --color-emerald-300: oklch(84.5% .143 164.978);
+--color-emerald-400: oklch(76.5% .177 163.223); --color-emerald-500: oklch(69.6%
+.17 162.48); --color-emerald-600: oklch(59.6% .145 163.225);
+--color-emerald-700: oklch(50.8% .118 165.612); --color-emerald-800: oklch(43.2%
+.095 166.913); --color-emerald-900: oklch(37.8% .077 168.94);
+--color-emerald-950: oklch(26.2% .051 172.552); --color-teal-50: oklch(98.4%
+.014 180.72); --color-teal-100: oklch(95.3% .051 180.801); --color-teal-200:
+oklch(91% .096 180.426); --color-teal-300: oklch(85.5% .138 181.071);
+--color-teal-400: oklch(77.7% .152 181.912); --color-teal-500: oklch(70.4% .14
+182.503); --color-teal-600: oklch(60% .118 184.704); --color-teal-700:
+oklch(51.1% .096 186.391); --color-teal-800: oklch(43.7% .078 188.216);
+--color-teal-950: oklch(27.7% .046 192.524); --color-cyan-700: oklch(52% .105
+223.128); --color-cyan-950: oklch(30.2% .056 229.695); --color-blue-50:
+oklch(97% .014 254.604); --color-blue-100: oklch(93.2% .032 255.585);
+--color-blue-200: oklch(88.2% .059 254.128); --color-blue-300: oklch(80.9% .105
+251.813); --color-blue-400: oklch(70.7% .165 254.624); --color-blue-500:
+oklch(62.3% .214 259.815); --color-blue-600: oklch(54.6% .245 262.881);
+--color-blue-700: oklch(48.8% .243 264.376); --color-blue-800: oklch(42.4% .199
+265.638); --color-blue-900: oklch(37.9% .146 265.522); --color-blue-950:
+oklch(28.2% .091 267.935); --color-indigo-50: oklch(96.2% .018 272.314);
+--color-indigo-100: oklch(93% .034 272.788); --color-indigo-200: oklch(87% .065
+274.039); --color-indigo-300: oklch(78.5% .115 274.713); --color-indigo-400:
+oklch(67.3% .182 276.935); --color-indigo-500: oklch(58.5% .233 277.117);
+--color-indigo-600: oklch(51.1% .262 276.966); --color-indigo-700: oklch(45.7%
+.24 277.023); --color-indigo-800: oklch(39.8% .195 277.366); --color-indigo-900:
+oklch(35.9% .144 278.697); --color-indigo-950: oklch(25.7% .09 281.288);
+--color-violet-600: oklch(54.1% .281 293.009); --color-violet-950: oklch(28.3%
+.141 291.089); --color-purple-50: oklch(97.7% .014 308.299); --color-purple-200:
+oklch(90.2% .063 306.703); --color-purple-400: oklch(71.4% .203 305.504);
+--color-purple-500: oklch(62.7% .265 303.9); --color-purple-600: oklch(55.8%
+.288 302.321); --color-purple-700: oklch(49.6% .265 301.924);
+--color-purple-800: oklch(43.8% .218 303.724); --color-purple-900: oklch(38.1%
+.176 304.987); --color-purple-950: oklch(29.1% .149 302.717); --color-rose-50:
+oklch(96.9% .015 12.422); --color-rose-100: oklch(94.1% .03 12.58);
+--color-rose-200: oklch(89.2% .058 10.001); --color-rose-300: oklch(81% .117
+11.638); --color-rose-400: oklch(71.2% .194 13.428); --color-rose-500:
+oklch(64.5% .246 16.439); --color-rose-600: oklch(58.6% .253 17.585);
+--color-rose-700: oklch(51.4% .222 16.935); --color-rose-800: oklch(45.5% .188
+13.697); --color-rose-900: oklch(41% .159 10.272); --color-rose-950: oklch(27.1%
+.105 12.094); --color-slate-50: oklch(98.4% .003 247.858); --color-slate-100:
+oklch(96.8% .007 247.896); --color-slate-200: oklch(92.9% .013 255.508);
+--color-slate-300: oklch(86.9% .022 252.894); --color-slate-400: oklch(70.4% .04
+256.788); --color-slate-500: oklch(55.4% .046 257.417); --color-slate-600:
+oklch(44.6% .043 257.281); --color-slate-700: oklch(37.2% .044 257.287);
+--color-slate-800: oklch(27.9% .041 260.031); --color-slate-900: oklch(20.8%
+.042 265.755); --color-slate-950: oklch(12.9% .042 264.695); --color-zinc-900:
+oklch(21% .006 285.885); --color-black: #000; --color-white: #fff; --spacing:
+.25rem; --container-xs: 20rem; --container-sm: 24rem; --container-md: 28rem;
+--container-lg: 32rem; --container-xl: 36rem; --container-2xl: 42rem;
+--container-4xl: 56rem; --container-5xl: 64rem; --container-7xl: 80rem;
+--text-xs: .75rem; --text-xs--line-height: calc(1 / .75); --text-sm: .875rem;
+--text-sm--line-height: calc(1.25 / .875); --text-base: 1rem;
+--text-base--line-height: 1.5 ; --text-lg: 1.125rem; --text-lg--line-height:
+calc(1.75 / 1.125); --text-xl: 1.25rem; --text-xl--line-height: calc(1.75 /
+1.25); --text-2xl: 1.5rem; --text-2xl--line-height: calc(2 / 1.5); --text-3xl:
+1.875rem; --text-3xl--line-height: 1.2 ; --font-weight-normal: 400;
+--font-weight-medium: 500; --font-weight-semibold: 600; --font-weight-bold: 700;
+--font-weight-extrabold: 800; --font-weight-black: 900; --tracking-tight:
+-.025em; --tracking-wide: .025em; --tracking-wider: .05em; --leading-tight:
+1.25; --leading-snug: 1.375; --leading-relaxed: 1.625; --radius-md: .375rem;
+--radius-lg: .5rem; --radius-xl: .75rem; --radius-2xl: 1rem; --radius-3xl:
+1.5rem; --ease-in-out: cubic-bezier(.4, 0, .2, 1); --animate-pulse: pulse 2s
+cubic-bezier(.4, 0, .6, 1) infinite; --blur-xs: 4px; --blur-sm: 8px; --blur-md:
+12px; --blur-xl: 24px; --blur-2xl: 40px; --blur-3xl: 64px; --aspect-video: 16 /
+9; --default-transition-duration: .15s; --default-transition-timing-function:
+cubic-bezier(.4, 0, .2, 1); --default-font-family: var(--font-sans);
+--default-mono-font-family: var(--font-mono) } } @layer base {
+*,:after,:before,::backdrop { box-sizing: border-box; border: 0 solid; margin:
+0; padding: 0 } ::file-selector-button { box-sizing: border-box; border: 0
+solid; margin: 0; padding: 0 } html,: host { -webkit-text-size-adjust:100%;
+-moz-tab-size: 4; tab-size: 4; line-height: 1.5; font-family:
+var(--default-font-family,-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+"Helvetica Neue", "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI
+Emoji", "Segoe UI Symbol", "Noto Color Emoji"); font-feature-settings:
+var(--default-font-feature-settings,normal); font-variation-settings:
+var(--default-font-variation-settings,normal); -webkit-tap-highlight-color:
+transparent } hr { height: 0; color: inherit; border-top-width: 1px } abbr:
+where([title]) { -webkit-text-decoration:underline dotted; text-decoration:
+underline dotted } h1,h2,h3,h4,h5,h6 { font-size: inherit; font-weight: inherit
+} a { color: inherit; -webkit-text-decoration: inherit; text-decoration: inherit
+} b,strong { font-weight: bolder } code,kbd,samp,pre { font-family:
+var(--default-mono-font-family,ui-monospace, SFMono-Regular, Menlo, Monaco,
+Consolas, "Liberation Mono", "Courier New", monospace); font-feature-settings:
+var(--default-mono-font-feature-settings,normal); font-variation-settings:
+var(--default-mono-font-variation-settings,normal); font-size: 1em } small {
+font-size: 80% } sub,sup { vertical-align: baseline; font-size: 75%;
+line-height: 0; position: relative } sub { bottom: -.25em } sup { top: -.5em }
+table { text-indent: 0; border-color: inherit; border-collapse: collapse }
+:-moz-focusring:where(:not(iframe)) { outline: auto } progress { vertical-align:
+baseline } summary { display: list-item } ol,ul,menu { list-style: none }
+img,svg,video,canvas,audio,iframe,embed,object { vertical-align: middle;
+display: block } img,video { max-width: 100%; height: auto }
+button,input,select,optgroup,textarea { font: inherit; font-feature-settings:
+inherit; font-variation-settings: inherit; letter-spacing: inherit; color:
+inherit; opacity: 1; background-color: #0000; border-radius: 0 }
+::file-selector-button { font: inherit; font-feature-settings: inherit;
+font-variation-settings: inherit; letter-spacing: inherit; color: inherit;
+opacity: 1; background-color: #0000; border-radius: 0 } :where(select:
+is([multiple],[size])) optgroup { font-weight:bolder } :where(select:
+is([multiple],[size])) optgroup option { padding-inline-start:20px }
+::file-selector-button { margin-inline-end:4px} ::placeholder { opacity: 1 }
+@supports (not ((-webkit-appearance: -apple-pay-button))) or
+(contain-intrinsic-size:1px) { ::placeholder { color:currentColor } @supports
+(color: color-mix(in lab,red,red)) { ::placeholder { color:color-mix(in
+oklab,currentcolor 50%,transparent) } } } textarea { resize: vertical }
+::-webkit-search-decoration { -webkit-appearance: none }
+::-webkit-date-and-time-value { min-height: 1lh; text-align: inherit }
+::-webkit-datetime-edit { display: inline-flex }
+::-webkit-datetime-edit-fields-wrapper { padding: 0 } ::-webkit-datetime-edit {
+padding-block:0} ::-webkit-datetime-edit-year-field { padding-block:0}
+::-webkit-datetime-edit-month-field { padding-block:0}
+::-webkit-datetime-edit-day-field { padding-block:0}
+::-webkit-datetime-edit-hour-field { padding-block:0}
+::-webkit-datetime-edit-minute-field { padding-block:0}
+::-webkit-datetime-edit-second-field { padding-block:0}
+::-webkit-datetime-edit-millisecond-field { padding-block:0}
+::-webkit-datetime-edit-meridiem-field { padding-block:0}
+::-webkit-calendar-picker-indicator { line-height: 1 } :-moz-ui-invalid {
+box-shadow: none } button,input: where([type=button],[type=reset],[type=submit])
+{ -webkit-appearance:button; -moz-appearance: button; appearance: button }
+::file-selector-button { -webkit-appearance: button; -moz-appearance: button;
+appearance: button } ::-webkit-inner-spin-button { height: auto }
+::-webkit-outer-spin-button { height: auto } [hidden]:
+where(:not([hidden=until-found])) { display:none!important } :root {
+--brand-primary: #059669; --brand-primary-rgb: 5, 150, 105; --brand-secondary:
+#10b981; --brand-secondary-rgb: 16, 185, 129 } html { font-family: Plus Jakarta
+Sans,system-ui,-apple-system,BlinkMacSystemFont,Segoe
+UI,Roboto,Oxygen,Ubuntu,Cantarell,sans-serif }
