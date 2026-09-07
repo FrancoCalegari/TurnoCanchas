@@ -17,13 +17,16 @@ const getAjustes = async (req, res) => {
 
 
         // Asegurar que las columnas existan
-        const columns = [
-            "ALTER TABLE ajustes_complejo ADD COLUMN info_wifi_ssid VARCHAR(100)",
-            "ALTER TABLE ajustes_complejo ADD COLUMN info_wifi_pass VARCHAR(100)",
-            "ALTER TABLE ajustes_complejo ADD COLUMN info_buffet VARCHAR(255)",
-            "ALTER TABLE ajustes_complejo ADD COLUMN info_reglas TEXT"
-        ];
-        for (const sql of columns) {
+        const checkCols = await executeQuery("SHOW COLUMNS FROM ajustes_complejo");
+        const existingColumns = checkCols.map(c => c.Field);
+        
+        const newColumns = [];
+        if (!existingColumns.includes('info_wifi_ssid')) newColumns.push("ALTER TABLE ajustes_complejo ADD COLUMN info_wifi_ssid VARCHAR(100)");
+        if (!existingColumns.includes('info_wifi_pass')) newColumns.push("ALTER TABLE ajustes_complejo ADD COLUMN info_wifi_pass VARCHAR(100)");
+        if (!existingColumns.includes('info_buffet')) newColumns.push("ALTER TABLE ajustes_complejo ADD COLUMN info_buffet VARCHAR(255)");
+        if (!existingColumns.includes('info_reglas')) newColumns.push("ALTER TABLE ajustes_complejo ADD COLUMN info_reglas TEXT");
+
+        for (const sql of newColumns) {
             try { await executeQuery(sql); } catch (e) {}
         }
         const result = await executeQuery(`SELECT * FROM ajustes_complejo WHERE ${tenantFilter}`);

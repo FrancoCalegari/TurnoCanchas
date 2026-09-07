@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewReportes = document.getElementById('view-reportes');
     const viewAjustes = document.getElementById('view-ajustes');
     const viewMensajes = document.getElementById('view-mensajes');
+    const viewClientes = document.getElementById('view-clientes');
 
     // Nav Buttons
     const btnNavDashboard = document.getElementById('nav-dashboard');
@@ -23,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnNavReportes = document.getElementById('nav-reportes');
     const btnNavAjustes = document.getElementById('nav-ajustes');
     const btnNavMensajes = document.getElementById('nav-mensajes');
+    const btnNavClientes = document.getElementById('nav-clientes');
 
     // Dashboard State
     let _dashboardReservas = [];
@@ -56,6 +58,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const btnShareWhatsapp = document.getElementById('btn-share-whatsapp');
         const btnCopyLink = document.getElementById('btn-copy-link');
+        const btnShareTenant = document.getElementById('btn-share-tenant');
+
+        if (btnShareTenant && tenantData) {
+            btnShareTenant.addEventListener('click', async () => {
+                const publicUrl = `${window.location.origin}/t/${tenantData.slug}`;
+                try {
+                    await navigator.clipboard.writeText(publicUrl);
+                    const originalHTML = btnShareTenant.innerHTML;
+                    btnShareTenant.innerHTML = `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg> <span class="hidden sm:inline">¡Copiado!</span>`;
+                    setTimeout(() => {
+                        btnShareTenant.innerHTML = originalHTML;
+                    }, 2000);
+                } catch (err) {
+                    alert(`El enlace es: ${publicUrl}`);
+                }
+            });
+        }
 
         if (btnShareWhatsapp && tenantData) {
             btnShareWhatsapp.addEventListener('click', () => {
@@ -652,6 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { btn: btnNavDashboard, view: viewDashboard },
             { btn: btnNavReservas, view: viewReservas },
             { btn: btnNavCanchas, view: viewCanchas },
+            { btn: btnNavClientes, view: viewClientes },
             { btn: btnNavReportes, view: viewReportes },
             { btn: btnNavAjustes, view: viewAjustes },
             { btn: btnNavMensajes, view: viewMensajes },
@@ -675,6 +695,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (nav.btn === btnNavDashboard) loadDashboardData();
                 if (nav.btn === btnNavCanchas && typeof loadCanchas === 'function') loadCanchas();
                 if (nav.btn === btnNavReservas) loadReservasAdmin();
+                if (nav.btn === btnNavClientes) loadClientesAdmin();
                 if (nav.btn === btnNavMensajes) loadMensajesData();
                 if (nav.btn === btnNavMiWeb) initMiWeb();
             });
@@ -1518,4 +1539,99 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     init();
+    // ==========================================
+    // CLIENTES CRM
+    // ==========================================
+    async function loadClientesAdmin(searchQuery = '') {
+        const tbody = document.getElementById('admin-clientes-table');
+        if (!tbody) return;
+
+        try {
+            tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500">Cargando clientes...</td></tr>`;
+            
+            const tenantData = window.API.getTenantInfo();
+            if (!tenantData) return;
+
+            let url = '/api/usuarios/admin/clientes';
+            if (searchQuery) url += `?search=${encodeURIComponent(searchQuery)}`;
+
+            const res = await fetch(url, { headers: window.API._getHeaders(false) });
+            if (!res.ok) throw new Error('Error al cargar clientes');
+            
+            const data = await res.json();
+            const clientes = data.data || [];
+
+            if (clientes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500 font-medium">No se encontraron clientes${searchQuery ? ' para tu búsqueda' : ''}.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = clientes.map(c => {
+                const initial = c.nombre ? c.nombre.substring(0, 2).toUpperCase() : 'US';
+                const reservas = parseInt(c.reservas_totales) || 0;
+                const canceladas = parseInt(c.cancelaciones) || 0;
+                
+                let ultima = '-';
+                if (c.ultima_reserva) {
+                    ultima = new Date(c.ultima_reserva).toLocaleDateString('es-AR');
+                }
+
+                // Generar link a WhatsApp
+                const phone = c.telefono ? c.telefono.replace(/\D/g, '') : '';
+                let waLink = '';
+                if (phone) {
+                    const text = encodeURIComponent(`Hola *${c.nombre}*! 👋 Te contactamos desde *${tenantData.nombre}* 🏟️.\n\nPodés ingresar a nuestro portal de reservas en línea:\n👉 ${window.location.origin}/t/${tenantData.slug}\n\n¿En qué podemos ayudarte? ⚽🎾`);
+                    waLink = `<a href="https://wa.me/${phone}?text=${text}" target="_blank" class="inline-flex p-1.5 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 hover:bg-emerald-200 transition-colors" title="Enviar WhatsApp">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"></path></svg>
+                    </a>`;
+                }
+
+                return `
+                    <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                        <td class="p-4">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-bold flex items-center justify-center shrink-0">
+                                    ${initial}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-900 dark:text-white">${c.nombre || 'Sin nombre'}</p>
+                                    <p class="text-[10px] text-slate-400 italic">Registrado el ${new Date(c.createdAt).toLocaleDateString('es-AR')}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <p class="text-slate-700 dark:text-slate-300 font-medium">${c.telefono || '-'}</p>
+                            <p class="text-[10px] text-slate-400">${c.email || '-'}</p>
+                        </td>
+                        <td class="p-4"><span class="font-bold text-slate-900 dark:text-white">${reservas} turnos</span></td>
+                        <td class="p-4"><span class="text-slate-500 font-medium">${canceladas}</span></td>
+                        <td class="p-4 text-slate-600 dark:text-slate-400">${ultima}</td>
+                        <td class="p-4 text-right space-x-2">
+                            ${waLink}
+                            <button class="inline-flex p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" title="Ver Historial Completo" onclick="alert('Historial en desarrollo')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+        } catch (error) {
+            console.error('Error cargando clientes:', error);
+            tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-rose-500 font-bold">Error cargando clientes.</td></tr>`;
+        }
+    }
+
+    // Bind Client Search input
+    const clientesSearchInput = document.getElementById('clientes-search-input');
+    if (clientesSearchInput) {
+        let debounceTimer;
+        clientesSearchInput.addEventListener('input', (e) => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                loadClientesAdmin(e.target.value);
+            }, 500);
+        });
+    }
+
 });

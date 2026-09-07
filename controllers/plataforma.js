@@ -46,16 +46,19 @@ const updateStatus = async (req, res) => {
 // ─── Información pública / branding de la plataforma ──────────────────────────
 const getInfo = async (req, res) => {
     try {
-        // Asegurar que las columnas existan (idempotente)
-        const columns = [
-            "ALTER TABLE plataforma_config ADD COLUMN logo_url VARCHAR(500)",
-            "ALTER TABLE plataforma_config ADD COLUMN favicon_url VARCHAR(500)",
-            "ALTER TABLE plataforma_config ADD COLUMN nombre_plataforma VARCHAR(150)",
-            "ALTER TABLE plataforma_config ADD COLUMN tagline VARCHAR(250)",
-            "ALTER TABLE plataforma_config ADD COLUMN links_servicios TEXT"
-        ];
-        for (const sql of columns) {
-            try { await executeQuery(sql); } catch (e) {}
+        // Asegurar que las columnas existan (idempotente sin generar logs de error)
+        const checkCols = await executeQuery("SHOW COLUMNS FROM plataforma_config LIKE 'logo_url'");
+        if (!checkCols || checkCols.length === 0) {
+            const columns = [
+                "ALTER TABLE plataforma_config ADD COLUMN logo_url VARCHAR(500)",
+                "ALTER TABLE plataforma_config ADD COLUMN favicon_url VARCHAR(500)",
+                "ALTER TABLE plataforma_config ADD COLUMN nombre_plataforma VARCHAR(150)",
+                "ALTER TABLE plataforma_config ADD COLUMN tagline VARCHAR(250)",
+                "ALTER TABLE plataforma_config ADD COLUMN links_servicios TEXT"
+            ];
+            for (const sql of columns) {
+                try { await executeQuery(sql); } catch (e) {}
+            }
         }
 
         const result = await executeQuery('SELECT logo_url, favicon_url, nombre_plataforma, tagline, links_servicios FROM plataforma_config WHERE id = 1');

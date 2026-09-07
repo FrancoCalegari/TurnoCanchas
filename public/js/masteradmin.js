@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Views
     const navDashboard = document.getElementById('nav-dashboard');
-    const navTenants = document.getElementById('nav-tenants');
     const navRubros = document.getElementById('nav-rubros');
     const navPlanes = document.getElementById('nav-planes');
     const navConfig = document.getElementById('nav-config');
@@ -60,7 +59,91 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalEditTenantContent = document.getElementById('modal-edit-tenant-content');
     const formEditTenant = document.getElementById('form-edit-tenant');
     const btnEtCancel = document.getElementById('btn-et-cancel');
-    
+
+    // Modal: Share Tenant
+    const modalShareTenant = document.getElementById('modal-share-tenant');
+    const modalShareContent = document.getElementById('modal-share-content');
+    const shareTenantName = document.getElementById('share-tenant-name');
+    const shareTenantOwner = document.getElementById('share-tenant-owner');
+    const shareTenantPhone = document.getElementById('share-tenant-phone');
+    const shareTenantSlug = document.getElementById('share-tenant-slug');
+    const shareAdminUrl = document.getElementById('share-admin-url');
+    const sharePortalUrl = document.getElementById('share-portal-url');
+    const btnShareClose = document.getElementById('btn-share-close');
+    const btnShareCloseX = document.getElementById('btn-share-close-x');
+    const btnShareAdminCopy = document.getElementById('btn-share-admin-copy');
+    const shareAdminOpen = document.getElementById('share-admin-open');
+    const shareAdminWa = document.getElementById('share-admin-wa');
+    const btnSharePortalCopy = document.getElementById('btn-share-portal-copy');
+    const sharePortalOpen = document.getElementById('share-portal-open');
+    const sharePortalWa = document.getElementById('share-portal-wa');
+    const btnShareBothCopy = document.getElementById('btn-share-both-copy');
+    const shareBothWa = document.getElementById('share-both-wa');
+
+    const openShareModal = (tenant) => {
+        shareTenantName.textContent = tenant.nombre;
+        shareTenantOwner.textContent = tenant.nombre_encargado || 'No especificado';
+        shareTenantPhone.textContent = tenant.telefono || 'No especificado';
+        shareTenantSlug.textContent = tenant.slug;
+
+        const adminUrl = `${window.location.origin}/admin`;
+        const portalUrl = `${window.location.origin}/t/${tenant.slug}`;
+
+        shareAdminUrl.value = adminUrl;
+        shareAdminOpen.href = adminUrl;
+        
+        sharePortalUrl.value = portalUrl;
+        sharePortalOpen.href = portalUrl;
+
+        // WhatsApp links
+        const phone = tenant.telefono ? tenant.telefono.replace(/[^0-9]/g, '') : '';
+        const waPhoneParam = phone ? `phone=${phone}&` : '';
+        
+        const adminWaText = encodeURIComponent(`¡Hola ${tenant.nombre_encargado || 'Encargado'}! 👋 Te compartimos el enlace directo a tu *Panel de Administrador* de *${tenant.nombre}* 🏟️:\n\n👉 ${adminUrl}\n\nDesde aquí podés administrar todas tus reservas, canchas, caja y clientes.`);
+        shareAdminWa.href = `https://api.whatsapp.com/send?${waPhoneParam}text=${adminWaText}`;
+
+        const portalWaText = encodeURIComponent(`¡Hola! 👋 Reservá tu cancha online en *${tenant.nombre}* 🏟️ de forma rápida ingresando a nuestro portal de reservas 24/7:\n\n👉 ${portalUrl}\n\n¡Elegí fecha, cancha y horario en segundos! ⚽🎾`);
+        sharePortalWa.href = `https://api.whatsapp.com/send?text=${portalWaText}`; // Typically sent to clients, so no phone preset
+
+        const bothWaText = encodeURIComponent(`¡Hola ${tenant.nombre_encargado || 'Encargado'}! 👋 Aquí tienes los enlaces de acceso oficiales para *${tenant.nombre}*:\n\n🔑 *Tu Panel de Administrador (Privado):*\n👉 ${adminUrl}\n\n🌐 *Tu Portal de Clientes (Público de Reservas):*\n👉 ${portalUrl}\n\n¡Cualquier consulta estamos a tu disposición!`);
+        shareBothWa.href = `https://api.whatsapp.com/send?${waPhoneParam}text=${bothWaText}`;
+
+        modalShareTenant.classList.remove('hidden');
+        setTimeout(() => {
+            modalShareContent.classList.remove('scale-95', 'opacity-0', 'translate-y-4');
+            modalShareContent.classList.add('scale-100', 'opacity-100', 'translate-y-0');
+        }, 10);
+    };
+
+    const closeShareModal = () => {
+        modalShareContent.classList.remove('scale-100', 'opacity-100', 'translate-y-0');
+        modalShareContent.classList.add('scale-95', 'opacity-0', 'translate-y-4');
+        setTimeout(() => {
+            modalShareTenant.classList.add('hidden');
+        }, 200);
+    };
+
+    if (btnShareClose) btnShareClose.addEventListener('click', closeShareModal);
+    if (btnShareCloseX) btnShareCloseX.addEventListener('click', closeShareModal);
+
+    const copyToClipboard = async (text, btnElement) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            const originalHTML = btnElement.innerHTML;
+            btnElement.innerHTML = `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg><span>¡Copiado!</span>`;
+            setTimeout(() => {
+                btnElement.innerHTML = originalHTML;
+            }, 2000);
+        } catch (err) {
+            console.error('Failed to copy: ', err);
+            alert('No se pudo copiar el texto');
+        }
+    };
+
+    if (btnShareAdminCopy) btnShareAdminCopy.addEventListener('click', () => copyToClipboard(shareAdminUrl.value, btnShareAdminCopy));
+    if (btnSharePortalCopy) btnSharePortalCopy.addEventListener('click', () => copyToClipboard(sharePortalUrl.value, btnSharePortalCopy));
+    if (btnShareBothCopy) btnShareBothCopy.addEventListener('click', () => copyToClipboard(`Panel Admin: ${shareAdminUrl.value}\nPortal Clientes: ${sharePortalUrl.value}`, btnShareBothCopy));
+
     // Modal: Rubro
     const modalRubro = document.getElementById('modal-rubro');
     const modalRubroContent = document.getElementById('modal-rubro-content');
@@ -275,6 +358,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
+                        <button class="btn-share-tenant p-2 rounded-xl text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 transition-colors cursor-pointer" data-id="${t.id}" title="Compartir enlaces">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2 w-4 h-4"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+                        </button>
                         <button class="btn-edit p-2 rounded-xl text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition-colors cursor-pointer" data-id="${t.id}" title="Editar datos">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pen-line w-4 h-4"><path d="M13 21h8"></path><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path></svg>
                         </button>
@@ -332,7 +418,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const activateBtn = e.target.closest('.btn-activate');
         const renewOneBtn = e.target.closest('.btn-renew-one');
         const editBtn = e.target.closest('.btn-edit');
+        const shareBtn = e.target.closest('.btn-share-tenant');
         const deleteTenantBtn = e.target.closest('.btn-delete-tenant');
+
+        if (shareBtn) {
+            const id = shareBtn.dataset.id;
+            const t = allTenants.find(tenant => tenant.id == id);
+            if (t) openShareModal(t);
+        }
 
         if (editBtn) {
             const id = editBtn.dataset.id;
@@ -655,7 +748,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ─── Nav switching ────────────────────────────────────────────────────────
     const switchNav = (activeNav, activeView) => {
-        const navs = [navDashboard, navTenants, navRubros, navPlanes, navConfig, navLogs, navPwa];
+        const navs = [navDashboard, navRubros, navPlanes, navConfig, navLogs, navPwa];
         navs.forEach(nav => {
             if(nav) {
                 nav.classList.remove('active', 'text-indigo-400');
@@ -681,7 +774,7 @@ document.addEventListener('DOMContentLoaded', () => {
         switchNav(navDashboard, viewDashboard);
         loadDashboardStats();
     });
-    if(navTenants) navTenants.addEventListener('click', () => switchNav(navDashboard, viewDashboard));
+
     if(navRubros) navRubros.addEventListener('click', () => switchNav(navRubros, viewRubros));
     if(navPlanes) navPlanes.addEventListener('click', () => switchNav(navPlanes, viewPlanes));
     if(navConfig) navConfig.addEventListener('click', () => {

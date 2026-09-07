@@ -57,11 +57,7 @@
             </a>
             <a href="#" id="nav-dashboard" class="sidebar-item active flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold cursor-pointer transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-                Resumen (Dashboard)
-            </a>
-            <a href="#" id="nav-tenants" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-400 cursor-pointer transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                Clientes (Tenants)
+                Resumen & Clientes
                 <span id="badge-total" class="ml-auto bg-indigo-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">0</span>
             </a>
             <a href="#" id="nav-rubros" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-400 cursor-pointer transition-all">
@@ -706,6 +702,142 @@ Club boutique de pádel panorámico con iluminación LED y pro-shop.</textarea>
         </div>
     </div>
 
+    <!-- Modal Share Tenant -->
+    <div id="modal-share-tenant" class="hidden fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6 md:p-8 bg-slate-950/85 backdrop-blur-md animate-fadeIn overflow-y-auto cursor-pointer font-sans">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-2xl w-full overflow-hidden text-slate-900 dark:text-slate-100 cursor-default my-auto max-h-[92vh] flex flex-col relative z-[1000000]" id="modal-share-content">
+            <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white p-5 sm:p-6 flex items-center justify-between shrink-0 shadow-md">
+                <div class="flex items-center space-x-3.5">
+                    <div class="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-inner">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-amber-300" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"></line></svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-full bg-indigo-500/30 text-amber-300 text-[10px] font-black uppercase tracking-wider border border-white/20">SuperAdmin</span>
+                            <span class="text-xs text-indigo-100 font-bold">Enlaces Oficiales</span>
+                        </div>
+                        <h3 id="share-tenant-name" class="font-extrabold text-lg sm:text-xl leading-tight text-white mt-0.5">Nombre Complejo</h3>
+                    </div>
+                </div>
+                <button id="btn-share-close-x" class="p-2.5 text-white/80 hover:text-white hover:bg-white/10 rounded-2xl transition-colors cursor-pointer shrink-0" title="Cerrar ventana">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="p-5 sm:p-7 space-y-6 overflow-y-auto">
+                <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 text-xs">
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-indigo-500" aria-hidden="true"><path d="m16 11 2 2 4-4"></path><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                        <span class="text-slate-500 dark:text-slate-400">Propietario:</span>
+                        <strong id="share-tenant-owner" class="text-slate-800 dark:text-slate-200">Propietario</strong>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-emerald-500" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect><path d="M12 18h.01"></path></svg>
+                        <span class="text-slate-500 dark:text-slate-400">Teléfono:</span>
+                        <strong id="share-tenant-phone" class="text-slate-800 dark:text-slate-200">Telefono</strong>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-purple-500" aria-hidden="true"><path d="M10 12h4"></path><path d="M10 8h4"></path><path d="M14 21v-3a2 2 0 0 0-4 0v3"></path><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"></path><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"></path></svg>
+                        <span class="text-slate-500 dark:text-slate-400">Slug:</span>
+                        <code id="share-tenant-slug" class="text-indigo-600 dark:text-indigo-400 font-mono font-bold">slug</code>
+                    </div>
+                </div>
+                
+                <div class="rounded-2xl border-2 border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-950/20 p-5 space-y-3.5 transition-all">
+                    <div class="flex items-start justify-between gap-2 flex-wrap">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black shadow-xs">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-1.5">
+                                    <span>1. Enlace del Panel Administrador</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-600 text-white font-black uppercase">Privado</span>
+                                </h4>
+                                <p class="text-xs text-slate-600 dark:text-slate-300">Enlace directo para que el dueño/encargado gestione este complejo.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800/80 shadow-inner">
+                        <input id="share-admin-url" readonly class="w-full bg-transparent text-xs font-mono text-indigo-900 dark:text-indigo-200 outline-none select-all" type="text" value="">
+                        <button type="button" id="btn-share-admin-copy" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-xs">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+                            <span>Copiar Link</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap pt-1">
+                        <a id="share-admin-open" href="#" target="_blank" class="px-3.5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer inline-flex">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 text-indigo-500" aria-hidden="true"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg>
+                            <span>Abrir en Nueva Pestaña</span>
+                        </a>
+                        <a id="share-admin-wa" href="#" target="_blank" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer inline-flex">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5" aria-hidden="true"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg>
+                            <span>Enviar Link al Dueño (WhatsApp)</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="rounded-2xl border-2 border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-950/20 p-5 space-y-3.5 transition-all">
+                    <div class="flex items-start justify-between gap-2 flex-wrap">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black shadow-xs">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-1.5">
+                                    <span>2. Enlace del Portal de Clientes</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-600 text-white font-black uppercase">Público 24/7</span>
+                                </h4>
+                                <p class="text-xs text-slate-600 dark:text-slate-300">Enlace oficial para que los jugadores y clientes hagan sus reservas online.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/80 shadow-inner">
+                        <input id="share-portal-url" readonly class="w-full bg-transparent text-xs font-mono text-emerald-900 dark:text-emerald-200 outline-none select-all" type="text" value="">
+                        <button type="button" id="btn-share-portal-copy" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-xs">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+                            <span>Copiar Link</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap pt-1">
+                        <a id="share-portal-open" href="#" target="_blank" class="px-3.5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer inline-flex">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 text-emerald-500" aria-hidden="true"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg>
+                            <span>Abrir Portal de Clientes</span>
+                        </a>
+                        <a id="share-portal-wa" href="#" target="_blank" class="px-3.5 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer inline-flex">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5" aria-hidden="true"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg>
+                            <span>Compartir Portal a Clientes (WhatsApp)</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border border-indigo-500/40 space-y-3 shadow-lg">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-amber-400" aria-hidden="true"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"></path><path d="M20 2v4"></path><path d="M22 4h-4"></path><circle cx="4" cy="20" r="2"></circle></svg>
+                            <span class="font-extrabold text-xs sm:text-sm text-white">Compartir Ambos Enlaces Juntos al Propietario</span>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">Pack Completo</span>
+                    </div>
+                    <p class="text-xs text-slate-300">Envía un mensaje completo con el link de gestión del administrador y el link de reservas para sus clientes.</p>
+                    <div class="flex items-center gap-2.5 flex-wrap pt-1">
+                        <button type="button" id="btn-share-both-copy" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 text-amber-300" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+                            <span>Copiar Ambos Enlaces</span>
+                        </button>
+                        <a id="share-both-wa" href="#" target="_blank" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-md inline-flex">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5" aria-hidden="true"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg>
+                            <span>Enviar Pack Completo por WhatsApp</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-700/80 flex items-center justify-end">
+                <button type="button" id="btn-share-close" class="px-5 py-2 rounded-xl bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 text-xs font-bold transition-all cursor-pointer">Cerrar</button>
+            </div>
+        </div>
+    </div>
+    
     <script src="/js/api.js"></script>
     <script src="/js/masteradmin.js"></script>
 </body>
