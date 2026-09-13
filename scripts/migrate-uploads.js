@@ -46,7 +46,8 @@ async function migrateUploads() {
                 continue; // Skip and continue to next file
             }
             
-            const newUrl = data.files[0].url;
+            const rawUrl = data.files[0].url;
+            const newUrl = `/api/proxy/image?url=${encodeURIComponent(rawUrl)}`;
             const oldUrl = '/uploads/' + file;
             
             // Update DB references

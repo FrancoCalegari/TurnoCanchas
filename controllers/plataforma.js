@@ -126,7 +126,8 @@ async function uploadToSpiderweb(fileBuffer, originalName) {
         throw new Error("Error al subir a Spiderweb API: " + JSON.stringify(data));
     }
     
-    return data.files[0].url;
+    const rawUrl = data.files[0].url;
+    return `/api/proxy/image?url=${encodeURIComponent(rawUrl)}`;
 }
 
 const uploadLogo = async (req, res) => {

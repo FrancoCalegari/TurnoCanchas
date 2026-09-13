@@ -22,6 +22,7 @@ router.use('/planes', require('./planes'));
 router.use('/upload', require('./upload'));
 router.use('/mensajes', require('./mensajes'));
 router.use('/push', require('./push'));
+router.use('/proxy', require('./proxy'));
 
 module.exports = router;
 
