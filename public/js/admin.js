@@ -26,6 +26,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnNavMensajes = document.getElementById('nav-mensajes');
     const btnNavClientes = document.getElementById('nav-clientes');
 
+    // Mobile Menu Toggle
+    const btnMobileMenu = document.getElementById('btn-mobile-menu');
+    const navMenuContainer = document.getElementById('nav-menu-container');
+    
+    if (btnMobileMenu && navMenuContainer) {
+        btnMobileMenu.addEventListener('click', () => {
+            navMenuContainer.classList.toggle('hidden');
+        });
+    }
+
     // Dashboard State
     let _dashboardReservas = [];
     let _dashboardCanchas = [];
