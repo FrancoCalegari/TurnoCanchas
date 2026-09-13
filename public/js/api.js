@@ -9,7 +9,9 @@ window.API = {
         const tenantToken = localStorage.getItem('tenantToken');
         if (tenantToken) { headers['Authorization'] = 'Tenant ' + tenantToken; return headers; }
         const adminToken = localStorage.getItem('adminToken');
-        if (adminToken) { headers['Authorization'] = 'Tenant ' + adminToken; }
+        if (adminToken) { headers['Authorization'] = 'Tenant ' + adminToken; return headers; }
+        const clientToken = localStorage.getItem('clientToken');
+        if (clientToken) { headers['Authorization'] = 'Client ' + clientToken; }
         return headers;
     },
     /**
@@ -161,6 +163,74 @@ window.API = {
         localStorage.removeItem('clientToken');
         localStorage.removeItem('clientData');
         window.location.reload();
+    },
+
+    /**
+     * Sube un archivo a la API (Ej: logo o chat)
+     */
+    uploadFile: async (file, type = 'logo') => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('type', type);
+        
+        const res = await fetch(`${API_BASE}/upload`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token') || localStorage.getItem('clientToken')}`
+            },
+            body: formData
+        });
+        
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || 'Error subiendo archivo');
+        }
+        const result = await res.json();
+        return result.fileUrl; // Ajustar según respuesta de la API de upload
+    },
+
+    // --- MENSAGERIA / CHAT ---
+    
+    getMensajes: async (clienteId = null) => {
+        let url = `${API_BASE}/mensajes`;
+        if (clienteId) url += `?cliente_id=${clienteId}`;
+        
+        const res = await fetch(url, { headers: window.API._getHeaders() });
+        if (!res.ok) throw new Error('Error al obtener mensajes');
+        const result = await res.json();
+        return result.data || [];
+    },
+
+    enviarMensaje: async (data) => {
+        const res = await fetch(`${API_BASE}/mensajes`, {
+            method: 'POST',
+            headers: window.API._getHeaders(),
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Error al enviar mensaje');
+        const result = await res.json();
+        return result.data;
+    },
+
+    marcarMensajesLeidos: async (targetId) => {
+        const res = await fetch(`${API_BASE}/mensajes/${targetId}/read`, {
+            method: 'PUT',
+            headers: window.API._getHeaders()
+        });
+        if (!res.ok) throw new Error('Error al marcar leídos');
+        return await res.json();
+    },
+
+    // --- PUSH NOTIFICATIONS ---
+    
+    subscribePush: async (subscription) => {
+        const res = await fetch(`${API_BASE}/push/subscribe`, {
+            method: 'POST',
+            headers: window.API._getHeaders(),
+            body: JSON.stringify({ subscription })
+        });
+        if (!res.ok) throw new Error('Error al suscribir notificaciones');
+        return await res.json();
     },
 
     /**
@@ -395,47 +465,6 @@ window.API = {
                 body: JSON.stringify(data)
             });
             if (!res.ok) throw new Error('Error al actualizar ajustes');
-            return await res.json();
-        } catch (error) {
-            console.error(error);
-            throw error;
-        }
-    },
-
-    getMensajes: async () => {
-        try {
-            const res = await fetch(`${API_BASE}/mensajes`, { headers: window.API._getHeaders() });
-            if (!res.ok) throw new Error('Error fetch mensajes');
-            const data = await res.json();
-            return data.data;
-        } catch (error) {
-            console.error(error);
-            return [];
-        }
-    },
-
-    createMensaje: async (data) => {
-        try {
-            const res = await fetch(`${API_BASE}/mensajes`, {
-                method: 'POST',
-                headers: window.API._getHeaders(),
-                body: JSON.stringify(data)
-            });
-            if (!res.ok) throw new Error('Error enviando mensaje');
-            return await res.json();
-        } catch (error) {
-            console.error(error);
-            throw error;
-        }
-    },
-
-    readMensaje: async (id) => {
-        try {
-            const res = await fetch(`${API_BASE}/mensajes/${id}/read`, {
-                method: 'PUT',
-                headers: window.API._getHeaders()
-            });
-            if (!res.ok) throw new Error('Error al marcar leído');
             return await res.json();
         } catch (error) {
             console.error(error);

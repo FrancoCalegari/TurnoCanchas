@@ -318,8 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const stats = t.stats || { canchas: 0, reservas: 0, clientes: 0 };
-        const logoUrl = "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200"; // Placeholder logo
-        
+        const logoUrl = t.logo_url || "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200"; // Fallback logo
         let actionsHtml = '';
         if (isPending) {
             actionsHtml = `<button class="btn-approve flex-1 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold transition-all shadow-md cursor-pointer flex items-center justify-center gap-2" data-id="${t.id}" data-name="${t.nombre}">✓ Aprobar</button>`;
@@ -431,6 +430,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = editBtn.dataset.id;
             const t = allTenants.find(tenant => tenant.id == id);
             if (t) {
+                // Actualizar cabecera del modal
+                if (document.getElementById('et-header-nombre')) document.getElementById('et-header-nombre').textContent = t.nombre;
+                if (document.getElementById('et-header-slug')) document.getElementById('et-header-slug').textContent = `ID: ${t.slug}`;
+                const etEstado = document.getElementById('et-header-estado');
+                if (etEstado) {
+                    etEstado.textContent = t.estado.charAt(0).toUpperCase() + t.estado.slice(1);
+                    etEstado.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold border ';
+                    if (t.estado === 'activo') etEstado.className += 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+                    else if (t.estado === 'pendiente') etEstado.className += 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+                    else if (t.estado === 'suspendido') etEstado.className += 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+                    else etEstado.className += 'bg-slate-500/20 text-slate-300 border-slate-500/30';
+                }
+
                 document.getElementById('et-id').value = t.id;
                 document.getElementById('et-nombre').value = t.nombre;
                 if(document.getElementById('et-slug')) document.getElementById('et-slug').value = t.slug;
@@ -438,6 +450,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('et-telefono').value = t.telefono || '';
                 document.getElementById('et-email').value = t.email || '';
                 document.getElementById('et-ubicacion').value = t.ubicacion || '';
+                
+                const etLogo = document.getElementById('et-logo');
+                const etLogoPreview = document.getElementById('et-logo-preview');
+                if (etLogo && etLogoPreview) {
+                    etLogo.value = t.logo_url || '';
+                    etLogoPreview.src = t.logo_url || "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=200";
+                }
+
                 if (document.getElementById('et-rubro')) {
                     document.getElementById('et-rubro').value = t.rubro_id || '';
                 }
@@ -516,17 +536,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 `¿Eliminar a "${name}" y TODOS sus datos (canchas, reservas, clientes)? Esta acción es permanente e irreversible.`,
                 async () => {
                     try {
-                        const res = await fetch(`/api/tenants/${id}`, {
-                            method: 'DELETE',
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        });
-                        if (res.ok) {
-                            showAlert('Eliminado', `Cliente "${name}" eliminado correctamente.`, 'success');
-                            loadTenants();
-                        } else {
-                            showAlert('Error', 'Fallo al eliminar cliente', 'error');
-                        }
-                    } catch (err) { showAlert('Error', 'Error de conexión', 'error'); }
+                        await apiFetch(`/api/tenants/${id}`, { method: 'DELETE' });
+                        showAlert('Eliminado', `Cliente "${name}" eliminado correctamente.`, 'success');
+                        loadTenants();
+                    } catch (err) { showAlert('Error', err.message || 'Error de conexión', 'error'); }
                 }
             );
         }
@@ -664,6 +677,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.addEventListener('click', () => closeModal(modalEditTenant, modalEditTenantContent));
             }
         });
+
+        const etLogo = document.getElementById('et-logo');
+        const etLogoPreview = document.getElementById('et-logo-preview');
+        const etLogoQuitar = document.getElementById('et-logo-quitar');
+        
+        if (etLogo && etLogoPreview) {
+            etLogo.addEventListener('input', (e) => {
+                etLogoPreview.src = e.target.value || "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=200";
+            });
+        }
+        if (etLogoQuitar && etLogo && etLogoPreview) {
+            etLogoQuitar.addEventListener('click', () => {
+                etLogo.value = '';
+                etLogoPreview.src = "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=200";
+            });
+        }
     }
 
     if (formEditTenant) {
@@ -675,6 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 telefono: document.getElementById('et-telefono').value,
                 email: document.getElementById('et-email').value,
                 ubicacion: document.getElementById('et-ubicacion').value,
+                logo_url: document.getElementById('et-logo') ? document.getElementById('et-logo').value : null,
                 rubro_id: (document.getElementById('et-rubro') ? document.getElementById('et-rubro').value : null)
             };
             try {
@@ -1033,7 +1063,58 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cfgTabLinks) cfgTabLinks.addEventListener('click', () => switchCfgTab('links'));
 
     // File upload helper
-    const uploadFile = async (file) => {
+    // Utilidad: Comprimir a WebP si es mayor a 128KB
+    async function compressAndConvertToWebP(file, maxKb = 128) {
+        return new Promise((resolve, reject) => {
+            if (!file.type.startsWith('image/')) return resolve(file);
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    const MAX_SIZE = 800; // logos and normal platform images don't need to be huge
+                    if (width > MAX_SIZE || height > MAX_SIZE) {
+                        if (width > height) {
+                            height = Math.round(height * (MAX_SIZE / width));
+                            width = MAX_SIZE;
+                        } else {
+                            width = Math.round(width * (MAX_SIZE / height));
+                            height = MAX_SIZE;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const tryCompress = (quality) => {
+                        canvas.toBlob((blob) => {
+                            if (!blob) return reject(new Error('Fallo al comprimir imagen'));
+                            if (blob.size / 1024 <= maxKb || quality <= 0.3) {
+                                const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", { type: "image/webp" });
+                                resolve(newFile);
+                            } else {
+                                tryCompress(quality - 0.2);
+                            }
+                        }, 'image/webp', quality);
+                    };
+
+                    tryCompress(0.9);
+                };
+                img.onerror = () => reject(new Error('Archivo de imagen inválido'));
+                img.src = e.target.result;
+            };
+            reader.onerror = () => reject(new Error('Error leyendo archivo'));
+            reader.readAsDataURL(file);
+        });
+    }
+
+    const uploadFile = async (rawFile) => {
+        const file = await compressAndConvertToWebP(rawFile, 128);
         const fd = new FormData();
         fd.append('image', file);
         const res = await fetch('/api/upload/image', { method: 'POST', headers: { 'Authorization': `SuperAdmin ${token}` }, body: fd });
@@ -1042,7 +1123,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return json.url;
     };
 
-    const uploadPlatformLogo = async (file) => {
+    const uploadPlatformLogo = async (rawFile) => {
+        const file = await compressAndConvertToWebP(rawFile, 128);
         const fd = new FormData();
         fd.append('logo', file);
         const res = await fetch('/api/plataforma/logo', { method: 'POST', headers: { 'Authorization': `SuperAdmin ${token}` }, body: fd });

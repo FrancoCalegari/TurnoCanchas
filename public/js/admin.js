@@ -293,57 +293,234 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function loadMensajesData() {
-        const table = document.getElementById('mensajes-table-body');
-        if (!table) return;
+    let activeChatPolling = null;
+    let currentChatClientId = null;
+    let selectedAdminFileUrl = null;
 
-        table.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">Cargando mensajes...</td></tr>`;
-        
+    async function loadMensajesData() {
+        const sessionsList = document.getElementById('chat-sessions-list');
+        if (!sessionsList) return;
+
         try {
-            const mensajes = await window.API.getMensajes();
-            if (!mensajes || mensajes.length === 0) {
-                table.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">No hay mensajes recientes.</td></tr>`;
+            const sessions = await window.API.getMensajes(); // Admin view returns sessions if no cliente_id
+            if (!sessions || sessions.length === 0) {
+                sessionsList.innerHTML = `<div class="p-8 text-center text-slate-500">No hay chats activos.</div>`;
                 return;
             }
 
-            table.innerHTML = mensajes.map(m => `
-                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${!m.leido ? 'font-bold bg-blue-50/50 dark:bg-blue-900/10' : ''}">
-                    <td class="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400">
-                        ${new Date(m.createdAt).toLocaleString()}
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="text-slate-900 dark:text-white">${m.asunto || 'Sin Asunto'}</div>
-                        ${m.reserva_id ? `<div class="text-xs text-blue-500">Reserva: ${m.reserva_id}</div>` : ''}
-                    </td>
-                    <td class="px-6 py-4 max-w-xs truncate text-slate-600 dark:text-slate-400" title="${m.mensaje}">
-                        ${m.mensaje}
-                    </td>
-                    <td class="px-6 py-4">
-                        ${m.leido 
-                            ? '<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">Leído</span>'
-                            : '<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Nuevo</span>'
-                        }
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        ${!m.leido ? `<button onclick="marcarLeido(${m.id})" class="text-blue-600 hover:text-blue-900 text-sm">Marcar Leído</button>` : ''}
-                    </td>
-                </tr>
-            `).join('');
+            sessionsList.innerHTML = sessions.map(s => {
+                const unreadBadge = parseInt(s.unread_count) > 0 
+                    ? `<span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">${s.unread_count}</span>` 
+                    : '';
+                
+                const time = new Date(s.last_message_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const isActive = currentChatClientId === s.cliente_id;
+
+                return `
+                <div onclick="openAdminChat(${s.cliente_id}, '${String(s.cliente_nombre).replace(/'/g,"\\'").replace(/"/g,"&quot;")}')" 
+                     class="p-4 border-b border-slate-100 dark:border-slate-800 cursor-pointer transition-colors flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 ${isActive ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''}">
+                    <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex flex-shrink-0 items-center justify-center text-slate-600 dark:text-slate-300 font-bold">
+                        ${(s.cliente_nombre || 'C').charAt(0).toUpperCase()}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-baseline mb-0.5">
+                            <h4 class="font-bold text-sm text-slate-800 dark:text-white truncate">${s.cliente_nombre || 'Cliente Anónimo'}</h4>
+                            <span class="text-[10px] text-slate-400 shrink-0 ml-2">${time}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <p class="text-xs text-slate-500 truncate">Ver conversación</p>
+                            ${unreadBadge}
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
 
         } catch (error) {
-            console.error(error);
-            table.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500">Error al cargar mensajes.</td></tr>`;
+            console.error('Error loading chat sessions:', error);
+            sessionsList.innerHTML = `<div class="p-8 text-center text-rose-500">Error al cargar chats.</div>`;
         }
     }
     
-    window.marcarLeido = async (id) => {
-        try {
-            await window.API.readMensaje(id);
-            loadMensajesData();
-        } catch (error) {
-            showAlertModal('Error', 'No se pudo marcar como leído', 'error');
-        }
+    window.openAdminChat = async (clienteId, clienteNombre) => {
+        currentChatClientId = clienteId;
+        document.getElementById('chat-empty-state').classList.add('hidden');
+        document.getElementById('chat-active-panel').classList.remove('hidden');
+        document.getElementById('chat-active-name').textContent = clienteNombre;
+        document.getElementById('chat-active-avatar').textContent = (clienteNombre || 'C').charAt(0).toUpperCase();
+        
+        if (activeChatPolling) clearInterval(activeChatPolling);
+        await loadActiveChat();
+        loadMensajesData(); // Refresh list to update active state
+        activeChatPolling = setInterval(loadActiveChat, 5000);
     };
+
+    async function loadActiveChat() {
+        if (!currentChatClientId) return;
+        const msgContainer = document.getElementById('chat-active-messages');
+        
+        try {
+            const msgs = await window.API.getMensajes(currentChatClientId);
+            renderAdminMessages(msgs, msgContainer);
+            
+            // Si hay no leídos del cliente, marcarlos
+            const unread = msgs.filter(m => !m.leido && m.sender_type === 'cliente');
+            if (unread.length > 0) {
+                await window.API.marcarMensajesLeidos('client'); // The backend expects { cliente_id } in body or something for 'client'.
+                // Wait, our backend code for 'client': 
+                // if (req.params.id === 'client') {
+                //      const { cliente_id } = req.body; ... 
+                // Let's adjust the frontend API for this.
+                await fetch('/api/mensajes/client/read', {
+                    method: 'PUT',
+                    headers: window.API._getHeaders(),
+                    body: JSON.stringify({ cliente_id: currentChatClientId })
+                });
+                loadMensajesData(); // Actualizar badges en sidebar
+            }
+        } catch (err) {
+            console.error('Error loading active chat:', err);
+        }
+    }
+
+    function renderAdminMessages(msgs, container) {
+        if (!msgs || msgs.length === 0) {
+            container.innerHTML = '<div class="text-center text-xs text-slate-500 my-4">No hay mensajes.</div>';
+            return;
+        }
+
+        container.innerHTML = msgs.map(msg => {
+            const isMe = msg.sender_type === 'admin';
+            const align = isMe ? 'justify-end' : 'justify-start';
+            const bgClass = isMe ? 'bg-blue-600 text-white rounded-br-none' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-none border border-slate-200 dark:border-slate-700';
+            
+            let fileHtml = '';
+            if (msg.file_url) {
+                if (msg.file_url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+                    fileHtml = `<img src="${msg.file_url}" class="max-w-full h-auto rounded-lg mb-2" alt="Adjunto">`;
+                } else {
+                    fileHtml = `<a href="${msg.file_url}" target="_blank" class="text-[10px] underline break-all flex items-center gap-1 mb-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Archivo adjunto</a>`;
+                }
+            }
+
+            const time = new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            return `
+            <div class="flex ${align}">
+                <div class="max-w-[70%] p-3 rounded-2xl ${bgClass} text-sm shadow-sm relative group">
+                    ${fileHtml}
+                    <p class="break-words">${msg.mensaje || ''}</p>
+                    <span class="text-[9px] opacity-70 mt-1 block text-right">${time}</span>
+                </div>
+            </div>
+            `;
+        }).join('');
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // Input events
+    const adminChatInput = document.getElementById('admin-chat-input');
+    const adminBtnSend = document.getElementById('btn-admin-send');
+    const adminBtnAttach = document.getElementById('btn-admin-attach');
+    const adminChatFile = document.getElementById('admin-chat-file');
+    const adminChatPreview = document.getElementById('admin-chat-attachment-preview');
+    
+    if (adminChatInput && adminBtnSend) {
+        adminChatInput.addEventListener('input', () => {
+            adminBtnSend.disabled = !adminChatInput.value.trim() && !selectedAdminFileUrl;
+        });
+
+        adminChatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendAdminMessage();
+        });
+
+        adminBtnSend.addEventListener('click', sendAdminMessage);
+    }
+
+    if (adminBtnAttach && adminChatFile) {
+        adminBtnAttach.addEventListener('click', () => adminChatFile.click());
+        adminChatFile.addEventListener('change', async (e) => {
+            if (e.target.files.length > 0) {
+                adminBtnAttach.classList.add('animate-pulse');
+                try {
+                    selectedAdminFileUrl = await window.API.uploadFile(e.target.files[0], 'chat');
+                    adminChatPreview.classList.remove('hidden');
+                    adminBtnSend.disabled = false;
+                } catch (err) {
+                    alert('Error al subir archivo');
+                }
+                adminBtnAttach.classList.remove('animate-pulse');
+            }
+        });
+    }
+
+    async function sendAdminMessage() {
+        if (!currentChatClientId) return;
+        const text = adminChatInput.value.trim();
+        if (!text && !selectedAdminFileUrl) return;
+
+        adminChatInput.disabled = true;
+        adminBtnSend.disabled = true;
+
+        try {
+            await window.API.enviarMensaje({
+                cliente_id: currentChatClientId,
+                mensaje: text,
+                file_url: selectedAdminFileUrl,
+                sender_type: 'admin'
+            });
+            adminChatInput.value = '';
+            selectedAdminFileUrl = null;
+            adminChatPreview.classList.add('hidden');
+            await loadActiveChat();
+        } catch (err) {
+            alert('No se pudo enviar el mensaje.');
+        } finally {
+            adminChatInput.disabled = false;
+            adminBtnSend.disabled = false;
+            adminChatInput.focus();
+        }
+    }
+
+    // Push Notif btn
+    const btnEnablePush = document.getElementById('btn-enable-push');
+    if (btnEnablePush) {
+        btnEnablePush.addEventListener('click', async () => {
+            if ('serviceWorker' in navigator && 'PushManager' in window) {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    let sub = await registration.pushManager.getSubscription();
+                    if (!sub) {
+                        const applicationServerKey = urlB64ToUint8Array('BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuB-5MEKKfP5Bq7sN2A-cOovlY'); 
+                        sub = await registration.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: applicationServerKey
+                        });
+                    }
+                    if (sub) {
+                        await window.API.subscribePush(sub);
+                        alert('Notificaciones Push activadas para este administrador.');
+                    }
+                } catch (error) {
+                    console.error('Push SW error:', error);
+                    alert('No se pudieron activar las notificaciones push. ' + error.message);
+                }
+            } else {
+                alert('Tu navegador no soporta notificaciones push.');
+            }
+        });
+    }
+
+    function urlB64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
 
     // Render Table
     function renderTable(reservas, canchas, isDemo = false) {
@@ -548,9 +725,33 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('ajustes-nombre').value = data.nombre_complejo || '';
             document.getElementById('ajustes-open').value = data.open_time || '';
             document.getElementById('ajustes-close').value = data.close_time || '';
+            
+            // Set modo
+            const modo = data.horario_modo || 'todos_los_dias';
+            const radio = document.querySelector(`input[name="horario_modo"][value="${modo}"]`);
+            if (radio) radio.checked = true;
+            
+            // Render horarios semana
+            let horariosSemana = {};
+            try {
+                if (data.horarios_semana) {
+                    horariosSemana = JSON.parse(data.horarios_semana);
+                }
+            } catch(e) {}
+            renderHorariosSemana(horariosSemana);
+            toggleHorarioModoView(modo);
+            
             document.getElementById('ajustes-wpp').value = data.wpp_contacto || '';
             const wppMensajeInput = document.getElementById('ajustes-wpp-mensaje');
             if (wppMensajeInput) wppMensajeInput.value = data.wpp_mensaje || '';
+
+            // Listeners para cambio de modo
+            const radios = document.querySelectorAll('input[name="horario_modo"]');
+            radios.forEach(r => {
+                r.addEventListener('change', (e) => {
+                    toggleHorarioModoView(e.target.value);
+                });
+            });
             const devolverSenaInput = document.getElementById('ajustes-devolver-sena');
             if (devolverSenaInput) devolverSenaInput.value = data.devolver_sena || 'no';
             const mapInput = document.getElementById('ajustes-maps');
@@ -647,7 +848,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         hero_title: document.getElementById('ajustes-hero-title') ? document.getElementById('ajustes-hero-title').value : undefined,
                         canchas_title: document.getElementById('ajustes-canchas-title') ? document.getElementById('ajustes-canchas-title').value : undefined,
                         nosotros_title: document.getElementById('ajustes-nosotros-title') ? document.getElementById('ajustes-nosotros-title').value : undefined,
-                        mercadopago_alias: document.getElementById('ajustes-mp-alias') ? document.getElementById('ajustes-mp-alias').value : undefined
+                        mercadopago_alias: document.getElementById('ajustes-mp-alias') ? document.getElementById('ajustes-mp-alias').value : undefined,
+                        horario_modo: document.querySelector('input[name="horario_modo"]:checked')?.value,
+                        horarios_semana: JSON.stringify(extractHorariosSemana())
                     });
                     showAlertModal('Éxito', 'Ajustes guardados correctamente.', 'success');
                 } catch (error) {
@@ -657,6 +860,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.disabled = false;
                 btn.innerText = 'Guardar Ajustes';
             });
+        }
+        
+        function extractHorariosSemana() {
+            const container = document.getElementById('horario-semana-container');
+            if (!container) return {};
+            const result = {};
+            const rows = container.querySelectorAll('.flex');
+            rows.forEach(row => {
+                const check = row.querySelector('.dia-abierto');
+                if (check) {
+                    const index = check.getAttribute('data-dia');
+                    const open = row.querySelector('.dia-open').value;
+                    const close = row.querySelector('.dia-close').value;
+                    result[index] = {
+                        abierto: check.checked,
+                        open: open,
+                        close: close
+                    };
+                }
+            });
+            return result;
         }
     }
 
@@ -1539,6 +1763,61 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     init();
+
+    function toggleHorarioModoView(modo) {
+        const todos = document.getElementById('horario-todos');
+        const personalizado = document.getElementById('horario-personalizado');
+        if (modo === 'todos_los_dias') {
+            todos.classList.remove('hidden');
+            personalizado.classList.add('hidden');
+        } else {
+            todos.classList.add('hidden');
+            personalizado.classList.remove('hidden');
+        }
+    }
+
+    function renderHorariosSemana(data) {
+        const container = document.getElementById('horario-semana-container');
+        if (!container) return;
+        const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        container.innerHTML = '';
+        
+        dias.forEach((dia, index) => {
+            const conf = data[index] || { abierto: true, open: '08:00', close: '23:00' };
+            const isChecked = conf.abierto ? 'checked' : '';
+            const disabledStr = conf.abierto ? '' : 'disabled opacity-50';
+            
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-4 bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700';
+            row.innerHTML = `
+                <div class="w-24">
+                    <label class="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
+                        <input type="checkbox" class="dia-abierto w-4 h-4 text-blue-600 rounded border-slate-300" data-dia="${index}" ${isChecked}>
+                        ${dia}
+                    </label>
+                </div>
+                <div class="flex-1 flex items-center gap-2">
+                    <input type="time" class="dia-open w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm ${disabledStr}" value="${conf.open}" ${disabledStr}>
+                    <span class="text-slate-500 font-bold">-</span>
+                    <input type="time" class="dia-close w-full px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm ${disabledStr}" value="${conf.close}" ${disabledStr}>
+                </div>
+            `;
+            
+            const check = row.querySelector('.dia-abierto');
+            const inputs = row.querySelectorAll('input[type="time"]');
+            check.addEventListener('change', (e) => {
+                const isOpen = e.target.checked;
+                inputs.forEach(inp => {
+                    inp.disabled = !isOpen;
+                    if (!isOpen) inp.classList.add('opacity-50');
+                    else inp.classList.remove('opacity-50');
+                });
+            });
+            
+            container.appendChild(row);
+        });
+    }
+
     // ==========================================
     // CLIENTES CRM
     // ==========================================

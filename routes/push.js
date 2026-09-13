@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const mensajesController = require('../controllers/mensajes');
+const pushController = require('../controllers/push');
 
 // Middleware para extraer auth de cualquier tipo (client o admin)
 const resolveAuth = async (req, res, next) => {
@@ -32,8 +32,6 @@ const resolveAuth = async (req, res, next) => {
     next();
 };
 
-router.get('/', resolveAuth, mensajesController.getMensajes);
-router.post('/', resolveAuth, mensajesController.createMensaje);
-router.put('/:id/read', resolveAuth, mensajesController.markAsRead);
+router.post('/subscribe', resolveAuth, pushController.subscribe);
 
 module.exports = router;

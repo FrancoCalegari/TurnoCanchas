@@ -1,4 +1,4 @@
-const { executeQuery } = require('../config/db');
+const { executeQuery, sqlEscape } = require('../config/db');
 
 const register = async (req, res) => { res.status(201).json({ message: 'Stub' }); };
 const login = async (req, res) => { res.json({ message: 'Stub' }); };
@@ -11,7 +11,7 @@ const getAdminClientes = async (req, res) => {
         const { search } = req.query;
 
         // Mostrar clientes del tenant actual, o clientes globales (0), o clientes que tengan reservas en este tenant
-        let conditions = [`(c.tenant_id = ${tenantId} OR c.tenant_id = 0 OR c.id IN (SELECT cliente_id FROM reservas WHERE tenant_id = ${tenantId}))`];
+        let conditions = [`(c.tenant_id = ${sqlEscape(tenantId)} OR c.tenant_id = 0 OR c.id IN (SELECT cliente_id FROM reservas WHERE tenant_id = ${sqlEscape(tenantId)}))`];
 
         if (search) {
             const s = String(search).replace(/'/g, "''");

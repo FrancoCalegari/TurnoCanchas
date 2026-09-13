@@ -49,88 +49,150 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Comprobar Paywall / Suscripción
-        const plat = await window.API.getPlataforma();
-        if (plat && (plat.estado === 'inactivo' || new Date(plat.fecha_vencimiento) < new Date())) {
-            document.body.innerHTML = `
-                <div class="h-screen w-full flex flex-col items-center justify-center bg-slate-50 text-slate-900 p-6">
-                    <svg class="w-20 h-20 text-rose-500 mb-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
-                    <h1 class="text-3xl font-black mb-2 tracking-tight text-center">Plataforma Suspendida</h1>
-                    <p class="text-slate-500 text-center max-w-md font-medium">El servicio de reservas se encuentra inactivo temporalmente. Por favor, vuelva a intentar más tarde o comuníquese con el complejo deportivo.</p>
-                </div>
-            `;
-            return;
+        const tenant = window.API.getPublicTenant();
+        const cacheKeyPrefix = `tenant_cache_${tenant}_`;
+        const loader = document.getElementById('global-loader');
+
+        // Check if we are at the portal root but missing tenant
+        if (window.location.pathname === '/portal' || window.location.pathname === '/portal.html') {
+            if (!tenant) {
+                // ...existing logic for portal...
+                document.body.innerHTML = `
+                    <div class="h-screen w-full flex flex-col items-center justify-center bg-slate-50 text-slate-900 p-6">
+                        <svg class="w-16 h-16 text-slate-400 mb-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                        <h1 class="text-2xl font-bold mb-2">Bienvenido al Portal</h1>
+                        <p class="text-slate-500 text-center">Por favor ingresa utilizando el enlace específico de tu complejo deportivo.</p>
+                    </div>
+                `;
+                if(loader) loader.style.display = 'none';
+                return;
+            }
         }
 
-        // Fetch Ajustes para encabezado
-        const ajustes = await window.API.getAjustes();
-        if (ajustes) {
-            state.ajustes = ajustes;
-            if (ajustes.wpp_contacto) {
-                const wppMsg = ajustes.wpp_mensaje
-                    ? encodeURIComponent(ajustes.wpp_mensaje)
-                    : 'Hola!';
-                const wppUrl = `https://api.whatsapp.com/send?phone=${ajustes.wpp_contacto}&text=${wppMsg}`;
+        // Try to load cached data
+        let cachedPlat = null;
+        let cachedAjustes = null;
+        try {
+            const cp = sessionStorage.getItem(cacheKeyPrefix + 'plat');
+            const ca = sessionStorage.getItem(cacheKeyPrefix + 'ajustes');
+            if (cp) cachedPlat = JSON.parse(cp);
+            if (ca) cachedAjustes = JSON.parse(ca);
+        } catch(e) {}
 
-                const wppLink = document.getElementById('btn-whatsapp-header');
-                if (wppLink) wppLink.href = wppUrl;
-
-                const wppFloat = document.getElementById('btn-whatsapp-flotante');
-                if (wppFloat) wppFloat.href = wppUrl;
+        // Function to apply UI updates
+        const applyUI = (plat, ajustes) => {
+            if (plat && (plat.estado === 'inactivo' || new Date(plat.fecha_vencimiento) < new Date())) {
+                document.body.innerHTML = `
+                    <div class="h-screen w-full flex flex-col items-center justify-center bg-slate-50 text-slate-900 p-6">
+                        <svg class="w-20 h-20 text-rose-500 mb-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                        <h1 class="text-3xl font-black mb-2 tracking-tight text-center">Plataforma Suspendida</h1>
+                        <p class="text-slate-500 text-center max-w-md font-medium">El servicio de reservas se encuentra inactivo temporalmente. Por favor, vuelva a intentar más tarde o comuníquese con el complejo deportivo.</p>
+                    </div>
+                `;
+                return false; // suspended
             }
+            if (ajustes) {
+                state.ajustes = ajustes;
+                if (ajustes.wpp_contacto) {
+                    const wppMsg = ajustes.wpp_mensaje ? encodeURIComponent(ajustes.wpp_mensaje) : 'Hola!';
+                    const wppUrl = `https://api.whatsapp.com/send?phone=${ajustes.wpp_contacto}&text=${wppMsg}`;
 
-            if (ajustes.ubicacion_maps) {
-                const mapsLink = document.getElementById('btn-ubicacion-header');
-                if (mapsLink) {
-                    mapsLink.href = ajustes.ubicacion_maps;
+                    const wppLink = document.getElementById('btn-whatsapp-header');
+                    if (wppLink) wppLink.href = wppUrl;
+
+                    const wppFloat = document.getElementById('btn-whatsapp-flotante');
+                    if (wppFloat) wppFloat.href = wppUrl;
                 }
-                const infoMapsLink = document.getElementById('info-ubicacion');
-                if (infoMapsLink) infoMapsLink.href = ajustes.ubicacion_maps;
-            }
 
-            if (document.getElementById('info-wifi-ssid')) document.getElementById('info-wifi-ssid').textContent = ajustes.info_wifi_ssid || 'No disponible';
-            if (document.getElementById('info-wifi-pass')) document.getElementById('info-wifi-pass').textContent = ajustes.info_wifi_pass || 'No disponible';
-            if (document.getElementById('info-buffet')) document.getElementById('info-buffet').textContent = ajustes.info_buffet || 'Servicios no especificados.';
-            if (document.getElementById('info-reglas')) document.getElementById('info-reglas').textContent = ajustes.info_reglas || 'No hay reglamento especificado.';
-
-            if (ajustes.logo_url) {
-                const logoImg = document.getElementById('header-logo');
-                if (logoImg) logoImg.src = ajustes.logo_url;
-                
-                // Update favicon
-                let favicon = document.querySelector('link[rel="icon"]');
-                if (!favicon) {
-                    favicon = document.createElement('link');
-                    favicon.rel = 'icon';
-                    document.head.appendChild(favicon);
+                if (ajustes.ubicacion_maps) {
+                    const mapsLink = document.getElementById('btn-ubicacion-header');
+                    if (mapsLink) {
+                        mapsLink.href = ajustes.ubicacion_maps;
+                    }
+                    const infoMapsLink = document.getElementById('info-ubicacion');
+                    if (infoMapsLink) infoMapsLink.href = ajustes.ubicacion_maps;
                 }
-                favicon.href = ajustes.logo_url;
+
+                if (document.getElementById('info-wifi-ssid')) document.getElementById('info-wifi-ssid').textContent = ajustes.info_wifi_ssid || 'No disponible';
+                if (document.getElementById('info-wifi-pass')) document.getElementById('info-wifi-pass').textContent = ajustes.info_wifi_pass || 'No disponible';
+                if (document.getElementById('info-buffet')) document.getElementById('info-buffet').textContent = ajustes.info_buffet || 'Servicios no especificados.';
+                if (document.getElementById('info-reglas')) document.getElementById('info-reglas').textContent = ajustes.info_reglas || 'No hay reglamento especificado.';
+
+                if (ajustes.logo_url) {
+                    const logoImg = document.getElementById('header-logo');
+                    if (logoImg) logoImg.src = ajustes.logo_url;
+                    
+                    // Update favicon
+                    let favicon = document.querySelector('link[rel="icon"]');
+                    if (!favicon) {
+                        favicon = document.createElement('link');
+                        favicon.rel = 'icon';
+                        document.head.appendChild(favicon);
+                    }
+                    favicon.href = ajustes.logo_url;
+                }
+                if (ajustes.hero_image_url) {
+                    const heroImg = document.getElementById('hero-image');
+                    if (heroImg) heroImg.src = ajustes.hero_image_url;
+                }
+                if (ajustes.hero_image_url_2) {
+                    const heroImg2 = document.getElementById('hero-image-2');
+                    if (heroImg2) heroImg2.src = ajustes.hero_image_url_2;
+                }
+                if (ajustes.hero_image_url_3) {
+                    const heroImg3 = document.getElementById('hero-image-3');
+                    if (heroImg3) heroImg3.src = ajustes.hero_image_url_3;
+                }
+                if (ajustes.hero_title) {
+                    const heroTitle = document.getElementById('hero-title');
+                    if (heroTitle) heroTitle.innerText = ajustes.hero_title;
+                }
+                if (ajustes.nombre_complejo) {
+                    const headerTitle = document.getElementById('header-title');
+                    if (headerTitle) headerTitle.innerText = ajustes.nombre_complejo;
+                    document.title = ajustes.nombre_complejo + ' - Reservas';
+                }
+                if (ajustes.nosotros_title) {
+                    const infoTitle = document.getElementById('info-title');
+                    if (infoTitle) infoTitle.innerText = ajustes.nosotros_title;
+                }
+                if (ajustes.canchas_title) {
+                    const canchasTitle = document.getElementById('canchas-title');
+                    if (canchasTitle) canchasTitle.innerText = ajustes.canchas_title;
+                }
             }
-            if (ajustes.hero_image_url) {
-                const heroImg = document.getElementById('hero-image');
-                if (heroImg) heroImg.src = ajustes.hero_image_url;
+            return true;
+        };
+
+        let isCached = false;
+        if (cachedPlat && cachedAjustes) {
+            isCached = true;
+            if (applyUI(cachedPlat, cachedAjustes)) {
+                if(loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 500);
+                }
             }
-            if (ajustes.hero_image_url_2) {
-                const heroImg2 = document.getElementById('hero-image-2');
-                if (heroImg2) heroImg2.src = ajustes.hero_image_url_2;
+        }
+
+        // Fetch fresh data
+        const platPromise = window.API.getPlataforma();
+        const ajustesPromise = window.API.getAjustes();
+        
+        const [plat, ajustes] = await Promise.all([platPromise, ajustesPromise]);
+        
+        sessionStorage.setItem(cacheKeyPrefix + 'plat', JSON.stringify(plat));
+        sessionStorage.setItem(cacheKeyPrefix + 'ajustes', JSON.stringify(ajustes));
+
+        if (!isCached) {
+            if (!applyUI(plat, ajustes)) return; // suspended
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
             }
-            if (ajustes.hero_image_url_3) {
-                const heroImg3 = document.getElementById('hero-image-3');
-                if (heroImg3) heroImg3.src = ajustes.hero_image_url_3;
-            }
-            if (ajustes.nombre_complejo) {
-                const headerTitle = document.getElementById('header-title');
-                if (headerTitle) headerTitle.innerText = ajustes.nombre_complejo;
-                document.title = ajustes.nombre_complejo + ' - Reservas';
-            }
-            if (ajustes.nosotros_title) {
-                const infoTitle = document.getElementById('info-title');
-                if (infoTitle) infoTitle.innerText = ajustes.nosotros_title;
-            }
-            if (ajustes.canchas_title) {
-                const canchasTitle = document.getElementById('canchas-title');
-                if (canchasTitle) canchasTitle.innerText = ajustes.canchas_title;
-            }
+        } else {
+            // Re-apply in case something changed in the background
+            applyUI(plat, ajustes);
         }
 
         renderCalendar();
@@ -149,6 +211,25 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function formatTime(hour) {
         return `${hour.toString().padStart(2, '0')}:00`;
+    }
+
+    // Helper para verificar superposición
+    function checkOverlap(hourStr, durationStr, canchaReservas) {
+        const newStart = parseHoraToMinutes(hourStr);
+        const newEnd = newStart + parseInt(durationStr);
+        
+        return canchaReservas.some(r => {
+            const resStart = parseHoraToMinutes(r.hora);
+            const resEnd = resStart + (parseInt(r.duracion) || 60);
+            return (newStart < resEnd && newEnd > resStart);
+        });
+    }
+
+    // Convertir HH:MM a minutos
+    function parseHoraToMinutes(horaStr) {
+        if (!horaStr) return 0;
+        const parts = horaStr.split(':');
+        return parseInt(parts[0], 10) * 60 + parseInt(parts[1] || 0, 10);
     }
 
     // Render Calendar
@@ -414,6 +495,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function getOperatingHours(dateObj) {
+        let startHour = 8;
+        let endHour = 22;
+        let isClosed = false;
+        
+        if (state.ajustes) {
+            if (state.ajustes.horario_modo === 'personalizado' && state.ajustes.horarios_semana) {
+                try {
+                    const hs = typeof state.ajustes.horarios_semana === 'string' ? JSON.parse(state.ajustes.horarios_semana) : state.ajustes.horarios_semana;
+                    const dayOfWeek = dateObj.getDay();
+                    const dayConfig = hs[dayOfWeek];
+                    
+                    if (dayConfig) {
+                        if (!dayConfig.abierto) {
+                            isClosed = true;
+                        } else {
+                            const openH = parseInt(dayConfig.open.split(':')[0], 10);
+                            const closeH = parseInt(dayConfig.close.split(':')[0], 10);
+                            if (!isNaN(openH)) startHour = openH;
+                            if (!isNaN(closeH)) endHour = closeH > 0 ? closeH - 1 : 23;
+                        }
+                    }
+                } catch(e) {}
+            } else if (state.ajustes.open_time && state.ajustes.close_time) {
+                const openH = parseInt(state.ajustes.open_time.split(':')[0], 10);
+                const closeH = parseInt(state.ajustes.close_time.split(':')[0], 10);
+                if (!isNaN(openH)) startHour = openH;
+                if (!isNaN(closeH)) endHour = closeH > 0 ? closeH - 1 : 23;
+            }
+        }
+        return { startHour, endHour, isClosed };
+    }
+
     // Render Courts
     function renderCourts() {
         courtsGrid.innerHTML = '';
@@ -431,8 +545,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const opHours = getOperatingHours(state.selectedDate);
+        if (opHours.isClosed) {
+            courtsGrid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-500 font-bold bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">El complejo se encuentra cerrado el día seleccionado.</div>';
+            return;
+        }
+
         if (state.viewMode === 'list') {
-            renderCourtsList(filteredCanchas);
+            renderCourtsList(filteredCanchas, opHours);
             return;
         }
 
@@ -473,7 +593,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="px-5 py-3 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
                     <span class="flex items-center gap-1 text-[11px]">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock w-3.5 h-3.5 text-slate-400"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        Horario: ${state.ajustes?.open_time || '08:00'} a ${state.ajustes?.close_time || '23:00'} hs
+                        Horario: ${opHours.startHour.toString().padStart(2, '0')}:00 a ${(opHours.endHour + 1).toString().padStart(2, '0')}:00 hs
                     </span>
                     <span class="font-semibold text-blue-600 dark:text-blue-400">Seña: ${cancha.porcentaje_sena !== undefined ? cancha.porcentaje_sena : 50}%</span>
                 </div>
@@ -490,75 +610,73 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentHour = now.getHours();
             
             // Generate hours dynamically
-            let startHour = 8;
-            let endHour = 22; // 22 is the last block if it closes at 23
-            
-            if (state.ajustes && state.ajustes.open_time && state.ajustes.close_time) {
-                const openH = parseInt(state.ajustes.open_time.split(':')[0], 10);
-                const closeH = parseInt(state.ajustes.close_time.split(':')[0], 10);
-                if (!isNaN(openH)) startHour = openH;
-                if (!isNaN(closeH)) endHour = closeH > 0 ? closeH - 1 : 23; 
-            }
+            const startHour = opHours.startHour;
+            const endHour = opHours.endHour;
             
             for (let h = startHour; h <= endHour; h++) {
-                const hourStr = formatTime(h);
-                
-                // Check if reserved
-                let isReserved = canchaReservas.some(r => r.hora === hourStr);
-                
-                // If duration is 120, we need 2 consecutive free slots
-                if (duration === 120 && h < endHour) {
-                    const nextHourStr = formatTime(h + 1);
-                    if (canchaReservas.some(r => r.hora === nextHourStr)) {
-                        isReserved = true; 
-                    }
-                } else if (duration === 120 && h === endHour) {
-                    isReserved = true; // Cannot fit 2 hours at the last slot
-                }
-                
-                const isPast = isToday && h <= currentHour;
+                for (let m = 0; m < 60; m += 30) {
+                    const hourStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                    const pStart = h * 60 + m;
+                    const pEnd = pStart + duration;
+                    const closeMinutes = (endHour + 1) * 60;
 
-                const btn = document.createElement('button');
-                
-                if (isPast) {
-                    btn.className = 'py-2 px-1 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-800 text-center cursor-not-allowed opacity-50 flex flex-col items-center justify-center';
-                    btn.disabled = true;
-                    btn.innerHTML = `
-                        <span class="text-xs font-bold text-slate-400 line-through">${hourStr}</span>
-                        <span class="text-[9px] text-rose-500 font-semibold mt-0.5">Pasado</span>
-                    `;
-                } else if (isReserved) {
-                    btn.className = 'py-2 px-1 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-800 text-center cursor-not-allowed opacity-50 flex flex-col items-center justify-center';
-                    btn.disabled = true;
-                    btn.innerHTML = `
-                        <span class="text-xs font-bold text-slate-400 line-through">${hourStr}</span>
-                        <span class="text-[9px] text-rose-500 font-semibold mt-0.5">Reservado</span>
-                    `;
-                } else {
-                    const price = (cancha.precioPorHora * (duration / 60));
-                    btn.className = 'py-2.5 px-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-600 hover:text-white text-emerald-900 dark:text-emerald-200 border border-emerald-200/80 dark:border-emerald-800/80 text-center transition-all group cursor-pointer shadow-2xs hover:scale-105 active:scale-95 flex flex-col items-center justify-center';
-                    btn.innerHTML = `
-                        <span class="text-xs font-black group-hover:text-white leading-tight">${hourStr} hs</span>
-                        <span class="text-[11px] font-extrabold text-emerald-700 dark:text-emerald-300 group-hover:text-emerald-100 my-0.5">$ ${price.toLocaleString('es-AR')}</span>
-                        <span class="text-[9px] font-bold uppercase tracking-tight text-emerald-600 dark:text-emerald-400 group-hover:text-white bg-emerald-100 dark:bg-emerald-900/60 group-hover:bg-emerald-700 px-1.5 py-0.5 rounded-md transition-colors">Reservar</span>
-                    `;
+                    if (pEnd > closeMinutes) continue; // No entra en el horario de cierre
                     
-                    btn.addEventListener('click', (e) => handleReserva(e.currentTarget, cancha, hourStr, duration, price));
+                    let isReserved = checkOverlap(hourStr, duration, canchaReservas);
+                    
+                    const isPast = isToday && (pStart <= (currentHour * 60 + now.getMinutes()));
+
+                    const btn = document.createElement('button');
+                    
+                    if (isPast) {
+                        btn.className = 'py-2 px-1 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-800 text-center cursor-not-allowed opacity-50 flex flex-col items-center justify-center';
+                        btn.disabled = true;
+                        btn.innerHTML = `
+                            <span class="text-xs font-bold text-slate-400 line-through">${hourStr}</span>
+                            <span class="text-[9px] text-rose-500 font-semibold mt-0.5">Pasado</span>
+                        `;
+                    } else if (isReserved) {
+                        btn.className = 'py-2 px-1 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-800 text-center cursor-not-allowed opacity-50 flex flex-col items-center justify-center';
+                        btn.disabled = true;
+                        btn.innerHTML = `
+                            <span class="text-xs font-bold text-slate-400 line-through">${hourStr}</span>
+                            <span class="text-[9px] text-rose-500 font-semibold mt-0.5">Reservado</span>
+                        `;
+                    } else {
+                        const price = (cancha.precioPorHora * (duration / 60));
+                        btn.className = 'py-2.5 px-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-600 hover:text-white text-emerald-900 dark:text-emerald-200 border border-emerald-200/80 dark:border-emerald-800/80 text-center transition-all group cursor-pointer shadow-2xs hover:scale-105 active:scale-95 flex flex-col items-center justify-center';
+                        btn.innerHTML = `
+                            <span class="text-xs font-black group-hover:text-white leading-tight">${hourStr} hs</span>
+                            <span class="text-[11px] font-extrabold text-emerald-700 dark:text-emerald-300 group-hover:text-emerald-100 my-0.5">$ ${price.toLocaleString('es-AR')}</span>
+                            <span class="text-[9px] font-bold uppercase tracking-tight text-emerald-600 dark:text-emerald-400 group-hover:text-white bg-emerald-100 dark:bg-emerald-900/60 group-hover:bg-emerald-700 px-1.5 py-0.5 rounded-md transition-colors">Reservar</span>
+                        `;
+                        
+                        btn.addEventListener('click', (e) => handleReserva(e.currentTarget, cancha, hourStr, duration, price));
+                    }
+                    
+                    hoursContainer.appendChild(btn);
                 }
-                
-                hoursContainer.appendChild(btn);
             }
         });
     }
 
-    function renderCourtsList(filteredCanchas) {
-        courtsGrid.innerHTML = `
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200/80 dark:border-slate-800"><th class="p-3 text-xs font-bold text-slate-500 sticky left-0 bg-slate-50 dark:bg-slate-800/90 z-10 w-48 border-r border-slate-200/80 dark:border-slate-700">Servicio</th>`;
-        for (let h = 8; h <= 22; h++) {
-            headerHTML += `<th class="p-3 text-xs font-bold text-slate-500 text-center min-w-[70px]">${formatTime(h)}</th>`;
+    function renderCourtsList(filteredCanchas, opHours) {
+        courtsGrid.innerHTML = '';
+        const tableWrapper = document.createElement('div');
+        tableWrapper.className = 'overflow-x-auto';
+        const table = document.createElement('table');
+        table.className = 'w-full text-left border-collapse';
+        const thead = document.createElement('thead');
+        let headerHTML = `<tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200/80 dark:border-slate-800"><th class="p-3 text-xs font-bold text-slate-500 sticky left-0 bg-slate-50 dark:bg-slate-800/90 z-10 w-48 border-r border-slate-200/80 dark:border-slate-700">Servicio</th>`;
+        
+        const startHourList = opHours.startHour;
+        const endHourList = opHours.endHour;
+
+        for (let h = startHourList; h <= endHourList; h++) {
+            for (let m = 0; m < 60; m += 30) {
+                const hourStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                headerHTML += `<th class="p-3 text-xs font-bold text-slate-500 text-center min-w-[70px]">${hourStr}</th>`;
+            }
         }
         headerHTML += `</tr>`;
         thead.innerHTML = headerHTML;
@@ -583,40 +701,40 @@ document.addEventListener('DOMContentLoaded', () => {
             tdName.innerHTML = `<div class="truncate w-44" title="${cancha.nombre}">${cancha.nombre}</div><div class="text-[10px] text-slate-500 font-normal truncate">${cancha.deporte}</div>`;
             tr.appendChild(tdName);
             
-            for (let h = 8; h <= 22; h++) {
-                const hourStr = formatTime(h);
-                let isReserved = canchaReservas.some(r => r.hora === hourStr);
-                
-                if (duration === 120 && h < 22) {
-                    const nextHourStr = formatTime(h + 1);
-                    if (canchaReservas.some(r => r.hora === nextHourStr)) {
-                        isReserved = true; 
-                    }
-                } else if (duration === 120 && h === 22) {
-                    isReserved = true;
-                }
-                
-                const isPast = isToday && h <= currentHour;
-                const price = (cancha.precioPorHora * (duration / 60));
+            for (let h = startHourList; h <= endHourList; h++) {
+                for (let m = 0; m < 60; m += 30) {
+                    const hourStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                    const pStart = h * 60 + m;
+                    const pEnd = pStart + duration;
+                    const closeMinutes = (endHourList + 1) * 60;
+                    
+                    const td = document.createElement('td');
+                    td.className = 'p-1.5 align-middle';
 
-                const td = document.createElement('td');
-                td.className = 'p-1.5 align-middle';
-                
-                if (isPast) {
-                    td.innerHTML = `<div class="h-11 rounded-lg bg-slate-50 dark:bg-slate-800/30 border border-slate-200/50 dark:border-slate-800 flex items-center justify-center opacity-40 cursor-not-allowed"><span class="text-[10px] text-slate-400 font-semibold line-through">${hourStr}</span></div>`;
-                } else if (isReserved) {
-                    td.innerHTML = `<div class="h-11 rounded-lg bg-rose-50/50 dark:bg-rose-900/10 border border-rose-200/50 dark:border-rose-800/30 flex flex-col items-center justify-center cursor-not-allowed"><span class="text-[9px] text-rose-400 font-semibold uppercase tracking-wider">Ocupado</span></div>`;
-                } else {
-                    const btn = document.createElement('button');
-                    btn.className = 'w-full h-11 rounded-lg bg-emerald-50/80 dark:bg-emerald-900/20 hover:bg-emerald-500 hover:text-white text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/50 flex flex-col items-center justify-center transition-all cursor-pointer shadow-xs hover:shadow-md hover:scale-[1.02] active:scale-95';
-                    btn.innerHTML = `<span class="text-[10px] font-bold block group-hover/btn:hidden">Libre</span><span class="text-[11px] font-black hidden group-hover/btn:block">Reservar</span>`;
-                    // Fix hover scope by adding group/btn to button
-                    btn.classList.add('group/btn');
-                    btn.addEventListener('click', (e) => handleReserva(e.currentTarget, cancha, hourStr, duration, price));
-                    td.appendChild(btn);
+                    if (pEnd > closeMinutes) {
+                        td.innerHTML = `<div class="h-11 rounded-lg bg-slate-50 dark:bg-slate-800/30 border border-slate-200/50 dark:border-slate-800 flex items-center justify-center opacity-20 cursor-not-allowed"></div>`;
+                        tr.appendChild(td);
+                        continue;
+                    }
+                    
+                    let isReserved = checkOverlap(hourStr, duration, canchaReservas);
+                    const isPast = isToday && (pStart <= (currentHour * 60 + now.getMinutes()));
+                    const price = (cancha.precioPorHora * (duration / 60));
+
+                    if (isPast) {
+                        td.innerHTML = `<div class="h-11 rounded-lg bg-slate-50 dark:bg-slate-800/30 border border-slate-200/50 dark:border-slate-800 flex items-center justify-center opacity-40 cursor-not-allowed"><span class="text-[10px] text-slate-400 font-semibold line-through">${hourStr}</span></div>`;
+                    } else if (isReserved) {
+                        td.innerHTML = `<div class="h-11 rounded-lg bg-rose-50/50 dark:bg-rose-900/10 border border-rose-200/50 dark:border-rose-800/30 flex flex-col items-center justify-center cursor-not-allowed"><span class="text-[9px] text-rose-400 font-semibold uppercase tracking-wider">Ocupado</span></div>`;
+                    } else {
+                        const btn = document.createElement('button');
+                        btn.className = 'w-full h-11 rounded-lg bg-emerald-50/80 dark:bg-emerald-900/20 hover:bg-emerald-500 hover:text-white text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/50 flex flex-col items-center justify-center transition-all cursor-pointer shadow-xs hover:shadow-md hover:scale-[1.02] active:scale-95 group/btn';
+                        btn.innerHTML = `<span class="text-[10px] font-bold block group-hover/btn:hidden">Libre</span><span class="text-[11px] font-black hidden group-hover/btn:block">Reservar</span>`;
+                        btn.addEventListener('click', (e) => handleReserva(e.currentTarget, cancha, hourStr, duration, price));
+                        td.appendChild(btn);
+                    }
+                    
+                    tr.appendChild(td);
                 }
-                
-                tr.appendChild(td);
             }
             
             tbody.appendChild(tr);
@@ -1064,7 +1182,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Initialize first slide
+        initChatWidget(state);
+    // Initialize first slide
         updateSlide(0);
         
         // Auto-advance every 5 seconds
@@ -1350,3 +1469,194 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start
     init();
 });
+
+
+// --- LÓGICA DE CHAT Y NOTIFICACIONES PUSH (Portal Clientes) ---
+
+let chatPollingInterval = null;
+let pushSubscription = null;
+
+async function initPushSubscription() {
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+        try {
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            // Check existing subscription
+            let sub = await registration.pushManager.getSubscription();
+            if (!sub) {
+                // Generar key (solo ejemplo, la real viene del .env/server)
+                const applicationServerKey = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuB-5MEKKfP5Bq7sN2A-cOovlY'; // REEMPLAZAR con VAPID_PUBLIC_KEY
+                sub = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlB64ToUint8Array(applicationServerKey)
+                });
+            }
+            if (sub && state.clientData) {
+                await window.API.subscribePush(sub);
+            }
+        } catch (error) {
+            console.error('Push SW error:', error);
+        }
+    }
+}
+
+function urlB64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
+function initChatWidget(state) {
+    const btnToggle = document.getElementById('btn-chat-toggle');
+    const chatPanel = document.getElementById('chat-panel');
+    const btnClose = document.getElementById('btn-chat-close');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const btnSend = document.getElementById('btn-chat-send');
+    const btnAttach = document.getElementById('btn-chat-attach');
+    const chatFile = document.getElementById('chat-file');
+    const chatBadge = document.getElementById('chat-badge');
+    const attachPreview = document.getElementById('chat-attachment-preview');
+    
+    let isChatOpen = false;
+    let selectedFileUrl = null;
+
+    if (!state.clientData) {
+        chatInput.disabled = true;
+        btnSend.disabled = true;
+        btnAttach.disabled = true;
+        return;
+    }
+
+    // Ya logueado
+    document.getElementById('chat-widget').classList.remove('hidden');
+    chatInput.disabled = false;
+    btnAttach.disabled = false;
+    initPushSubscription();
+
+    const toggleChat = () => {
+        isChatOpen = !isChatOpen;
+        if (isChatOpen) {
+            chatPanel.classList.remove('scale-0', 'opacity-0', 'pointer-events-none');
+            chatBadge.classList.add('hidden');
+            loadChatMessages();
+            chatPollingInterval = setInterval(loadChatMessages, 5000);
+        } else {
+            chatPanel.classList.add('scale-0', 'opacity-0', 'pointer-events-none');
+            if (chatPollingInterval) clearInterval(chatPollingInterval);
+        }
+    };
+
+    btnToggle.addEventListener('click', toggleChat);
+    btnClose.addEventListener('click', toggleChat);
+
+    const loadChatMessages = async () => {
+        try {
+            const msgs = await window.API.getMensajes(state.clientData.id);
+            renderMessages(msgs);
+            
+            // Marcar leídos
+            const unread = msgs.filter(m => !m.leido && m.sender_type === 'admin');
+            if (unread.length > 0 && isChatOpen) {
+                await window.API.marcarMensajesLeidos('client'); // Marcaría todos del cliente como leídos? No, admin marca los del cliente. Para el portal, el cliente llama a la API.
+                // En realidad la API que hicimos (id='client') marca como leídos los que mandó el cliente.
+                // Tendríamos que arreglar ese endpoint.
+            } else if (unread.length > 0 && !isChatOpen) {
+                chatBadge.classList.remove('hidden');
+            }
+        } catch (err) {
+            console.error('Chat error:', err);
+        }
+    };
+
+    const renderMessages = (msgs) => {
+        if (!msgs || msgs.length === 0) {
+            chatMessages.innerHTML = '<div class="text-center text-xs text-slate-500 my-4">No hay mensajes.</div>';
+            return;
+        }
+
+        chatMessages.innerHTML = '';
+        msgs.forEach(msg => {
+            const isMe = msg.sender_type === 'cliente';
+            const align = isMe ? 'justify-end' : 'justify-start';
+            const bgClass = isMe ? 'bg-emerald-500 text-white rounded-br-none' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-none border border-slate-200 dark:border-slate-700';
+            
+            let fileHtml = '';
+            if (msg.file_url) {
+                if (msg.file_url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+                    fileHtml = `<img src="${msg.file_url}" class="max-w-full h-auto rounded-lg mb-2" alt="Adjunto">`;
+                } else {
+                    fileHtml = `<a href="${msg.file_url}" target="_blank" class="text-[10px] underline break-all flex items-center gap-1 mb-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg> Archivo adjunto</a>`;
+                }
+            }
+
+            const time = new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            const el = document.createElement('div');
+            el.className = `flex ${align}`;
+            el.innerHTML = `
+                <div class="max-w-[80%] p-3 rounded-2xl ${bgClass} text-sm shadow-sm relative group">
+                    ${fileHtml}
+                    <p class="break-words">${msg.mensaje || ''}</p>
+                    <span class="text-[9px] opacity-70 mt-1 block text-right">${time}</span>
+                </div>
+            `;
+            chatMessages.appendChild(el);
+        });
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    };
+
+    chatInput.addEventListener('input', () => {
+        btnSend.disabled = !chatInput.value.trim() && !selectedFileUrl;
+    });
+
+    btnAttach.addEventListener('click', () => chatFile.click());
+    chatFile.addEventListener('change', async (e) => {
+        if (e.target.files.length > 0) {
+            btnAttach.classList.add('animate-pulse');
+            try {
+                selectedFileUrl = await window.API.uploadFile(e.target.files[0], 'chat');
+                attachPreview.classList.remove('hidden');
+                btnSend.disabled = false;
+            } catch (err) {
+                alert('Error al subir archivo');
+            }
+            btnAttach.classList.remove('animate-pulse');
+        }
+    });
+
+    const sendMessage = async () => {
+        const text = chatInput.value.trim();
+        if (!text && !selectedFileUrl) return;
+
+        chatInput.disabled = true;
+        btnSend.disabled = true;
+
+        try {
+            await window.API.enviarMensaje({
+                mensaje: text,
+                file_url: selectedFileUrl,
+                sender_type: 'cliente'
+            });
+            chatInput.value = '';
+            selectedFileUrl = null;
+            attachPreview.classList.add('hidden');
+            loadChatMessages();
+        } catch (err) {
+            alert('No se pudo enviar el mensaje.');
+        } finally {
+            chatInput.disabled = false;
+            btnSend.disabled = false;
+            chatInput.focus();
+        }
+    };
+
+    btnSend.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+}

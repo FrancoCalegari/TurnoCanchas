@@ -49,6 +49,15 @@ const executeQuery = async (query) => {
     }
 };
 
+const sqlEscape = (val) => {
+    if (val === null || val === undefined) return 'NULL';
+    if (typeof val === 'number') return val.toString();
+    if (typeof val === 'boolean') return val ? '1' : '0';
+    if (typeof val === 'object') return "'" + JSON.stringify(val).replace(/'/g, "''") + "'";
+    return "'" + String(val).replace(/'/g, "''") + "'";
+};
+
 module.exports = {
-    executeQuery
+    executeQuery,
+    sqlEscape
 };

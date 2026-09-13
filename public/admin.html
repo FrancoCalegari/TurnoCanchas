@@ -112,13 +112,18 @@
         <nav
           class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm sticky top-0 z-10"
         >
-          <div
-            class="max-w-7xl mx-auto px-4 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700"
-          >
-            <div class="flex items-center space-x-1 py-3 min-w-max">
+          <div class="max-w-7xl mx-auto px-4 relative">
+            <div class="flex items-center justify-between py-3 md:hidden">
+              <span id="mobile-nav-title" class="font-black text-slate-800 dark:text-white text-sm">Dashboard General</span>
+              <button id="btn-mobile-menu" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+              </button>
+            </div>
+            
+            <div id="nav-menu-container" class="hidden md:flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-1 py-3 md:overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 absolute md:static top-full left-0 w-full bg-white dark:bg-slate-900 px-4 md:px-0 border-b border-slate-200 dark:border-slate-800 md:border-0 shadow-lg md:shadow-none z-20">
               <button
                 id="nav-dashboard"
-                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 shadow-sm flex items-center gap-2"
+                class="w-full md:w-auto justify-start md:justify-center px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 shadow-sm flex items-center gap-2"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -141,59 +146,59 @@
               </button>
               <button
                 id="nav-reservas"
-                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
+                class="w-full md:w-auto justify-start md:justify-center px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days w-4 h-4"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path><path d="M8 14h.01"></path><path d="M12 14h.01"></path><path d="M16 14h.01"></path><path d="M8 18h.01"></path><path d="M12 18h.01"></path><path d="M16 18h.01"></path></svg>
                 Gestión de Reservas
               </button>
               <button
                 id="nav-canchas"
-                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
+                class="w-full md:w-auto justify-start md:justify-center px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map w-4 h-4"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" x2="9" y1="3" y2="18"></line><line x1="15" x2="15" y1="6" y2="21"></line></svg>
                 Configuración de Canchas
               </button>
               <button
                 id="nav-clientes"
-                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
+                class="w-full md:w-auto justify-start md:justify-center px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users w-4 h-4"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg>
                 Clientes
               </button>
               <button
                 id="nav-reportes"
-                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
+                class="w-full md:w-auto justify-start md:justify-center px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
                 Reportes
               </button>
               <button
                 id="nav-mensajes"
-                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
+                class="w-full md:w-auto justify-start md:justify-center px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 Mensajes
               </button>
               <button
                 id="nav-ajustes"
-                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
+                class="w-full md:w-auto justify-start md:justify-center px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 Ajustes
               </button>
               <button
                 id="nav-miweb"
-                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
+                class="w-full md:w-auto justify-start md:justify-center px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 border border-transparent"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
                 Mi Web
               </button>
 
-              <div class="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+              <div class="h-px w-full md:h-6 md:w-px bg-slate-200 dark:bg-slate-700 mx-0 md:mx-1 my-2 md:my-0"></div>
               
               <button
                 id="btn-share-whatsapp"
-                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm flex items-center gap-2"
+                class="w-full md:w-auto justify-start md:justify-center px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm flex items-center gap-2"
                 title="Compartir por WhatsApp"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
@@ -202,7 +207,7 @@
 
               <button
                 id="btn-copy-link"
-                class="px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer bg-slate-800 hover:bg-slate-700 text-white shadow-sm flex items-center gap-2"
+                class="w-full md:w-auto justify-start md:justify-center px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer bg-slate-800 hover:bg-slate-700 text-white shadow-sm flex items-center gap-2"
                 title="Copiar Link de mi Web"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
@@ -915,39 +920,73 @@
 
     
         <!-- CONTENIDO: MENSAJES -->
-        <div id="view-mensajes" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div id="view-mensajes" class="hidden flex-1 w-full mx-auto p-2 sm:p-4 md:p-6 space-y-4 h-full flex flex-col h-[calc(100vh-80px)]">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
             <div>
               <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-blue-500"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                Mensajes y Alertas
+                Mensajes (Chat)
               </h1>
-              <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">Chat con clientes y solicitudes de reprogramación.</p>
+              <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">Chatea con tus clientes en tiempo real.</p>
             </div>
-            <button onclick="openQaModal('aviso')" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-              Nuevo Mensaje
+            <button id="btn-enable-push" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-indigo-500/30 transition-all flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+              Activar Notificaciones Push
             </button>
           </div>
           
-          <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden">
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm text-left">
-                <thead class="text-xs text-slate-500 dark:text-slate-400 uppercase bg-slate-50/50 dark:bg-slate-800/50 font-bold border-b border-slate-200 dark:border-slate-800">
-                  <tr>
-                    <th class="px-6 py-4">Fecha</th>
-                    <th class="px-6 py-4">Asunto / Reserva</th>
-                    <th class="px-6 py-4">Mensaje</th>
-                    <th class="px-6 py-4">Estado</th>
-                    <th class="px-6 py-4">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody id="mensajes-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300 font-medium">
-                  <tr>
-                    <td colspan="5" class="p-8 text-center text-slate-500">Cargando mensajes...</td>
-                  </tr>
-                </tbody>
-              </table>
+          <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden flex flex-1 max-h-[800px] h-full">
+            <!-- Sidebar: Lista de Sesiones -->
+            <div class="w-1/3 md:w-80 border-r border-slate-200 dark:border-slate-800 flex flex-col bg-slate-50/50 dark:bg-slate-900/50">
+              <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
+                <input type="text" id="chat-search" placeholder="Buscar cliente..." class="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+              <div id="chat-sessions-list" class="flex-1 overflow-y-auto overflow-x-hidden">
+                <!-- Se llenará con JS -->
+                <div class="p-8 text-center text-slate-400 text-sm">Cargando chats...</div>
+              </div>
+            </div>
+
+            <!-- Panel de Chat Activo -->
+            <div class="flex-1 flex flex-col bg-[#F9FAFB] dark:bg-slate-950/50 relative hidden" id="chat-active-panel">
+              <!-- Header -->
+              <div class="h-16 px-6 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 font-bold" id="chat-active-avatar">
+                    C
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-slate-800 dark:text-white" id="chat-active-name">Nombre Cliente</h3>
+                    <p class="text-xs text-emerald-500 font-medium">En línea</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mensajes -->
+              <div id="chat-active-messages" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+                 <!-- Mensajes aquí -->
+              </div>
+
+              <!-- Input -->
+              <div class="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shrink-0">
+                <div class="flex items-center gap-2">
+                  <input type="file" id="admin-chat-file" accept="image/*,application/pdf" class="hidden">
+                  <button id="btn-admin-attach" class="p-3 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-xl transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                  </button>
+                  <input type="text" id="admin-chat-input" placeholder="Escribe un mensaje..." class="flex-1 bg-slate-100 dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                  <button id="btn-admin-send" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all">
+                    Enviar
+                  </button>
+                </div>
+                <div id="admin-chat-attachment-preview" class="text-xs text-blue-500 mt-2 font-medium hidden">Archivo adjunto listo para enviar</div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="flex-1 flex flex-col items-center justify-center bg-[#F9FAFB] dark:bg-slate-950/50 text-slate-400" id="chat-empty-state">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="mb-4 opacity-50"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <p>Selecciona un chat para comenzar a enviar mensajes</p>
             </div>
           </div>
         </div>
@@ -960,147 +999,219 @@
         </div>
 
         <!-- Vista de Ajustes -->
-        <div id="view-ajustes" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
-            <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Ajustes del Complejo</h2>
-            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 max-w-2xl">
-                <form id="ajustes-form" class="space-y-4" novalidate>
+        <div id="view-ajustes" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6 animate-fadeIn">
+            <div class="flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                    <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Ajustes del Complejo</h2>
+                    <p class="text-sm text-slate-500 font-medium mt-1">Configura la información pública y parámetros de tu panel</p>
+                </div>
+                <button type="submit" form="ajustes-form" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md shadow-blue-500/20 transition-all flex items-center gap-2 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"></path><path d="M7 3v4a1 1 0 0 0 1 1h7"></path></svg>
+                    Guardar Ajustes
+                </button>
+            </div>
+
+            <form id="ajustes-form" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start" novalidate>
+                
+                <!-- CARD 1: Info General -->
+                <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-5">
+                    <div class="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                        <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-slate-800 dark:text-white">Información Principal</h3>
+                    </div>
+                    
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Nombre del Complejo</label>
-                        <input type="text" id="ajustes-nombre" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
+                        <input type="text" id="ajustes-nombre" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm">
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    
+                    <div class="space-y-3">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Modo de Horarios</label>
+                        <div class="flex gap-4">
+                            <label class="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
+                                <input type="radio" name="horario_modo" value="todos_los_dias" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-300">
+                                Todos los días
+                            </label>
+                            <label class="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
+                                <input type="radio" name="horario_modo" value="personalizado" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-300">
+                                Personalizado por día
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="horario-todos" class="grid grid-cols-2 gap-4 transition-all">
                         <div class="space-y-1.5">
                             <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Hora de Apertura</label>
-                            <input type="time" id="ajustes-open" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
+                            <input type="time" id="ajustes-open" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm">
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Hora de Cierre</label>
-                            <input type="time" id="ajustes-close" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
+                            <input type="time" id="ajustes-close" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm">
                         </div>
                     </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">WhatsApp de Contacto (Ej: 5491100000000)</label>
-                        <input type="text" id="ajustes-wpp" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
+
+                    <div id="horario-personalizado" class="hidden space-y-3 transition-all">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Configuración Semanal</label>
+                        <div class="space-y-2" id="horario-semana-container">
+                            <!-- Los días se renderizan con JS -->
+                        </div>
                     </div>
+
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Mensaje del Botón WhatsApp <span class="font-normal text-slate-400">(texto que aparece pre-cargado al abrir el chat)</span></label>
-                        <textarea id="ajustes-wpp-mensaje" rows="2" placeholder="Hola! Quisiera hacer una consulta sobre las canchas." class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm resize-none"></textarea>
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">WhatsApp de Contacto <span class="font-normal opacity-70">(Ej: 5491100000000)</span></label>
+                        <input type="text" id="ajustes-wpp" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm">
                     </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Link de Google Maps</label>
+                        <input type="url" id="ajustes-maps" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm" placeholder="https://maps.app.goo.gl/...">
+                    </div>
+                </div>
+
+                <!-- CARD 2: Personalización del Portal -->
+                <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-5">
+                    <div class="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                        </div>
+                        <h3 class="font-bold text-slate-800 dark:text-white">Textos del Portal Público</h3>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Mensaje de WhatsApp <span class="font-normal opacity-70">(pre-cargado)</span></label>
+                        <textarea id="ajustes-wpp-mensaje" rows="2" placeholder="Hola! Quisiera hacer una consulta..." class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold text-sm resize-none"></textarea>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Título de Cabecera (Hero)</label>
+                        <input type="text" id="ajustes-hero-title" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold text-sm" placeholder="El mejor lugar para jugar">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Título de Servicios</label>
+                            <input type="text" id="ajustes-canchas-title" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold text-sm" placeholder="Nuestras Instalaciones">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Título de Nosotros</label>
+                            <input type="text" id="ajustes-nosotros-title" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold text-sm" placeholder="Sobre Nosotros">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 3: Imágenes y Multimedia -->
+                <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-5 lg:col-span-2">
+                    <div class="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-slate-800 dark:text-white">Imágenes y Multimedia</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Logo -->
+                        <div class="space-y-2.5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                            <label class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wide">Logo del Complejo</label>
+                            <div class="flex items-center gap-2 mt-2">
+                                <input type="text" id="ajustes-logo" class="flex-1 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-xs" placeholder="https://ejemplo.com/logo.png">
+                                <input type="file" id="ajustes-logo-file" accept="image/*" class="hidden">
+                                <button type="button" onclick="document.getElementById('ajustes-logo-file').click()" class="px-3 py-2 bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-900/40 dark:hover:bg-indigo-800/60 rounded-xl text-xs font-bold transition-all text-indigo-700 dark:text-indigo-300 whitespace-nowrap">
+                                    Subir Archivo
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Hero Images -->
+                        <div class="space-y-4">
+                            <div class="space-y-1.5">
+                                <label class="text-[11px] font-bold text-slate-600 dark:text-slate-400">Imagen 1 (Fondo/Hero)</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="text" id="ajustes-hero-image" class="flex-1 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-xs" placeholder="URL o subir archivo">
+                                    <input type="file" id="ajustes-hero-image-file" accept="image/*" class="hidden">
+                                    <button type="button" onclick="document.getElementById('ajustes-hero-image-file').click()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-xl text-xs font-bold transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap">Subir</button>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[11px] font-bold text-slate-600 dark:text-slate-400">Imagen 2</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="text" id="ajustes-hero-image-2" class="flex-1 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-xs">
+                                    <input type="file" id="ajustes-hero-image-2-file" accept="image/*" class="hidden">
+                                    <button type="button" onclick="document.getElementById('ajustes-hero-image-2-file').click()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-xl text-xs font-bold transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap">Subir</button>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[11px] font-bold text-slate-600 dark:text-slate-400">Imagen 3</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="text" id="ajustes-hero-image-3" class="flex-1 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-xs">
+                                    <input type="file" id="ajustes-hero-image-3-file" accept="image/*" class="hidden">
+                                    <button type="button" onclick="document.getElementById('ajustes-hero-image-3-file').click()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-xl text-xs font-bold transition-all text-slate-700 dark:text-slate-200 whitespace-nowrap">Subir</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 4: Reservas y Servicios -->
+                <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-5">
+                    <div class="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                        <div class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-slate-800 dark:text-white">Reservas y Servicios</h3>
+                    </div>
+
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold text-slate-600 dark:text-slate-400">¿Devolver seña al cancelar reserva?</label>
-                        <select id="ajustes-devolver-sena" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm cursor-pointer">
-                            <option value="no">No (Informar al usuario que la seña no se devuelve)</option>
-                            <option value="si">Sí (Informar al usuario que se le devolverá en breve)</option>
+                        <select id="ajustes-devolver-sena" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 font-semibold text-sm cursor-pointer">
+                            <option value="no">No (Informar que la seña no se devuelve)</option>
+                            <option value="si">Sí (Informar que se devolverá en breve)</option>
                         </select>
                     </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Link de Google Maps (Ubicación)</label>
-                        <input type="text" id="ajustes-maps" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold" placeholder="https://maps.app.goo.gl/...">
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Logo (Subir archivo o ingresar URL)</label>
-                        <div class="flex items-center gap-2">
-                            <input type="text" id="ajustes-logo" class="flex-1 px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm" placeholder="https://ejemplo.com/logo.png">
-                            <input type="file" id="ajustes-logo-file" accept="image/*" class="hidden">
-                            <button type="button" onclick="document.getElementById('ajustes-logo-file').click()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-sm font-bold transition-all border border-slate-200 dark:border-slate-700 whitespace-nowrap text-slate-700 dark:text-slate-300">
-                                Subir Archivo
-                            </button>
-                        </div>
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Imagen del Hero 1 (Subir archivo o ingresar URL)</label>
-                        <div class="flex items-center gap-2">
-                            <input type="text" id="ajustes-hero-image" class="flex-1 px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm" placeholder="https://ejemplo.com/cancha.jpg">
-                            <input type="file" id="ajustes-hero-image-file" accept="image/*" class="hidden">
-                            <button type="button" onclick="document.getElementById('ajustes-hero-image-file').click()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-sm font-bold transition-all border border-slate-200 dark:border-slate-700 whitespace-nowrap text-slate-700 dark:text-slate-300">
-                                Subir Archivo
-                            </button>
-                        </div>
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Imagen del Hero 2 (Subir archivo o ingresar URL)</label>
-                        <div class="flex items-center gap-2">
-                            <input type="text" id="ajustes-hero-image-2" class="flex-1 px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm" placeholder="https://ejemplo.com/cancha2.jpg">
-                            <input type="file" id="ajustes-hero-image-2-file" accept="image/*" class="hidden">
-                            <button type="button" onclick="document.getElementById('ajustes-hero-image-2-file').click()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-sm font-bold transition-all border border-slate-200 dark:border-slate-700 whitespace-nowrap text-slate-700 dark:text-slate-300">
-                                Subir Archivo
-                            </button>
-                        </div>
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Imagen del Hero 3 (Subir archivo o ingresar URL)</label>
-                        <div class="flex items-center gap-2">
-                            <input type="text" id="ajustes-hero-image-3" class="flex-1 px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm" placeholder="https://ejemplo.com/cancha3.jpg">
-                            <input type="file" id="ajustes-hero-image-3-file" accept="image/*" class="hidden">
-                            <button type="button" onclick="document.getElementById('ajustes-hero-image-3-file').click()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-sm font-bold transition-all border border-slate-200 dark:border-slate-700 whitespace-nowrap text-slate-700 dark:text-slate-300">
-                                Subir Archivo
-                            </button>
-                        </div>
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Título del Hero</label>
-                        <input type="text" id="ajustes-hero-title" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold" placeholder="El mejor lugar para jugar">
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Título de Servicios</label>
-                        <input type="text" id="ajustes-canchas-title" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold" placeholder="Nuestras Instalaciones">
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Título de Nosotros</label>
-                        <input type="text" id="ajustes-nosotros-title" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold" placeholder="Sobre Nosotros">
-                    </div>
 
-
-                    <!-- Sección Información y Servicios -->
-                    <div class="pt-2 border-t border-slate-100 dark:border-slate-800">
-                        <p class="text-xs font-black text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"></path><path d="M2 8.82a15 15 0 0 1 20 0"></path><path d="M5 12.859a10 10 0 0 1 14 0"></path><path d="M8.5 16.429a5 5 0 0 1 7 0"></path></svg>
-                            Información y Servicios (Portal)
-                        </p>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Wi-Fi (Nombre / SSID)</label>
-                                <input type="text" id="ajustes-wifi-ssid" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm" placeholder="Ej: test_Guest">
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Wi-Fi (Contraseña)</label>
-                                <input type="text" id="ajustes-wifi-pass" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm" placeholder="Ej: canchasdeportivas">
-                            </div>
-                        </div>
-                        <div class="space-y-1.5 mt-4">
-                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Descripción del Buffet / Bar</label>
-                            <textarea id="ajustes-buffet" rows="2" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm resize-none" placeholder="Cafetería, bebidas frías..."></textarea>
-                        </div>
-                        <div class="space-y-1.5 mt-4">
-                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Reglamento Breve</label>
-                            <textarea id="ajustes-reglas" rows="2" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm resize-none" placeholder="Seña del 50% requerida..."></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Sección de Pagos -->
-                    <div class="pt-2 border-t border-slate-100 dark:border-slate-800">
-                        <p class="text-xs font-black text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-                            Pagos
-                        </p>
+                    <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400">
-                                Alias de MercadoPago
-                                <span class="font-normal text-slate-400">(se mostrará al cliente al reservar)</span>
-                            </label>
-                            <div class="relative">
-                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500 font-black text-sm select-none">$</span>
-                                <input type="text" id="ajustes-mp-alias"
-                                    class="w-full pl-8 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold"
-                                    placeholder="mi.alias.mercadopago">
-                            </div>
-                            <p class="text-[11px] text-slate-400">Los clientes verán este alias para realizar la transferencia y podrán subir el comprobante.</p>
+                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Wi-Fi (SSID)</label>
+                            <input type="text" id="ajustes-wifi-ssid" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 font-semibold text-sm" placeholder="Ej: test_Guest">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Wi-Fi (Contraseña)</label>
+                            <input type="text" id="ajustes-wifi-pass" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 font-semibold text-sm" placeholder="Ej: contraseña">
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all mt-4">Guardar Ajustes</button>
-                </form>
-            </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Descripción de Buffet / Bar</label>
+                        <textarea id="ajustes-buffet" rows="2" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 font-semibold text-sm resize-none"></textarea>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Reglamento del Complejo</label>
+                        <textarea id="ajustes-reglas" rows="2" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 font-semibold text-sm resize-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- CARD 5: Pagos -->
+                <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-5">
+                    <div class="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                        <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"></rect><line x1="2" x2="22" y1="10" y2="10"></line></svg>
+                        </div>
+                        <h3 class="font-bold text-slate-800 dark:text-white">Medios de Pago</h3>
+                    </div>
+
+                    <div class="space-y-2 p-5 rounded-2xl bg-[#009EE3]/5 border border-[#009EE3]/20 dark:bg-slate-800/50">
+                        <label class="text-[13px] font-black text-[#009EE3]">Alias de Mercado Pago</label>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-400 font-medium mb-3">Tus clientes verán este alias al momento de realizar la seña para enviarte comprobantes.</p>
+                        <div class="relative mt-2">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 font-black text-slate-400 select-none">$</span>
+                            <input type="text" id="ajustes-mp-alias" class="w-full pl-8 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#009EE3] font-semibold text-sm" placeholder="tu.alias.mercadopago">
+                        </div>
+                    </div>
+                </div>
+
+            </form>
         </div>
 
       </div>

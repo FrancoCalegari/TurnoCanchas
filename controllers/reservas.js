@@ -1,20 +1,26 @@
-const { executeQuery } = require('../config/db');
+const { executeQuery, sqlEscape } = require('../config/db');
 const { notifyReservationCreated, notifyReservationStatusChanged } = require('../utils/notifications');
+
+const parseHoraToMinutes = (horaStr) => {
+    if (!horaStr) return 0;
+    const parts = horaStr.split(':');
+    return parseInt(parts[0], 10) * 60 + parseInt(parts[1] || 0, 10);
+};
 
 const getAll = async (req, res) => {
     try {
         const { fecha } = req.query;
         let tenantFilter = '';
         if (req.query.tenant) {
-            const safeSlug = String(req.query.tenant).replace(/'/g, "''");
-            const tRes = await executeQuery(`SELECT id FROM tenants WHERE slug = '${safeSlug}'`);
+            const safeSlug = req.query.tenant;
+            const tRes = await executeQuery(`SELECT id FROM tenants WHERE slug = ${sqlEscape(safeSlug)}`);
             if (tRes && tRes.length > 0) {
-                tenantFilter = `tenant_id = ${tRes[0].id}`;
+                tenantFilter = `tenant_id = ${sqlEscape(tRes[0].id)}`;
             }
         }
 
         let conditions = [];
-        if (fecha) conditions.push(`fecha = '${String(fecha).replace(/'/g, "''")}'`);
+        if (fecha) conditions.push(`fecha = ${sqlEscape(fecha)}`);
         if (tenantFilter) conditions.push(tenantFilter);
 
         let query = 'SELECT * FROM reservas';
@@ -36,7 +42,7 @@ const getAdminReservas = async (req, res) => {
         let conditions = [];
         
         if (req.tenant && req.tenant.id) {
-            conditions.push(`r.tenant_id = ${req.tenant.id}`);
+            conditions.push(`r.tenant_id = ${sqlEscape(req.tenant.id)}`);
         }
 
         if (search) {
@@ -44,16 +50,13 @@ const getAdminReservas = async (req, res) => {
             conditions.push(`(r.cliente ILIKE '%${s}%' OR r.id ILIKE '%${s}%' OR CAST(r.canchaId AS TEXT) ILIKE '%${s}%')`);
         }
         if (estado && estado !== 'todos') {
-            const safeEstado = String(estado).replace(/'/g, "''");
-            conditions.push(`r.estado = '${safeEstado}'`);
+            conditions.push(`r.estado = ${sqlEscape(estado)}`);
         }
         if (desde) {
-            const safeDesde = String(desde).replace(/'/g, "''");
-            conditions.push(`r.fecha >= '${safeDesde}'`);
+            conditions.push(`r.fecha >= ${sqlEscape(desde)}`);
         }
         if (hasta) {
-            const safeHasta = String(hasta).replace(/'/g, "''");
-            conditions.push(`r.fecha <= '${safeHasta}'`);
+            conditions.push(`r.fecha <= ${sqlEscape(hasta)}`);
         }
 
         const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -88,20 +91,18 @@ const getByUser = async (req, res) => {
 
         let tenantFilter = '';
         if (tenant) {
-            const safeTenant = String(tenant).replace(/'/g, "''");
-            const tRes = await executeQuery(`SELECT id FROM tenants WHERE slug = '${safeTenant}'`);
+            const safeTenant = tenant;
+            const tRes = await executeQuery(`SELECT id FROM tenants WHERE slug = ${sqlEscape(safeTenant)}`);
             if (tRes && tRes.length > 0) {
-                tenantFilter = `AND tenant_id = ${tRes[0].id}`;
+                tenantFilter = `AND tenant_id = ${sqlEscape(tRes[0].id)}`;
             }
         }
 
-        const safeUserId = String(userId).replace(/'/g, "''");
-        
         let query;
-        if (!isNaN(userId) && userId.trim() !== '') {
-            query = `SELECT * FROM reservas WHERE (cliente = '${safeUserId}' OR cliente_id = ${parseInt(userId)}) ${tenantFilter}`;
+        if (!isNaN(userId) && String(userId).trim() !== '') {
+            query = `SELECT * FROM reservas WHERE (cliente = ${sqlEscape(userId)} OR cliente_id = ${sqlEscape(parseInt(userId))}) ${tenantFilter}`;
         } else {
-            query = `SELECT * FROM reservas WHERE cliente = '${safeUserId}' ${tenantFilter}`;
+            query = `SELECT * FROM reservas WHERE cliente = ${sqlEscape(userId)} ${tenantFilter}`;
         }
         
         const result = await executeQuery(query);
@@ -119,22 +120,42 @@ const create = async (req, res) => {
         const id = 'RES-' + Math.random().toString(36).substr(2, 6).toUpperCase();
         
         const safeCanchaId = parseInt(canchaId);
-        const safeFecha = String(fecha).replace(/'/g, "''");
-        const safeHora = String(hora).replace(/'/g, "''");
-        const safeCliente = String(cliente).replace(/'/g, "''");
+        if (isNaN(safeCanchaId)) return res.status(400).json({ error: 'Cancha ID inválido' });
+
         const safeDuracion = parseInt(duracion) || 60;
         const safePrecio = parseInt(precio) || 0;
-        
-        const safeClienteId = cliente_id ? parseInt(cliente_id) : 'NULL';
-        const finalEstado = estado ? String(estado).replace(/'/g, "''") : 'por confirmar';
+        const safeClienteId = cliente_id ? parseInt(cliente_id) : null;
+        const finalEstado = estado || 'por confirmar';
 
         // Get tenant_id from cancha
-        const canchaRes = await executeQuery(`SELECT tenant_id FROM canchas WHERE id = ${safeCanchaId}`);
+        const canchaRes = await executeQuery(`SELECT tenant_id FROM canchas WHERE id = ${sqlEscape(safeCanchaId)}`);
         const tenantId = (canchaRes && canchaRes.length > 0) ? canchaRes[0].tenant_id : 0;
+
+        // Validar solapamientos
+        const checkQuery = `
+            SELECT id, hora, duracion 
+            FROM reservas 
+            WHERE canchaId = ${sqlEscape(safeCanchaId)} 
+              AND fecha = ${sqlEscape(fecha)} 
+              AND estado != 'cancelada'
+        `;
+        const reservasExistentes = await executeQuery(checkQuery) || [];
+        
+        const newStart = parseHoraToMinutes(hora);
+        const newEnd = newStart + safeDuracion;
+
+        for (const r of reservasExistentes) {
+            const resStart = parseHoraToMinutes(r.hora);
+            const resEnd = resStart + (r.duracion || 60);
+
+            if (newStart < resEnd && newEnd > resStart) {
+                return res.status(400).json({ error: 'La cancha ya se encuentra reservada o bloqueada en ese horario.' });
+            }
+        }
 
         const query = `
             INSERT INTO reservas (id, canchaId, fecha, hora, cliente, cliente_id, duracion, precio, estado, tenant_id) 
-            VALUES ('${id}', ${safeCanchaId}, '${safeFecha}', '${safeHora}', '${safeCliente}', ${safeClienteId}, ${safeDuracion}, ${safePrecio}, '${finalEstado}', ${tenantId})
+            VALUES (${sqlEscape(id)}, ${sqlEscape(safeCanchaId)}, ${sqlEscape(fecha)}, ${sqlEscape(hora)}, ${sqlEscape(cliente)}, ${sqlEscape(safeClienteId)}, ${sqlEscape(safeDuracion)}, ${sqlEscape(safePrecio)}, ${sqlEscape(finalEstado)}, ${sqlEscape(tenantId)})
         `;
         
         await executeQuery(query);
@@ -142,16 +163,16 @@ const create = async (req, res) => {
         // Return the created ID as frontend expects it
         res.status(201).json({ 
             message: 'Reserva creada con éxito', 
-            data: { id, canchaId: safeCanchaId, fecha: safeFecha, hora: safeHora, cliente: safeCliente, cliente_id: safeClienteId !== 'NULL' ? safeClienteId : null, duracion: safeDuracion, precio: safePrecio }
+            data: { id, canchaId: safeCanchaId, fecha, hora, cliente, cliente_id: safeClienteId, duracion: safeDuracion, precio: safePrecio }
         });
 
         // Trigger Notification
-        if (safeClienteId !== 'NULL') {
+        if (safeClienteId) {
             try {
-                const cliRes = await executeQuery(`SELECT email, telefono, nombre FROM clientes WHERE id = ${safeClienteId}`);
+                const cliRes = await executeQuery(`SELECT email, telefono, nombre FROM clientes WHERE id = ${sqlEscape(safeClienteId)}`);
                 if (cliRes && cliRes.length > 0) {
                     await notifyReservationCreated({
-                        id, fecha: safeFecha, hora: safeHora, precio: safePrecio, cliente: safeCliente, estado: finalEstado
+                        id, fecha, hora, precio: safePrecio, cliente, estado: finalEstado
                     }, cliRes[0]);
                 }
             } catch (notiErr) {
@@ -169,9 +190,8 @@ const updateStatus = async (req, res) => {
         const { id } = req.params;
         const { status } = req.body;
         
-        const safeStatus = String(status).replace(/'/g, "''");
-        const tenantFilter = req.tenant && req.tenant.id ? `AND tenant_id = ${req.tenant.id}` : '';
-        await executeQuery(`UPDATE reservas SET estado = '${safeStatus}' WHERE id = '${id}' ${tenantFilter}`);
+        const tenantFilter = req.tenant && req.tenant.id ? `AND tenant_id = ${sqlEscape(req.tenant.id)}` : '';
+        await executeQuery(`UPDATE reservas SET estado = ${sqlEscape(status)} WHERE id = ${sqlEscape(id)} ${tenantFilter}`);
         
         res.json({ message: `Estado de la reserva ${id} actualizado a ${status}` });
 
@@ -181,7 +201,7 @@ const updateStatus = async (req, res) => {
                 SELECT r.fecha, r.hora, r.cliente, c.email, c.telefono, c.nombre 
                 FROM reservas r 
                 LEFT JOIN clientes c ON r.cliente_id = c.id 
-                WHERE r.id = '${id}'
+                WHERE r.id = ${sqlEscape(id)}
             `);
             if (resData && resData.length > 0) {
                 await notifyReservationStatusChanged({
@@ -199,7 +219,7 @@ const updateStatus = async (req, res) => {
 
 const getRecent = async (req, res) => {
     try {
-        const tenantFilter = req.tenant && req.tenant.id ? `WHERE tenant_id = ${req.tenant.id}` : '';
+        const tenantFilter = req.tenant && req.tenant.id ? `WHERE tenant_id = ${sqlEscape(req.tenant.id)}` : '';
         // Obtenemos las últimas 50 reservas
         const result = await executeQuery(`SELECT * FROM reservas ${tenantFilter} ORDER BY createdAt DESC LIMIT 50`);
         res.json({ message: 'Reservas recientes', data: result });
@@ -215,7 +235,7 @@ const cancelByClient = async (req, res) => {
 
         // Verificar que la reserva pertenezca al cliente
         const result = await executeQuery(
-            `SELECT * FROM reservas WHERE id = '${String(id).replace(/'/g, "''")}' AND cliente_id = ${clientId}`
+            `SELECT * FROM reservas WHERE id = ${sqlEscape(id)} AND cliente_id = ${sqlEscape(clientId)}`
         );
         if (!result || result.length === 0) {
             return res.status(403).json({ error: 'No tenés permiso para cancelar esta reserva o no existe' });
@@ -229,7 +249,7 @@ const cancelByClient = async (req, res) => {
             return res.status(400).json({ error: 'No se puede cancelar una reserva pasada' });
         }
 
-        await executeQuery(`UPDATE reservas SET estado = 'cancelada' WHERE id = '${String(id).replace(/'/g, "''")}'`);
+        await executeQuery(`UPDATE reservas SET estado = 'cancelada' WHERE id = ${sqlEscape(id)}`);
         res.json({ message: 'Reserva cancelada exitosamente' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -245,4 +265,3 @@ module.exports = {
     getRecent,
     cancelByClient
 };
-

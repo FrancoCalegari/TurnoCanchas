@@ -1,5 +1,5 @@
 // controllers/tenants.js
-const { executeQuery } = require('../config/db');
+const { executeQuery, sqlEscape } = require('../config/db');
 const bcrypt = require('bcryptjs');
 
 const SALT_ROUNDS = 10;
@@ -20,29 +20,25 @@ const registerTenant = async (req, res) => {
             return res.status(400).json({ error: 'Faltan campos obligatorios (nombre, slug, email, password)' });
         }
 
-        const safeSlug = String(slug).toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/'/g, "''");
-        const safeEmail = String(email).replace(/'/g, "''").toLowerCase();
-        const safeNombre = String(nombre).replace(/'/g, "''");
-        const safeTel = String(telefono || '').replace(/'/g, "''");
-        const safeUbicacion = String(ubicacion || '').replace(/'/g, "''");
+        const safeSlug = String(slug).toLowerCase().replace(/[^a-z0-9-]/g, '');
+        const safeEmail = String(email).toLowerCase();
 
         // Verificar duplicados
-        const existingSlug = await executeQuery(`SELECT id FROM tenants WHERE slug = '${safeSlug}'`);
+        const existingSlug = await executeQuery(`SELECT id FROM tenants WHERE slug = ${sqlEscape(safeSlug)}`);
         if (existingSlug && existingSlug.length > 0) {
             return res.status(400).json({ error: 'El slug ya está en uso. Elegí otro nombre de URL.' });
         }
-        const existingEmail = await executeQuery(`SELECT id FROM tenants WHERE email = '${safeEmail}'`);
+        const existingEmail = await executeQuery(`SELECT id FROM tenants WHERE email = ${sqlEscape(safeEmail)}`);
         if (existingEmail && existingEmail.length > 0) {
             return res.status(400).json({ error: 'Ya existe una cuenta con ese email.' });
         }
 
         const hash = await bcrypt.hash(String(password), SALT_ROUNDS);
-        const safeHash = hash.replace(/'/g, "''");
         const safeRubroId = rubro_id ? parseInt(rubro_id) : 1;
 
         await executeQuery(`
             INSERT INTO tenants (nombre, slug, email, password_hash, telefono, ubicacion, estado, rubro_id)
-            VALUES ('${safeNombre}', '${safeSlug}', '${safeEmail}', '${safeHash}', '${safeTel}', '${safeUbicacion}', 'pendiente', ${safeRubroId})
+            VALUES (${sqlEscape(nombre)}, ${sqlEscape(safeSlug)}, ${sqlEscape(safeEmail)}, ${sqlEscape(hash)}, ${sqlEscape(telefono)}, ${sqlEscape(ubicacion)}, 'pendiente', ${safeRubroId})
         `);
 
         res.status(201).json({ message: 'Solicitud enviada exitosamente. Tu cuenta será revisada por el administrador.' });
@@ -204,6 +200,7 @@ const listTenants = async (req, res) => {
             SELECT 
                 t.*, 
                 r.nombre as rubro_nombre,
+                (SELECT logo_url FROM ajustes_complejo WHERE tenant_id = t.id LIMIT 1) as logo_url,
                 (SELECT COUNT(*) FROM canchas WHERE tenant_id = t.id) as canchas_count,
                 (SELECT COUNT(*) FROM reservas WHERE tenant_id = t.id AND estado != 'cancelada') as reservas_count,
                 (SELECT COUNT(*) FROM clientes WHERE tenant_id = t.id) as clientes_count
@@ -456,6 +453,47 @@ const deleteTenant = async (req, res) => {
     }
 };
 
+// ─── Actualizar tenant ────────────────────────────────────────────────────────
+const updateTenant = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nombre, telefono, email, ubicacion, rubro_id, logo_url } = req.body;
+
+        const tenant = await executeQuery(`SELECT id FROM tenants WHERE id = ${parseInt(id)}`);
+        if (!tenant || tenant.length === 0) return res.status(404).json({ error: 'Tenant no encontrado' });
+
+        const safeNombre = sqlEscape(nombre);
+        const safeTel = sqlEscape(telefono || '');
+        const safeEmail = sqlEscape(email);
+        const safeUbicacion = sqlEscape(ubicacion || '');
+        const safeRubroId = rubro_id ? parseInt(rubro_id) : 'NULL';
+
+        await executeQuery(`
+            UPDATE tenants 
+            SET nombre = ${safeNombre}, 
+                telefono = ${safeTel}, 
+                email = ${safeEmail}, 
+                ubicacion = ${safeUbicacion}, 
+                rubro_id = ${safeRubroId}
+            WHERE id = ${parseInt(id)}
+        `);
+
+        if (logo_url !== undefined) {
+            const safeLogo = logo_url ? sqlEscape(logo_url) : 'NULL';
+            const ajustes = await executeQuery(`SELECT id FROM ajustes_complejo WHERE tenant_id = ${parseInt(id)}`);
+            if (ajustes && ajustes.length > 0) {
+                await executeQuery(`UPDATE ajustes_complejo SET logo_url = ${safeLogo} WHERE tenant_id = ${parseInt(id)}`);
+            } else {
+                await executeQuery(`INSERT INTO ajustes_complejo (tenant_id, logo_url) VALUES (${parseInt(id)}, ${safeLogo})`);
+            }
+        }
+
+        res.json({ message: 'Tenant actualizado' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     registerTenant,
     loginTenant,
@@ -469,5 +507,6 @@ module.exports = {
     impersonateTenant,
     superCreateTenant,
     getTenantStats,
-    deleteTenant
+    deleteTenant,
+    updateTenant
 };

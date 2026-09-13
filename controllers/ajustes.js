@@ -1,20 +1,19 @@
-const { executeQuery } = require('../config/db');
+const { executeQuery, sqlEscape } = require('../config/db');
 
 const getAjustes = async (req, res) => {
     try {
         let tenantFilter = 'tenant_id = 0'; // Fallback to 0 if no tenant specified
         if (req.tenant && req.tenant.id) {
-            tenantFilter = `tenant_id = ${req.tenant.id}`;
+            tenantFilter = `tenant_id = ${sqlEscape(req.tenant.id)}`;
         } else if (req.query.tenant) {
-            const safeSlug = String(req.query.tenant).replace(/'/g, "''");
-            const tRes = await executeQuery(`SELECT id FROM tenants WHERE slug = '${safeSlug}'`);
+            const safeSlug = req.query.tenant;
+            const tRes = await executeQuery(`SELECT id FROM tenants WHERE slug = ${sqlEscape(safeSlug)}`);
             if (tRes && tRes.length > 0) {
-                tenantFilter = `tenant_id = ${tRes[0].id}`;
+                tenantFilter = `tenant_id = ${sqlEscape(tRes[0].id)}`;
             } else {
                 return res.status(404).json({ error: 'Tenant no encontrado' });
             }
         }
-
 
         // Asegurar que las columnas existan
         const checkCols = await executeQuery("SHOW COLUMNS FROM ajustes_complejo");
@@ -25,6 +24,8 @@ const getAjustes = async (req, res) => {
         if (!existingColumns.includes('info_wifi_pass')) newColumns.push("ALTER TABLE ajustes_complejo ADD COLUMN info_wifi_pass VARCHAR(100)");
         if (!existingColumns.includes('info_buffet')) newColumns.push("ALTER TABLE ajustes_complejo ADD COLUMN info_buffet VARCHAR(255)");
         if (!existingColumns.includes('info_reglas')) newColumns.push("ALTER TABLE ajustes_complejo ADD COLUMN info_reglas TEXT");
+        if (!existingColumns.includes('horario_modo')) newColumns.push("ALTER TABLE ajustes_complejo ADD COLUMN horario_modo VARCHAR(50) DEFAULT 'todos_los_dias'");
+        if (!existingColumns.includes('horarios_semana')) newColumns.push("ALTER TABLE ajustes_complejo ADD COLUMN horarios_semana TEXT");
 
         for (const sql of newColumns) {
             try { await executeQuery(sql); } catch (e) {}
@@ -41,94 +42,38 @@ const getAjustes = async (req, res) => {
 
 const updateAjustes = async (req, res) => {
     try {
-        const { nombre_complejo, open_time, close_time, wpp_contacto, wpp_mensaje, ubicacion_maps, logo_url, hero_image_url, hero_image_url_2, hero_image_url_3, hero_title, canchas_title, nosotros_title, devolver_sena, mercadopago_alias , info_wifi_ssid, info_wifi_pass, info_buffet, info_reglas } = req.body;
+        const { nombre_complejo, open_time, close_time, wpp_contacto, wpp_mensaje, ubicacion_maps, logo_url, hero_image_url, hero_image_url_2, hero_image_url_3, hero_title, canchas_title, nosotros_title, devolver_sena, mercadopago_alias, info_wifi_ssid, info_wifi_pass, info_buffet, info_reglas, horario_modo, horarios_semana } = req.body;
         
         let updates = [];
-        if (nombre_complejo !== undefined) {
-            const safe = String(nombre_complejo).replace(/'/g, "''");
-            updates.push(`nombre_complejo = '${safe}'`);
-        }
-        if (open_time !== undefined) {
-            const safe = String(open_time).replace(/'/g, "''");
-            updates.push(`open_time = '${safe}'`);
-        }
-        if (close_time !== undefined) {
-            const safe = String(close_time).replace(/'/g, "''");
-            updates.push(`close_time = '${safe}'`);
-        }
-        if (wpp_contacto !== undefined) {
-            const safe = String(wpp_contacto).replace(/'/g, "''");
-            updates.push(`wpp_contacto = '${safe}'`);
-        }
-        if (wpp_mensaje !== undefined) {
-            const safe = String(wpp_mensaje).replace(/'/g, "''");
-            updates.push(`wpp_mensaje = '${safe}'`);
-        }
-        if (devolver_sena !== undefined) {
-            const safe = String(devolver_sena).replace(/'/g, "''");
-            updates.push(`devolver_sena = '${safe}'`);
-        }
-        if (ubicacion_maps !== undefined) {
-            const safe = String(ubicacion_maps).replace(/'/g, "''");
-            updates.push(`ubicacion_maps = '${safe}'`);
-        }
-        if (logo_url !== undefined) {
-            const safe = String(logo_url).replace(/'/g, "''");
-            updates.push(`logo_url = '${safe}'`);
-        }
-        if (hero_image_url !== undefined) {
-            const safe = String(hero_image_url).replace(/'/g, "''");
-            updates.push(`hero_image_url = '${safe}'`);
-        }
-        if (hero_image_url_2 !== undefined) {
-            const safe = String(hero_image_url_2).replace(/'/g, "''");
-            updates.push(`hero_image_url_2 = '${safe}'`);
-        }
-        if (hero_image_url_3 !== undefined) {
-            const safe = String(hero_image_url_3).replace(/'/g, "''");
-            updates.push(`hero_image_url_3 = '${safe}'`);
-        }
-        if (hero_title !== undefined) {
-            const safe = String(hero_title).replace(/'/g, "''");
-            updates.push(`hero_title = '${safe}'`);
-        }
-        if (canchas_title !== undefined) {
-            const safe = String(canchas_title).replace(/'/g, "''");
-            updates.push(`canchas_title = '${safe}'`);
-        }
-        if (nosotros_title !== undefined) {
-            const safe = String(nosotros_title).replace(/'/g, "''");
-            updates.push(`nosotros_title = '${safe}'`);
-        }
-        if (mercadopago_alias !== undefined) {
-            const safe = String(mercadopago_alias).replace(/'/g, "''");
-            updates.push(`mercadopago_alias = '${safe}'`);
-        }
-
-        if (info_wifi_ssid !== undefined) {
-            const safe = String(info_wifi_ssid).replace(/'/g, "''");
-            updates.push(`info_wifi_ssid = '${safe}'`);
-        }
-        if (info_wifi_pass !== undefined) {
-            const safe = String(info_wifi_pass).replace(/'/g, "''");
-            updates.push(`info_wifi_pass = '${safe}'`);
-        }
-        if (info_buffet !== undefined) {
-            const safe = String(info_buffet).replace(/'/g, "''");
-            updates.push(`info_buffet = '${safe}'`);
-        }
-        if (info_reglas !== undefined) {
-            const safe = String(info_reglas).replace(/'/g, "''");
-            updates.push(`info_reglas = '${safe}'`);
-        }
-
+        if (nombre_complejo !== undefined) updates.push(`nombre_complejo = ${sqlEscape(nombre_complejo)}`);
+        if (open_time !== undefined) updates.push(`open_time = ${sqlEscape(open_time)}`);
+        if (close_time !== undefined) updates.push(`close_time = ${sqlEscape(close_time)}`);
+        if (wpp_contacto !== undefined) updates.push(`wpp_contacto = ${sqlEscape(wpp_contacto)}`);
+        if (wpp_mensaje !== undefined) updates.push(`wpp_mensaje = ${sqlEscape(wpp_mensaje)}`);
+        if (devolver_sena !== undefined) updates.push(`devolver_sena = ${sqlEscape(devolver_sena)}`);
+        if (ubicacion_maps !== undefined) updates.push(`ubicacion_maps = ${sqlEscape(ubicacion_maps)}`);
+        if (logo_url !== undefined) updates.push(`logo_url = ${sqlEscape(logo_url)}`);
+        if (hero_image_url !== undefined) updates.push(`hero_image_url = ${sqlEscape(hero_image_url)}`);
+        if (hero_image_url_2 !== undefined) updates.push(`hero_image_url_2 = ${sqlEscape(hero_image_url_2)}`);
+        if (hero_image_url_3 !== undefined) updates.push(`hero_image_url_3 = ${sqlEscape(hero_image_url_3)}`);
+        if (hero_title !== undefined) updates.push(`hero_title = ${sqlEscape(hero_title)}`);
+        if (canchas_title !== undefined) updates.push(`canchas_title = ${sqlEscape(canchas_title)}`);
+        if (nosotros_title !== undefined) updates.push(`nosotros_title = ${sqlEscape(nosotros_title)}`);
+        if (mercadopago_alias !== undefined) updates.push(`mercadopago_alias = ${sqlEscape(mercadopago_alias)}`);
+        if (info_wifi_ssid !== undefined) updates.push(`info_wifi_ssid = ${sqlEscape(info_wifi_ssid)}`);
+        if (info_wifi_pass !== undefined) updates.push(`info_wifi_pass = ${sqlEscape(info_wifi_pass)}`);
+        if (info_buffet !== undefined) updates.push(`info_buffet = ${sqlEscape(info_buffet)}`);
+        if (info_reglas !== undefined) updates.push(`info_reglas = ${sqlEscape(info_reglas)}`);
+        
+        if (horario_modo !== undefined) updates.push(`horario_modo = ${sqlEscape(horario_modo)}`);
+        if (horarios_semana !== undefined) updates.push(`horarios_semana = ${sqlEscape(typeof horarios_semana === 'string' ? horarios_semana : JSON.stringify(horarios_semana))}`);
 
         if (updates.length === 0) {
             return res.status(400).json({ error: 'No data to update' });
         }
 
         const tenantId = req.tenant ? req.tenant.id : 0;
-        const query = `UPDATE ajustes_complejo SET ${updates.join(', ')} WHERE tenant_id = ${tenantId}`;
+        const query = `UPDATE ajustes_complejo SET ${updates.join(', ')} WHERE tenant_id = ${sqlEscape(tenantId)}`;
         await executeQuery(query);
 
         res.json({ message: 'Ajustes actualizados exitosamente' });

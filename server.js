@@ -9,7 +9,23 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares
-app.use(cors());
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
+app.use(helmet({
+    contentSecurityPolicy: false // Permite scripts/estilos en línea existentes en el frontend
+}));
+app.use(cors({
+    origin: process.env.CORS_ORIGIN || '*'
+}));
+
+const globalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 150,
+    message: { error: 'Demasiadas peticiones, por favor intenta más tarde.' }
+});
+app.use('/api', globalLimiter);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
