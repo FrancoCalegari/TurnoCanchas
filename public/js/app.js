@@ -113,10 +113,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (infoMapsLink) infoMapsLink.href = ajustes.ubicacion_maps;
                 }
 
-                if (document.getElementById('info-wifi-ssid')) document.getElementById('info-wifi-ssid').textContent = ajustes.info_wifi_ssid || 'No disponible';
-                if (document.getElementById('info-wifi-pass')) document.getElementById('info-wifi-pass').textContent = ajustes.info_wifi_pass || 'No disponible';
-                if (document.getElementById('info-buffet')) document.getElementById('info-buffet').textContent = ajustes.info_buffet || 'Servicios no especificados.';
-                if (document.getElementById('info-reglas')) document.getElementById('info-reglas').textContent = ajustes.info_reglas || 'No hay reglamento especificado.';
+                const hasInfo = ajustes.info_wifi_ssid || ajustes.info_wifi_pass || ajustes.info_buffet || ajustes.info_reglas;
+                const infoSectionWrapper = document.getElementById('info-section-wrapper');
+                if (infoSectionWrapper) {
+                    if (hasInfo) {
+                        infoSectionWrapper.classList.remove('hidden');
+                        if (document.getElementById('info-wifi-ssid')) document.getElementById('info-wifi-ssid').textContent = ajustes.info_wifi_ssid || 'No disponible';
+                        if (document.getElementById('info-wifi-pass')) document.getElementById('info-wifi-pass').textContent = ajustes.info_wifi_pass || 'No disponible';
+                        if (document.getElementById('info-buffet')) document.getElementById('info-buffet').textContent = ajustes.info_buffet || 'Servicios no especificados.';
+                        if (document.getElementById('info-reglas')) document.getElementById('info-reglas').textContent = ajustes.info_reglas || 'No hay reglamento especificado.';
+                    } else {
+                        infoSectionWrapper.classList.add('hidden');
+                    }
+                }
 
                 if (ajustes.logo_url) {
                     const logoImg = document.getElementById('header-logo');
@@ -613,18 +622,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const startHour = opHours.startHour;
             const endHour = opHours.endHour;
             
-            for (let h = startHour; h <= endHour; h++) {
+            const totalHours = endHour >= startHour ? (endHour - startHour + 1) : (24 - startHour + endHour + 1);
+            for (let i = 0; i < totalHours; i++) {
+                let h = (startHour + i) % 24;
                 for (let m = 0; m < 60; m += 30) {
                     const hourStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-                    const pStart = h * 60 + m;
+                    const adjustedH = h < startHour ? h + 24 : h;
+                    const pStart = adjustedH * 60 + m;
                     const pEnd = pStart + duration;
-                    const closeMinutes = (endHour + 1) * 60;
+                    const adjustedEndHour = endHour < startHour ? endHour + 24 : endHour;
+                    const closeMinutes = (adjustedEndHour + 1) * 60;
 
                     if (pEnd > closeMinutes) continue; // No entra en el horario de cierre
                     
                     let isReserved = checkOverlap(hourStr, duration, canchaReservas);
                     
-                    const isPast = isToday && (pStart <= (currentHour * 60 + now.getMinutes()));
+                    const isNextDay = h < startHour;
+                    const isPast = isToday && !isNextDay && ((h * 60 + m) <= (currentHour * 60 + now.getMinutes()));
 
                     const btn = document.createElement('button');
                     
@@ -672,7 +686,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const startHourList = opHours.startHour;
         const endHourList = opHours.endHour;
 
-        for (let h = startHourList; h <= endHourList; h++) {
+        const totalHoursList = endHourList >= startHourList ? (endHourList - startHourList + 1) : (24 - startHourList + endHourList + 1);
+        for (let i = 0; i < totalHoursList; i++) {
+            let h = (startHourList + i) % 24;
             for (let m = 0; m < 60; m += 30) {
                 const hourStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
                 headerHTML += `<th class="p-3 text-xs font-bold text-slate-500 text-center min-w-[70px]">${hourStr}</th>`;
@@ -701,12 +717,16 @@ document.addEventListener('DOMContentLoaded', () => {
             tdName.innerHTML = `<div class="truncate w-44" title="${cancha.nombre}">${cancha.nombre}</div><div class="text-[10px] text-slate-500 font-normal truncate">${cancha.deporte}</div>`;
             tr.appendChild(tdName);
             
-            for (let h = startHourList; h <= endHourList; h++) {
+            const totalHoursList = endHourList >= startHourList ? (endHourList - startHourList + 1) : (24 - startHourList + endHourList + 1);
+            for (let i = 0; i < totalHoursList; i++) {
+                let h = (startHourList + i) % 24;
                 for (let m = 0; m < 60; m += 30) {
                     const hourStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-                    const pStart = h * 60 + m;
+                    const adjustedH = h < startHourList ? h + 24 : h;
+                    const pStart = adjustedH * 60 + m;
                     const pEnd = pStart + duration;
-                    const closeMinutes = (endHourList + 1) * 60;
+                    const adjustedEndHour = endHourList < startHourList ? endHourList + 24 : endHourList;
+                    const closeMinutes = (adjustedEndHour + 1) * 60;
                     
                     const td = document.createElement('td');
                     td.className = 'p-1.5 align-middle';
@@ -718,7 +738,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     
                     let isReserved = checkOverlap(hourStr, duration, canchaReservas);
-                    const isPast = isToday && (pStart <= (currentHour * 60 + now.getMinutes()));
+                    const isNextDay = h < startHourList;
+                    const isPast = isToday && !isNextDay && ((h * 60 + m) <= (currentHour * 60 + now.getMinutes()));
                     const price = (cancha.precioPorHora * (duration / 60));
 
                     if (isPast) {
@@ -1464,6 +1485,21 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             container.innerHTML = `<p class="text-center text-rose-500 font-bold py-8 text-sm">Error al cargar las reservas.</p>`;
         }
+    }
+
+    // Info Toggle
+    const btnToggleInfo = document.getElementById('btn-toggle-info');
+    const infoContentContainer = document.getElementById('info-content-container');
+    const btnToggleInfoText = document.getElementById('btn-toggle-info-text');
+    if (btnToggleInfo && infoContentContainer) {
+        btnToggleInfo.addEventListener('click', () => {
+            infoContentContainer.classList.toggle('hidden');
+            if (infoContentContainer.classList.contains('hidden')) {
+                if (btnToggleInfoText) btnToggleInfoText.innerText = 'Ver Detalles ▼';
+            } else {
+                if (btnToggleInfoText) btnToggleInfoText.innerText = 'Ocultar ▲';
+            }
+        });
     }
 
     // Start

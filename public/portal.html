@@ -259,33 +259,12 @@
                   type="button"
                   class="transition-all rounded-full cursor-pointer w-2 h-2 bg-white/50 hover:bg-white/80"
                   title="Ir a imagen 3"
-                ></button>
-              </div>
-            </div>
           </div>
-          <div
-            class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden"
-          >
-            <button
-              class="w-full p-4 bg-gradient-to-r from-slate-50 via-blue-50/30 to-indigo-50/20 dark:from-slate-800/80 dark:to-slate-900 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer"
-            >
+          <div id="info-section-wrapper" class="hidden bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden transition-all">
+            <button id="btn-toggle-info" class="w-full p-4 bg-gradient-to-r from-slate-50 via-blue-50/30 to-indigo-50/20 dark:from-slate-800/80 dark:to-slate-900 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer">
               <div class="flex items-center gap-2.5">
-                <div
-                  class="w-8 h-8 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center shrink-0"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="lucide lucide-wifi w-4 h-4"
-                    aria-hidden="true"
-                  >
+                <div class="w-8 h-8 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wifi w-4 h-4" aria-hidden="true">
                     <path d="M12 20h.01"></path>
                     <path d="M2 8.82a15 15 0 0 1 20 0"></path>
                     <path d="M5 12.859a10 10 0 0 1 14 0"></path>
@@ -293,23 +272,31 @@
                   </svg>
                 </div>
                 <div>
-                  <h3
-                    id="info-title"
-                    class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider"
-                  >
+                  <h3 id="info-title" class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
                     Información &amp; Servicios del Complejo
                   </h3>
                   <p class="text-[11px] text-slate-500 font-medium">
-                    Hacé clic para ver detalles de los servicios, reglas y datos
-                    del complejo
+                    Hacé clic para ver detalles de los servicios, reglas y datos del complejo
                   </p>
                 </div>
               </div>
-              <span
-                class="px-3 py-1 rounded-xl bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 border border-slate-200 dark:border-slate-700 font-bold text-xs shrink-0"
-                >Ver Detalles ▼</span
-              >
+              <span id="btn-toggle-info-text" class="px-3 py-1 rounded-xl bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 border border-slate-200 dark:border-slate-700 font-bold text-xs shrink-0">Ver Detalles ▼</span>
             </button>
+            <div id="info-content-container" class="hidden border-t border-slate-100 dark:border-slate-800 p-5 space-y-4">
+               <div>
+                  <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Wi-Fi</h4>
+                  <p class="text-sm font-medium text-slate-800 dark:text-slate-200">Red: <span id="info-wifi-ssid">No disponible</span></p>
+                  <p class="text-sm font-medium text-slate-800 dark:text-slate-200">Clave: <span id="info-wifi-pass">No disponible</span></p>
+               </div>
+               <div>
+                  <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Buffet / Servicios</h4>
+                  <p class="text-sm font-medium text-slate-800 dark:text-slate-200" id="info-buffet">Servicios no especificados.</p>
+               </div>
+               <div>
+                  <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Reglamento</h4>
+                  <p class="text-sm font-medium text-slate-800 dark:text-slate-200 whitespace-pre-line" id="info-reglas">No hay reglamento especificado.</p>
+               </div>
+            </div>
           </div>
           <div
             class="flex bg-slate-200/80 dark:bg-slate-900 p-1 rounded-2xl max-w-xs mx-auto border border-slate-300/60 dark:border-slate-800"
@@ -954,7 +941,7 @@
     </div>
 
     <!-- CHAT WIDGET FLOTANTE -->
-    <div id="chat-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end hidden">
+    <div id="chat-widget" class="fixed bottom-24 right-6 z-50 flex flex-col items-end hidden">
         <!-- Burbuja -->
         <button id="btn-chat-toggle" class="w-14 h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg shadow-emerald-500/30 flex items-center justify-center transition-all hover:scale-110 active:scale-95">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>

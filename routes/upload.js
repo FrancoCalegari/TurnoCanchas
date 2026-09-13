@@ -2,40 +2,11 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 const { requireTenantAdmin } = require('../middleware/auth');
+const { executeQuery } = require('../config/db');
 
-// Create uploads directory if it doesn't exist
-const uploadDir = path.join(__dirname, '../public/uploads');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        // Safe filename with tenant ID and timestamp
-        const tenantId = req.tenant ? req.tenant.id : 'unknown';
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname).toLowerCase();
-        cb(null, 'logo-' + tenantId + '-' + uniqueSuffix + ext);
-    }
-});
-
-// Storage for comprobantes
-const comprobanteStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        const reservaId = req.body ? (req.body.reservaId || 'unknown') : 'unknown';
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname).toLowerCase();
-        cb(null, 'comprobante-' + reservaId + '-' + uniqueSuffix + ext);
-    }
-});
+// Utilizar memoria para no guardar en disco
+const storage = multer.memoryStorage();
 
 // Allow only images
 const fileFilter = (req, file, cb) => {
@@ -62,31 +33,60 @@ const upload = multer({
 });
 
 const uploadComprobante = multer({
-    storage: comprobanteStorage,
+    storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
     fileFilter: comprobanteFileFilter
 });
 
+async function uploadToSpiderweb(fileBuffer, originalName) {
+    const API_KEY = process.env.spiderwebapikey;
+    const PROJECT_ID = process.env.spiderwebcloudstorageid;
+
+    if (!API_KEY || !PROJECT_ID) {
+        throw new Error("API Key o Project ID de Spiderweb no configurado");
+    }
+
+    const form = new FormData();
+    form.append('files', new Blob([fileBuffer]), originalName);
+    
+    const res = await fetch(`https://spiderwebargapi.com.ar/api/v1/storage/projects/${PROJECT_ID}/files`, {
+        method: 'POST',
+        headers: {
+            'X-API-KEY': API_KEY
+        },
+        body: form
+    });
+    
+    const data = await res.json();
+    if (!data.success || !data.files || data.files.length === 0) {
+        throw new Error("Error al subir a Spiderweb API: " + JSON.stringify(data));
+    }
+    
+    return data.files[0].url;
+}
+
 // Endpoint for uploading logo
-router.post('/logo', requireTenantAdmin, upload.single('logo'), (req, res) => {
+router.post('/logo', requireTenantAdmin, upload.single('logo'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No se subió ninguna imagen' });
         }
         
-        // Return the public URL for the uploaded file
-        // E.g., /uploads/logo-1-123456789.png
-        const fileUrl = '/uploads/' + req.file.filename;
+        const tenantId = req.tenant ? req.tenant.id : 'unknown';
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(req.file.originalname).toLowerCase();
+        const finalName = 'logo-' + tenantId + '-' + uniqueSuffix + ext;
+
+        const fileUrl = await uploadToSpiderweb(req.file.buffer, finalName);
         
         res.json({ message: 'Imagen subida con éxito', url: fileUrl });
     } catch (error) {
+        console.error('[Upload Logo] Error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
 // Endpoint for uploading payment comprobante (no admin auth required — public client)
-const { executeQuery } = require('../config/db');
-
 router.post('/comprobante', uploadComprobante.single('comprobante'), async (req, res) => {
     try {
         if (!req.file) {
@@ -94,7 +94,12 @@ router.post('/comprobante', uploadComprobante.single('comprobante'), async (req,
         }
 
         const reservaId = req.body && req.body.reservaId ? String(req.body.reservaId).replace(/'/g, "''") : null;
-        const fileUrl = '/uploads/' + req.file.filename;
+        
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(req.file.originalname).toLowerCase();
+        const finalName = 'comprobante-' + (reservaId || 'unknown') + '-' + uniqueSuffix + ext;
+
+        const fileUrl = await uploadToSpiderweb(req.file.buffer, finalName);
 
         // Update the reserva with the comprobante URL and mark as comprobante_enviado
         if (reservaId) {
@@ -110,9 +115,9 @@ router.post('/comprobante', uploadComprobante.single('comprobante'), async (req,
 
         res.json({ message: 'Comprobante subido con éxito', url: fileUrl });
     } catch (error) {
+        console.error('[Upload Comprobante] Error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
 module.exports = router;
-

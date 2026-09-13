@@ -79,9 +79,18 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Algo salió mal en el servidor.' });
 });
 
+const migrateUploads = require('./scripts/migrate-uploads');
+
 if (!process.env.VERCEL) {
-    app.listen(PORT, () => {
-        console.log(`Servidor de TurnoCanchas corriendo en el puerto ${PORT}`);
+    migrateUploads().then(() => {
+        app.listen(PORT, () => {
+            console.log(`Servidor de TurnoCanchas corriendo en el puerto ${PORT}`);
+        });
+    }).catch(err => {
+        console.error('[Startup Error] Migrate uploads falló:', err);
+        app.listen(PORT, () => {
+            console.log(`Servidor de TurnoCanchas corriendo en el puerto ${PORT} (con error de migración)`);
+        });
     });
 }
 

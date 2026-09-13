@@ -102,25 +102,56 @@ const updateInfo = async (req, res) => {
 const fs = require('fs');
 const path = require('path');
 
+async function uploadToSpiderweb(fileBuffer, originalName) {
+    const API_KEY = process.env.spiderwebapikey;
+    const PROJECT_ID = process.env.spiderwebcloudstorageid;
+
+    if (!API_KEY || !PROJECT_ID) {
+        throw new Error("API Key o Project ID de Spiderweb no configurado");
+    }
+
+    const form = new FormData();
+    form.append('files', new Blob([fileBuffer]), originalName);
+    
+    const res = await fetch(`https://spiderwebargapi.com.ar/api/v1/storage/projects/${PROJECT_ID}/files`, {
+        method: 'POST',
+        headers: {
+            'X-API-KEY': API_KEY
+        },
+        body: form
+    });
+    
+    const data = await res.json();
+    if (!data.success || !data.files || data.files.length === 0) {
+        throw new Error("Error al subir a Spiderweb API: " + JSON.stringify(data));
+    }
+    
+    return data.files[0].url;
+}
+
 const uploadLogo = async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No se subió ninguna imagen' });
         }
 
-        const logoUrl = '/uploads/' + req.file.filename;
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(req.file.originalname).toLowerCase();
+        const finalName = 'logo-plataforma-' + uniqueSuffix + ext;
+
+        const logoUrl = await uploadToSpiderweb(req.file.buffer, finalName);
         const faviconUrl = '/favicon.ico';
         
-        // Copy the uploaded file to public/favicon.ico
-        const uploadedPath = req.file.path;
+        // Save the favicon locally using the buffer (since we use memoryStorage now)
         const faviconPath = path.join(__dirname, '../public/favicon.ico');
-        fs.copyFileSync(uploadedPath, faviconPath);
+        fs.writeFileSync(faviconPath, req.file.buffer);
 
         // Update database
         await executeQuery(`UPDATE plataforma_config SET logo_url = '${logoUrl}', favicon_url = '${faviconUrl}' WHERE id = 1`);
 
         res.json({ message: 'Logo subido con éxito', logo_url: logoUrl, favicon_url: faviconUrl });
     } catch (error) {
+        console.error('[Plataforma Upload Logo] Error:', error);
         res.status(500).json({ error: error.message });
     }
 };
