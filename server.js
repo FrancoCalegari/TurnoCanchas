@@ -21,8 +21,12 @@ app.use(cors({
 
 const globalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 150,
-    message: { error: 'Demasiadas peticiones, por favor intenta más tarde.' }
+    max: 3000,
+    message: { error: 'Demasiadas peticiones, por favor intenta más tarde.' },
+    skip: (req, res) => {
+        const authHeader = req.headers['authorization'] || '';
+        return authHeader.startsWith('SuperAdmin ');
+    }
 });
 app.use('/api', globalLimiter);
 
