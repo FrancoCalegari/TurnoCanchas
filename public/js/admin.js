@@ -80,6 +80,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(() => {
                         btnShareTenant.innerHTML = originalHTML;
                     }, 2000);
+                    
+                    // Mostrar toast
+                    const toast = document.createElement('div');
+                    toast.className = 'fixed bottom-4 right-4 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-xl transform transition-all translate-y-0 opacity-100 z-50 text-sm font-bold flex items-center gap-2';
+                    toast.innerHTML = `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg> link de la tienda copiada al portapapeles`;
+                    document.body.appendChild(toast);
+                    setTimeout(() => {
+                        toast.classList.add('translate-y-10', 'opacity-0');
+                        setTimeout(() => toast.remove(), 300);
+                    }, 3000);
                 } catch (err) {
                     alert(`El enlace es: ${publicUrl}`);
                 }
@@ -359,11 +369,30 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('chat-active-name').textContent = clienteNombre;
         document.getElementById('chat-active-avatar').textContent = (clienteNombre || 'C').charAt(0).toUpperCase();
         
+        // Hide sidebar on mobile when chat is opened
+        if (window.innerWidth < 768) {
+            document.getElementById('chat-sidebar').classList.add('hidden');
+        }
+        
         if (activeChatPolling) clearInterval(activeChatPolling);
         await loadActiveChat();
         loadMensajesData(); // Refresh list to update active state
         activeChatPolling = setInterval(loadActiveChat, 5000);
     };
+
+    // Chat back button for mobile
+    const btnChatBack = document.getElementById('btn-chat-back');
+    if (btnChatBack) {
+        btnChatBack.addEventListener('click', () => {
+            document.getElementById('chat-active-panel').classList.add('hidden');
+            document.getElementById('chat-sidebar').classList.remove('hidden');
+            document.getElementById('chat-empty-state').classList.remove('hidden');
+            document.getElementById('chat-empty-state').classList.add('md:flex');
+            currentChatClientId = null;
+            if (activeChatPolling) clearInterval(activeChatPolling);
+            loadMensajesData(); // Refresh list to clear active state
+        });
+    }
 
     async function loadActiveChat() {
         if (!currentChatClientId) return;
@@ -932,6 +961,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (nav.btn === btnNavClientes) loadClientesAdmin();
                 if (nav.btn === btnNavMensajes) loadMensajesData();
                 if (nav.btn === btnNavMiWeb) initMiWeb();
+                
+                // Cerrar menu móvil
+                const navMenuContainer = document.getElementById('nav-menu-container');
+                if (navMenuContainer && !navMenuContainer.classList.contains('hidden') && window.innerWidth < 768) {
+                    navMenuContainer.classList.add('hidden');
+                }
             });
         });
     }
