@@ -169,6 +169,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     const canchasTitle = document.getElementById('canchas-title');
                     if (canchasTitle) canchasTitle.innerText = ajustes.canchas_title;
                 }
+                
+                // Update duration filter options
+                const durationFilterEl = document.getElementById('duration-filter');
+                if (durationFilterEl) {
+                    const intervalo = ajustes.intervalo_turnos || 60;
+                    durationFilterEl.innerHTML = '';
+                    if (intervalo === 30) {
+                        durationFilterEl.innerHTML += `<option value="30">30 Minutos</option>`;
+                        durationFilterEl.innerHTML += `<option value="60" selected>60 Minutos (1 Hora)</option>`;
+                        durationFilterEl.innerHTML += `<option value="90">90 Minutos (1.5 Horas)</option>`;
+                        durationFilterEl.innerHTML += `<option value="120">120 Minutos (2 Horas)</option>`;
+                        if (!['30','60','90','120'].includes(state.filters.duration)) {
+                            state.filters.duration = '60';
+                        }
+                    } else {
+                        durationFilterEl.innerHTML += `<option value="60" selected>60 Minutos (1 Hora)</option>`;
+                        durationFilterEl.innerHTML += `<option value="120">120 Minutos (2 Horas)</option>`;
+                        if (!['60','120'].includes(state.filters.duration)) {
+                            state.filters.duration = '60';
+                        }
+                    }
+                }
             }
             return true;
         };
@@ -625,7 +647,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const totalHours = endHour >= startHour ? (endHour - startHour + 1) : (24 - startHour + endHour + 1);
             for (let i = 0; i < totalHours; i++) {
                 let h = (startHour + i) % 24;
-                for (let m = 0; m < 60; m += 30) {
+                const intervalo = parseInt(state.ajustes?.intervalo_turnos, 10) || 60;
+                for (let m = 0; m < 60; m += intervalo) {
                     const hourStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
                     const adjustedH = h < startHour ? h + 24 : h;
                     const pStart = adjustedH * 60 + m;
@@ -689,7 +712,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalHoursList = endHourList >= startHourList ? (endHourList - startHourList + 1) : (24 - startHourList + endHourList + 1);
         for (let i = 0; i < totalHoursList; i++) {
             let h = (startHourList + i) % 24;
-            for (let m = 0; m < 60; m += 30) {
+            const intervalo = parseInt(state.ajustes?.intervalo_turnos, 10) || 60;
+            for (let m = 0; m < 60; m += intervalo) {
                 const hourStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
                 headerHTML += `<th class="p-3 text-xs font-bold text-slate-500 text-center min-w-[70px]">${hourStr}</th>`;
             }
@@ -720,7 +744,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const totalHoursList = endHourList >= startHourList ? (endHourList - startHourList + 1) : (24 - startHourList + endHourList + 1);
             for (let i = 0; i < totalHoursList; i++) {
                 let h = (startHourList + i) % 24;
-                for (let m = 0; m < 60; m += 30) {
+                const intervalo = parseInt(state.ajustes?.intervalo_turnos, 10) || 60;
+                for (let m = 0; m < 60; m += intervalo) {
                     const hourStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
                     const adjustedH = h < startHourList ? h + 24 : h;
                     const pStart = adjustedH * 60 + m;

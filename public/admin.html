@@ -21,6 +21,7 @@
       rel="stylesheet"
     />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   </head>
   <body
     class="h-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased font-sans"
@@ -996,9 +997,49 @@
         </div>
         <!-- CONTENIDO: REPORTES -->
         <div id="view-reportes" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
-            <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Reportes</h2>
-            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 text-center text-slate-500 font-bold">
-                Módulo en desarrollo...
+            <div class="space-y-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-column w-5 h-5 text-indigo-600" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg>
+                            Reportes, Estadísticas y Exportación
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">Análisis de facturación por cancha y distribución de turnos por estado.</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button id="btn-export-csv" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4" aria-hidden="true"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>
+                            <span>Exportar CSV</span>
+                        </button>
+                        <button id="btn-export-pdf" class="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer w-4 h-4" aria-hidden="true"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"></path><rect x="6" y="14" width="12" height="8" rx="1"></rect></svg>
+                            <span>Imprimir PDF</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+                        <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up w-4 h-4 text-blue-600" aria-hidden="true"><path d="M16 7h6v6"></path><path d="m22 7-8.5 8.5-5-5L2 17"></path></svg>
+                            Ingresos Totales por Cancha ($)
+                        </h3>
+                        <div class="h-64 w-full">
+                            <div id="chart-ingresos-cancha" style="width: 100%; height: 100%;"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+                        <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-pie w-4 h-4 text-emerald-600" aria-hidden="true"><path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z"></path><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path></svg>
+                            Distribución de Turnos por Estado
+                        </h3>
+                        <div class="h-64 w-full flex items-center justify-center">
+                            <div id="chart-distribucion-estado" style="width: 100%; height: 100%;"></div>
+                        </div>
+                        <div id="reporte-estados-legend" class="flex justify-center gap-4 text-xs font-semibold flex-wrap">
+                            <!-- JS injected legend -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1029,6 +1070,15 @@
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Nombre del Complejo</label>
                         <input type="text" id="ajustes-nombre" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Módulo de Turnos</label>
+                        <select id="ajustes-intervalo-turnos" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm">
+                            <option value="60">1 Hora (60 Minutos)</option>
+                            <option value="30">Media Hora (30 Minutos)</option>
+                        </select>
+                        <p class="text-[10px] text-slate-500 mt-1 leading-tight">Define la duración mínima de un turno en la grilla. Las opciones de duración al reservar se adaptarán a este valor.</p>
                     </div>
                     
                     <div class="space-y-3">

@@ -26,7 +26,7 @@ const getAjustes = async (req, res) => {
         if (!existingColumns.includes('info_reglas')) newColumns.push("ALTER TABLE ajustes_complejo ADD COLUMN info_reglas TEXT");
         if (!existingColumns.includes('horario_modo')) newColumns.push("ALTER TABLE ajustes_complejo ADD COLUMN horario_modo VARCHAR(50) DEFAULT 'todos_los_dias'");
         if (!existingColumns.includes('horarios_semana')) newColumns.push("ALTER TABLE ajustes_complejo ADD COLUMN horarios_semana TEXT");
-
+        if (!existingColumns.includes('intervalo_turnos')) newColumns.push("ALTER TABLE ajustes_complejo ADD COLUMN intervalo_turnos INT DEFAULT 60");
         for (const sql of newColumns) {
             try { await executeQuery(sql); } catch (e) {}
         }
@@ -42,7 +42,7 @@ const getAjustes = async (req, res) => {
 
 const updateAjustes = async (req, res) => {
     try {
-        const { nombre_complejo, open_time, close_time, wpp_contacto, wpp_mensaje, ubicacion_maps, logo_url, hero_image_url, hero_image_url_2, hero_image_url_3, hero_title, canchas_title, nosotros_title, devolver_sena, mercadopago_alias, info_wifi_ssid, info_wifi_pass, info_buffet, info_reglas, horario_modo, horarios_semana } = req.body;
+        const { nombre_complejo, open_time, close_time, wpp_contacto, wpp_mensaje, ubicacion_maps, logo_url, hero_image_url, hero_image_url_2, hero_image_url_3, hero_title, canchas_title, nosotros_title, devolver_sena, mercadopago_alias, info_wifi_ssid, info_wifi_pass, info_buffet, info_reglas, horario_modo, horarios_semana, intervalo_turnos } = req.body;
         
         let updates = [];
         if (nombre_complejo !== undefined) updates.push(`nombre_complejo = ${sqlEscape(nombre_complejo)}`);
@@ -67,7 +67,7 @@ const updateAjustes = async (req, res) => {
         
         if (horario_modo !== undefined) updates.push(`horario_modo = ${sqlEscape(horario_modo)}`);
         if (horarios_semana !== undefined) updates.push(`horarios_semana = ${sqlEscape(typeof horarios_semana === 'string' ? horarios_semana : JSON.stringify(horarios_semana))}`);
-
+        if (intervalo_turnos !== undefined) updates.push(`intervalo_turnos = ${sqlEscape(intervalo_turnos)}`);
         if (updates.length === 0) {
             return res.status(400).json({ error: 'No data to update' });
         }

@@ -256,12 +256,38 @@ window.API = {
      * Actualiza el estado de una reserva
      */
     updateReservaStatus: async (id, status) => {
-        const res = await fetch(`${API_BASE}/reservas/${id}/status`, { method: 'PUT', headers: window.API._getHeaders(), body: JSON.stringify({ status }) });
-        if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.error || 'Error al actualizar reserva');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        try {
+            console.log(`[API] updating reserva ${id} to ${status}`);
+            const res = await fetch(`${API_BASE}/reservas/${id}/status`, { 
+                method: 'PUT', 
+                headers: window.API._getHeaders(), 
+                body: JSON.stringify({ status }),
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || 'Error al actualizar reserva');
+            }
+            return await res.json().catch(() => ({}));
+        } catch (error) {
+            clearTimeout(timeoutId);
+            console.error('[API] Error in updateReservaStatus:', error);
+            throw error;
         }
-        return await res.json();
+    },
+
+    /**
+     * Obtiene los datos para los reportes (ingresos por cancha y estados)
+     * @returns {Promise<Object>} Datos agrupados
+     */
+    getReportesAdmin: async () => {
+        const res = await fetch(`${API_BASE}/reservas/reportes`, { headers: window.API._getHeaders() });
+        if (!res.ok) throw new Error('Error fetching reportes');
+        const result = await res.json();
+        return result.data || { ingresos: [], estados: [] };
     },
 
     /**
@@ -496,8 +522,8 @@ window.API = {
      */
     uploadComprobante: async (reservaId, file) => {
         const formData = new FormData();
-        formData.append('comprobante', file);
         formData.append('reservaId', String(reservaId));
+        formData.append('comprobante', file);
         const res = await fetch('/api/upload/comprobante', {
             method: 'POST',
             body: formData

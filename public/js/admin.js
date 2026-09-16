@@ -762,6 +762,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             document.getElementById('ajustes-nombre').value = data.nombre_complejo || '';
+            if(document.getElementById('ajustes-intervalo-turnos')) {
+                document.getElementById('ajustes-intervalo-turnos').value = data.intervalo_turnos || 60;
+            }
             document.getElementById('ajustes-open').value = data.open_time || '';
             document.getElementById('ajustes-close').value = data.close_time || '';
             
@@ -874,6 +877,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     await window.API.updateAjustes({
                         nombre_complejo: document.getElementById('ajustes-nombre') ? document.getElementById('ajustes-nombre').value : undefined,
+                        intervalo_turnos: document.getElementById('ajustes-intervalo-turnos') ? parseInt(document.getElementById('ajustes-intervalo-turnos').value) : undefined,
                         open_time: document.getElementById('ajustes-open') ? document.getElementById('ajustes-open').value : undefined,
                         close_time: document.getElementById('ajustes-close') ? document.getElementById('ajustes-close').value : undefined,
                         wpp_contacto: document.getElementById('ajustes-wpp') ? document.getElementById('ajustes-wpp').value : undefined,
@@ -960,6 +964,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (nav.btn === btnNavReservas) loadReservasAdmin();
                 if (nav.btn === btnNavClientes) loadClientesAdmin();
                 if (nav.btn === btnNavMensajes) loadMensajesData();
+                if (nav.btn === btnNavReportes) loadReportesData();
                 if (nav.btn === btnNavMiWeb) initMiWeb();
                 
                 // Cerrar menu móvil
@@ -1862,6 +1867,171 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(row);
         });
     }
+
+    // ==========================================
+    // REPORTES
+    // ==========================================
+    let chartIngresosInstance = null;
+    let chartEstadosInstance = null;
+
+    async function loadReportesData() {
+        showGlobalLoader();
+        try {
+            const reportes = await window.API.getReportesAdmin();
+            
+            // Render Bar Chart (Ingresos por Cancha)
+            const ingresosEl = document.getElementById('chart-ingresos-cancha');
+            if (ingresosEl) {
+                if (chartIngresosInstance) chartIngresosInstance.destroy();
+                
+                const seriesData = reportes.ingresos.map(i => i.ingresos || 0);
+                const categories = reportes.ingresos.map(i => i.canchaName || 'Desconocida');
+                
+                const optionsIngresos = {
+                    series: [{
+                        name: 'Ingresos ($)',
+                        data: seriesData
+                    }],
+                    chart: {
+                        type: 'bar',
+                        height: '100%',
+                        toolbar: { show: false },
+                        fontFamily: 'inherit',
+                        foreColor: '#94a3b8',
+                        background: 'transparent'
+                    },
+                    plotOptions: {
+                        bar: {
+                            borderRadius: 4,
+                            horizontal: false,
+                            columnWidth: '40%',
+                        }
+                    },
+                    dataLabels: { enabled: false },
+                    xaxis: {
+                        categories: categories,
+                        axisBorder: { show: false },
+                        axisTicks: { show: false }
+                    },
+                    yaxis: {
+                        labels: {
+                            formatter: (val) => '$' + val.toLocaleString('es-AR')
+                        }
+                    },
+                    colors: ['#3b82f6'],
+                    grid: {
+                        borderColor: 'rgba(148, 163, 184, 0.1)',
+                        strokeDashArray: 4,
+                    },
+                    tooltip: {
+                        theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+                        y: {
+                            formatter: function (val) {
+                                return "$" + val.toLocaleString('es-AR')
+                            }
+                        }
+                    }
+                };
+                chartIngresosInstance = new ApexCharts(ingresosEl, optionsIngresos);
+                chartIngresosInstance.render();
+            }
+
+            // Render Donut Chart (Distribución por Estado)
+            const estadosEl = document.getElementById('chart-distribucion-estado');
+            if (estadosEl) {
+                if (chartEstadosInstance) chartEstadosInstance.destroy();
+                
+                const labels = reportes.estados.map(e => e.estado.charAt(0).toUpperCase() + e.estado.slice(1));
+                const seriesData = reportes.estados.map(e => e.cantidad || 0);
+                
+                const colorMap = {
+                    'Confirmada': '#10b981',
+                    'Cancelada': '#f43f5e',
+                    'Por confirmar': '#f59e0b',
+                    'Comprobante_enviado': '#3b82f6'
+                };
+                const colors = labels.map(l => colorMap[l] || '#94a3b8');
+
+                const optionsEstados = {
+                    series: seriesData,
+                    chart: {
+                        type: 'donut',
+                        height: '100%',
+                        fontFamily: 'inherit',
+                        foreColor: '#94a3b8',
+                        background: 'transparent'
+                    },
+                    labels: labels,
+                    colors: colors,
+                    dataLabels: { enabled: false },
+                    plotOptions: {
+                        pie: {
+                            donut: {
+                                size: '70%',
+                                labels: {
+                                    show: true,
+                                    name: { show: true },
+                                    value: { show: true, formatter: val => val }
+                                }
+                            }
+                        }
+                    },
+                    legend: { show: false }, // We use custom legend
+                    stroke: { show: false },
+                    tooltip: {
+                        theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                    }
+                };
+                chartEstadosInstance = new ApexCharts(estadosEl, optionsEstados);
+                chartEstadosInstance.render();
+                
+                // Custom Legend
+                const legendEl = document.getElementById('reporte-estados-legend');
+                if (legendEl) {
+                    legendEl.innerHTML = labels.map((lbl, idx) => `
+                        <span class="flex items-center gap-1.5" style="color: ${colors[idx]};">
+                            ● ${lbl}: ${seriesData[idx]}
+                        </span>
+                    `).join('');
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching reportes', error);
+            showAlertModal('Error', 'No se pudieron cargar los reportes', 'error');
+        } finally {
+            hideGlobalLoader();
+        }
+    }
+
+    // Export Logic
+    document.getElementById('btn-export-csv')?.addEventListener('click', async () => {
+        try {
+            const reportes = await window.API.getReportesAdmin();
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Cancha,Ingresos Totales\n";
+            reportes.ingresos.forEach(i => {
+                csvContent += `"${i.canchaName}",${i.ingresos}\n`;
+            });
+            csvContent += "\nEstado,Cantidad\n";
+            reportes.estados.forEach(e => {
+                csvContent += `"${e.estado}",${e.cantidad}\n`;
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "reporte_turnocanchas.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (e) {
+            showAlertModal('Error', 'Fallo al exportar CSV', 'error');
+        }
+    });
+
+    document.getElementById('btn-export-pdf')?.addEventListener('click', () => {
+        window.print();
+    });
 
     // ==========================================
     // CLIENTES CRM

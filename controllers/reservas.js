@@ -256,6 +256,42 @@ const cancelByClient = async (req, res) => {
     }
 };
 
+const getReportes = async (req, res) => {
+    try {
+        const tenantFilter = req.tenant && req.tenant.id ? `AND r.tenant_id = ${sqlEscape(req.tenant.id)}` : '';
+        const tenantFilterSimple = req.tenant && req.tenant.id ? `WHERE tenant_id = ${sqlEscape(req.tenant.id)}` : '';
+        
+        // Ingresos por cancha (solo confirmadas)
+        const ingresosQuery = `
+            SELECT c.nombre AS canchaName, SUM(r.precio) AS ingresos 
+            FROM reservas r 
+            LEFT JOIN canchas c ON r.canchaId = c.id 
+            WHERE r.estado = 'confirmada' ${tenantFilter}
+            GROUP BY c.id, c.nombre
+        `;
+        const ingresosResult = await executeQuery(ingresosQuery);
+
+        // Distribución por estado
+        const estadosQuery = `
+            SELECT estado, COUNT(*) as cantidad 
+            FROM reservas 
+            ${tenantFilterSimple}
+            GROUP BY estado
+        `;
+        const estadosResult = await executeQuery(estadosQuery);
+
+        res.json({
+            message: 'Reportes generados',
+            data: {
+                ingresos: ingresosResult || [],
+                estados: estadosResult || []
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     getAll,
     getAdminReservas,
@@ -263,5 +299,6 @@ module.exports = {
     create,
     updateStatus,
     getRecent,
-    cancelByClient
+    cancelByClient,
+    getReportes
 };

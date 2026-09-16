@@ -60,7 +60,6 @@ async function initDB() {
         )
     `;
 
-    const createAjustes = `
         CREATE TABLE IF NOT EXISTS ajustes_complejo (
             id INT PRIMARY KEY,
             tenant_id INT NOT NULL DEFAULT 0,
@@ -73,7 +72,8 @@ async function initDB() {
             hero_image_url VARCHAR(500),
             hero_title VARCHAR(200),
             canchas_title VARCHAR(100),
-            nosotros_title VARCHAR(100)
+            nosotros_title VARCHAR(100),
+            intervalo_turnos INT DEFAULT 60
         )
     `;
 

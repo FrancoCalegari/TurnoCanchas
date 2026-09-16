@@ -94,7 +94,8 @@ router.post('/comprobante', uploadComprobante.single('comprobante'), async (req,
             return res.status(400).json({ error: 'No se subió ningún archivo' });
         }
 
-        const reservaId = req.body && req.body.reservaId ? String(req.body.reservaId).replace(/'/g, "''") : null;
+        const rawReservaId = req.body && req.body.reservaId ? String(req.body.reservaId) : null;
+        const reservaId = (rawReservaId && rawReservaId !== 'undefined' && rawReservaId !== 'null') ? rawReservaId.replace(/'/g, "''") : null;
         
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const ext = path.extname(req.file.originalname).toLowerCase();
@@ -110,8 +111,10 @@ router.post('/comprobante', uploadComprobante.single('comprobante'), async (req,
                 );
             } catch (dbErr) {
                 console.error('[Upload Comprobante] DB error:', dbErr.message);
-                // Still return success even if DB update fails; the file is saved
+                throw new Error('El comprobante se subió pero no se pudo asociar a la reserva.');
             }
+        } else {
+            console.warn('[Upload Comprobante] Warning: File uploaded without valid reservaId.');
         }
 
         res.json({ message: 'Comprobante subido con éxito', url: fileUrl });

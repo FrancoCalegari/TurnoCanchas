@@ -7,6 +7,7 @@ const { requireTenantAdmin, requireClientAuth } = require('../middleware/auth');
 router.get('/', reservasController.getAll);
 router.get('/admin', requireTenantAdmin, reservasController.getAdminReservas);
 router.get('/recientes', requireTenantAdmin, reservasController.getRecent);
+router.get('/reportes', requireTenantAdmin, reservasController.getReportes);
 router.get('/usuario/:userId', reservasController.getByUser);
 router.post('/', reservasController.create);
 router.put('/:id/status', requireTenantAdmin, reservasController.updateStatus);

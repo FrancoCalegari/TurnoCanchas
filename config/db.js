@@ -13,17 +13,26 @@ const executeQuery = async (query) => {
             console.warn("ADVERTENCIA: Faltan variables de entorno para la base de datos (spiderapidbname o spiderwebapikey).");
         }
 
-        const response = await fetch(`${SPIDERWEB_API}/query`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-API-KEY': API_KEY
-            },
-            body: JSON.stringify({
-                database: DB_NAME,
-                query: query
-            })
-        });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
+        let response;
+        try {
+            response = await fetch(`${SPIDERWEB_API}/query`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-KEY': API_KEY
+                },
+                body: JSON.stringify({
+                    database: DB_NAME,
+                    query: query
+                }),
+                signal: controller.signal
+            });
+        } finally {
+            clearTimeout(timeoutId);
+        }
 
         const text = await response.text();
         if (!response.ok) {
