@@ -24,9 +24,20 @@ const login = async (req, res) => {
 
         const user = result[0];
         
-        // Comparación simple para admin (sin bcrypt por compatibilidad con datos existentes)
-        if (user.password_hash === password) {
-            const fakeToken = Buffer.from(`${user.username}:${Date.now()}`).toString('base64');
+        let passwordMatch = false;
+        if (user.password_hash && user.password_hash.startsWith('$2')) {
+            passwordMatch = await bcrypt.compare(String(password), user.password_hash);
+        } else {
+            passwordMatch = (user.password_hash === password);
+            if (passwordMatch) {
+                const newHash = await bcrypt.hash(String(password), SALT_ROUNDS);
+                const safeHash = newHash.replace(/'/g, "''");
+                await executeQuery(`UPDATE admin_users SET password_hash = '${safeHash}' WHERE id = ${user.id}`);
+            }
+        }
+
+        if (passwordMatch) {
+            const fakeToken = Buffer.from(`tenant:${user.tenant_id}:${user.username}:${Date.now()}`).toString('base64');
             res.json({ token: fakeToken, username: user.username });
         } else {
             res.status(401).json({ error: 'Contraseña incorrecta' });
