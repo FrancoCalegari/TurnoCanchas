@@ -13,25 +13,39 @@ const executeQuery = async (query) => {
             console.warn("ADVERTENCIA: Faltan variables de entorno para la base de datos (spiderapidbname o spiderwebapikey).");
         }
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-        
         let response;
-        try {
-            response = await fetch(`${SPIDERWEB_API}/query`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-KEY': API_KEY
-                },
-                body: JSON.stringify({
-                    database: DB_NAME,
-                    query: query
-                }),
-                signal: controller.signal
-            });
-        } finally {
-            clearTimeout(timeoutId);
+        let retries = 2;
+        let lastError = null;
+
+        while (retries >= 0) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
+            
+            try {
+                response = await fetch(`${SPIDERWEB_API}/query`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-KEY': API_KEY
+                    },
+                    body: JSON.stringify({
+                        database: DB_NAME,
+                        query: query
+                    }),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                break; // Exito
+            } catch (err) {
+                clearTimeout(timeoutId);
+                lastError = err;
+                retries--;
+                if (retries < 0) {
+                    throw lastError; // Se agotaron los reintentos
+                }
+                // Esperar 500ms antes de reintentar
+                await new Promise(r => setTimeout(r, 500));
+            }
         }
 
         const text = await response.text();

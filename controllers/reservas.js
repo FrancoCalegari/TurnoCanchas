@@ -166,7 +166,7 @@ const create = async (req, res) => {
             data: { id, canchaId: safeCanchaId, fecha, hora, cliente, cliente_id: safeClienteId, duracion: safeDuracion, precio: safePrecio }
         });
 
-        // Trigger Notification
+        // Trigger Notification to Client via WS/Email
         if (safeClienteId) {
             try {
                 const cliRes = await executeQuery(`SELECT email, telefono, nombre FROM clientes WHERE id = ${sqlEscape(safeClienteId)}`);
@@ -178,6 +178,18 @@ const create = async (req, res) => {
             } catch (notiErr) {
                 console.error('Error enviando notificación (creación):', notiErr);
             }
+        }
+
+        // Trigger Push Notification to Admins
+        try {
+            const pushController = require('./push');
+            await pushController.sendPushToUser(tenantId, null, null, {
+                title: 'Nuevo turno por corroborar',
+                body: `Se ha reservado un turno para la fecha ${fecha} a las ${hora}.`,
+                url: '/admin#view-reservas'
+            });
+        } catch (pushErr) {
+            console.error('Error enviando push (creación):', pushErr);
         }
 
     } catch (error) {
@@ -198,7 +210,7 @@ const updateStatus = async (req, res) => {
         // Trigger Notification
         try {
             const resData = await executeQuery(`
-                SELECT r.fecha, r.hora, r.cliente, c.email, c.telefono, c.nombre 
+                SELECT r.fecha, r.hora, r.cliente, r.cliente_id, r.tenant_id, c.email, c.telefono, c.nombre 
                 FROM reservas r 
                 LEFT JOIN clientes c ON r.cliente_id = c.id 
                 WHERE r.id = ${sqlEscape(id)}
@@ -207,6 +219,15 @@ const updateStatus = async (req, res) => {
                 await notifyReservationStatusChanged({
                     id, fecha: resData[0].fecha, hora: resData[0].hora, cliente: resData[0].cliente
                 }, resData[0], status);
+
+                if (status === 'confirmada' && resData[0].cliente_id) {
+                    const pushController = require('./push');
+                    await pushController.sendPushToUser(resData[0].tenant_id, resData[0].cliente_id, null, {
+                        title: '¡Turno Confirmado!',
+                        body: `Tu reserva para el ${resData[0].fecha} a las ${resData[0].hora} ha sido confirmada exitosamente.`,
+                        url: '/portal'
+                    });
+                }
             }
         } catch (notiErr) {
             console.error('Error enviando notificación (update):', notiErr);

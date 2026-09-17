@@ -10,5 +10,7 @@ router.get('/perfil', usuariosController.getProfile); // Requiere auth middlewar
 router.put('/perfil', usuariosController.updateProfile);
 
 router.get('/admin/clientes', requireTenantAdmin, usuariosController.getAdminClientes);
+router.delete('/admin/clientes/:id', requireTenantAdmin, usuariosController.deleteCliente);
+router.post('/admin/clientes/:id/reset-password', requireTenantAdmin, usuariosController.adminResetPassword);
 
 module.exports = router;

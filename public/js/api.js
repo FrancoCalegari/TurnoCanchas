@@ -6,12 +6,24 @@ window.API = {
     _getHeaders: (isJson = true) => {
         const headers = {};
         if (isJson) headers['Content-Type'] = 'application/json';
+        
+        const path = window.location.pathname;
+        const isAdminPanel = path.startsWith('/admin') || path.startsWith('/master');
+
         const tenantToken = localStorage.getItem('tenantToken');
-        if (tenantToken) { headers['Authorization'] = 'Tenant ' + tenantToken; return headers; }
         const adminToken = localStorage.getItem('adminToken');
-        if (adminToken) { headers['Authorization'] = 'Tenant ' + adminToken; return headers; }
         const clientToken = localStorage.getItem('clientToken');
-        if (clientToken) { headers['Authorization'] = 'Client ' + clientToken; }
+
+        if (isAdminPanel) {
+            if (tenantToken) headers['Authorization'] = 'Tenant ' + tenantToken;
+            else if (adminToken) headers['Authorization'] = 'Tenant ' + adminToken;
+            else if (clientToken) headers['Authorization'] = 'Client ' + clientToken; // Fallback for some reason
+        } else {
+            // Portal Público (e.g. /t/test, /login, etc)
+            if (clientToken) headers['Authorization'] = 'Client ' + clientToken;
+            else if (tenantToken) headers['Authorization'] = 'Tenant ' + tenantToken; // Fallback if admin is viewing portal unlogged as client
+        }
+        
         return headers;
     },
     /**
@@ -90,6 +102,25 @@ window.API = {
             if (tenant) url += `?tenant=${tenant}`;
             const res = await fetch(url);
             if (!res.ok) throw new Error('Error fetching reservas by user');
+            const result = await res.json();
+            return result.data || [];
+        } catch (error) {
+            console.error(error);
+            return [];
+        }
+    },
+
+    /**
+     * Obtiene las reservas de un cliente específico (Uso Administrativo)
+     */
+    getReservasAdminByUser: async (userId) => {
+        try {
+            const tenantData = window.API.getTenantInfo();
+            const tenant = tenantData ? tenantData.slug : '';
+            let url = `${API_BASE}/reservas/usuario/${encodeURIComponent(userId)}`;
+            if (tenant) url += `?tenant=${tenant}`;
+            const res = await fetch(url, { headers: window.API._getHeaders(false) });
+            if (!res.ok) throw new Error('Error fetching reservas admin by user');
             const result = await res.json();
             return result.data || [];
         } catch (error) {
@@ -531,6 +562,58 @@ window.API = {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Error al subir comprobante');
         return data;
+    },
+
+    /**
+     * Inicia y registra Push Notifications
+     */
+    initPushNotifications: async () => {
+        try {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                console.log('Push notifications no soportadas en este navegador.');
+                return;
+            }
+            
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                console.log('Permiso de notificaciones denegado.');
+                return;
+            }
+
+            const swReg = await navigator.serviceWorker.register('/sw.js');
+            
+            // Get public key
+            const pkRes = await fetch('/api/push/public-key');
+            if (!pkRes.ok) throw new Error('Error al obtener VAPID public key');
+            const pkData = await pkRes.json();
+            
+            // Convert VAPID key
+            function urlBase64ToUint8Array(base64String) {
+                const padding = '='.repeat((4 - base64String.length % 4) % 4);
+                const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+                const rawData = window.atob(base64);
+                const outputArray = new Uint8Array(rawData.length);
+                for (let i = 0; i < rawData.length; ++i) {
+                    outputArray[i] = rawData.charCodeAt(i);
+                }
+                return outputArray;
+            }
+
+            const subscription = await swReg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(pkData.publicKey)
+            });
+
+            // Enviar al servidor
+            await fetch('/api/push/subscribe', {
+                method: 'POST',
+                headers: window.API._getHeaders(),
+                body: JSON.stringify({ subscription })
+            });
+            console.log('Push notifications suscriptas exitosamente.');
+        } catch (error) {
+            console.error('Error al inicializar Push Notifications:', error);
+        }
     }
 };
 

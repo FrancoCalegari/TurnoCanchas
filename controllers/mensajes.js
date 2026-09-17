@@ -83,11 +83,20 @@ const createMensaje = async (req, res) => {
         const query = `
             INSERT INTO mensajes (tenant_id, cliente_id, admin_id, reserva_id, asunto, mensaje, sender_type, file_url)
             VALUES (${tenantId}, ${safeClienteId}, ${safeAdminId}, ${safeReservaId}, ${safeAsunto}, '${safeMensaje}', '${finalSenderType}', ${safeFileUrl})
-            RETURNING *;
         `;
         
-        const insertRes = await executeQuery(query);
-        const newMessage = Array.isArray(insertRes) ? insertRes[0] : null;
+        await executeQuery(query);
+        
+        // Fetch the newly inserted message (or at least the latest for this sender)
+        const fetchQuery = `
+            SELECT * FROM mensajes 
+            WHERE tenant_id = ${tenantId} 
+              AND sender_type = '${finalSenderType}'
+              ${finalSenderType === 'cliente' ? `AND cliente_id = ${safeClienteId}` : `AND admin_id = ${safeAdminId}`}
+            ORDER BY id DESC LIMIT 1
+        `;
+        const insertRes = await executeQuery(fetchQuery);
+        const newMessage = (insertRes && insertRes.length > 0) ? insertRes[0] : null;
 
         // Disparar Notificación Push
         try {

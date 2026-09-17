@@ -60,6 +60,23 @@ async function initDB() {
         )
     `;
 
+    const createMensajes = `
+        CREATE TABLE IF NOT EXISTS mensajes (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            tenant_id INT NOT NULL DEFAULT 0,
+            cliente_id INT,
+            admin_id INT,
+            reserva_id VARCHAR(50),
+            asunto VARCHAR(150),
+            mensaje TEXT,
+            leido BOOLEAN DEFAULT FALSE,
+            createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            sender_type VARCHAR(20) DEFAULT 'cliente',
+            file_url VARCHAR(255)
+        )
+    `;
+
+    const createAjustes = `
         CREATE TABLE IF NOT EXISTS ajustes_complejo (
             id INT PRIMARY KEY,
             tenant_id INT NOT NULL DEFAULT 0,
@@ -101,6 +118,17 @@ async function initDB() {
         )
     `;
 
+    const createPushSubscriptions = `
+        CREATE TABLE IF NOT EXISTS push_subscriptions (
+            id SERIAL PRIMARY KEY,
+            tenant_id INT NOT NULL DEFAULT 0,
+            cliente_id INT,
+            admin_id INT,
+            subscription TEXT NOT NULL,
+            createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+
     try {
         console.log("Creando tabla 'canchas'...");
         await executeQuery(createCanchas);
@@ -124,6 +152,10 @@ async function initDB() {
         console.log("Creando tabla 'admin_users'...");
         await executeQuery(createAdminUsers);
         console.log("Tabla 'admin_users' lista.");
+
+        console.log("Creando tabla 'mensajes'...");
+        await executeQuery(createMensajes);
+        console.log("Tabla 'mensajes' lista.");
 
         console.log("Creando tabla 'ajustes_complejo'...");
         await executeQuery(createAjustes);
@@ -165,6 +197,10 @@ async function initDB() {
             try { await executeQuery(sql); } catch(e) {}
         }
         console.log("Columnas tenant_id aplicadas.");
+
+        console.log("Creando tabla 'push_subscriptions'...");
+        await executeQuery(createPushSubscriptions);
+        console.log("Tabla 'push_subscriptions' lista.");
 
         // Comprobar super admin
         const superAdminRes = await executeQuery("SELECT COUNT(*) as count FROM super_admins");

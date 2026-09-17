@@ -1547,6 +1547,56 @@
         </div>
     </div>
 
+    <!-- ===== MODAL: HISTORIAL DEL CLIENTE ===== -->
+    <div id="modal-cliente-historial" class="fixed inset-0 z-[60] hidden bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden">
+            <!-- Header -->
+            <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-blue-600 to-indigo-600">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-white text-lg" id="modal-historial-cliente-name">Historial</h3>
+                        <p class="text-blue-100 text-xs font-medium">Reservas del cliente</p>
+                    </div>
+                </div>
+                <button id="btn-close-historial" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 text-white transition-all cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <!-- Body (List/Table) -->
+            <div class="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 p-4 sm:p-6">
+                <div id="modal-historial-loader" class="flex flex-col items-center justify-center py-12 text-slate-400">
+                    <svg class="animate-spin h-8 w-8 mb-3 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <p class="text-sm font-bold">Cargando reservas...</p>
+                </div>
+                
+                <div id="modal-historial-content" class="hidden">
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 dark:bg-slate-950/60 text-slate-400 font-bold uppercase border-b border-slate-200 dark:border-slate-800">
+                                    <tr>
+                                        <th class="p-4">Código</th>
+                                        <th class="p-4">Fecha y Hora</th>
+                                        <th class="p-4">Cancha</th>
+                                        <th class="p-4">Monto</th>
+                                        <th class="p-4">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modal-historial-tbody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                                    <!-- Inyectado por JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ═══ View: Mi Web ═══════════════════════════════════════════════════════ -->
     <div id="view-miweb" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
         <div>
@@ -1634,6 +1684,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="/js/api.js"></script>
-    <script src="/js/admin.js"></script>
+    <script src="/js/admin.js?v=2"></script>
   </body>
 </html>

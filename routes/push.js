@@ -32,6 +32,7 @@ const resolveAuth = async (req, res, next) => {
     next();
 };
 
+router.get('/public-key', pushController.getPublicKey);
 router.post('/subscribe', resolveAuth, pushController.subscribe);
 
 module.exports = router;

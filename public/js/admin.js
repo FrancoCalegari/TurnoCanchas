@@ -53,6 +53,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const tenantData = window.API.getTenantInfo();
+        
+        // Iniciar Notificaciones Push
+        if (window.API.initPushNotifications) {
+            window.API.initPushNotifications();
+        }
 
         const usernameDisplay = document.getElementById('admin-username-display');
         if (usernameDisplay) {
@@ -870,9 +875,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (form) {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const btn = form.querySelector('button[type="submit"]');
-                btn.disabled = true;
-                btn.innerText = 'Guardando...';
+                const btn = document.querySelector('button[form="ajustes-form"]') || form.querySelector('button[type="submit"]');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerText = 'Guardando...';
+                }
                 
                 try {
                     await window.API.updateAjustes({
@@ -900,8 +907,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     showAlertModal('Error', 'Error guardando ajustes.', 'error');
                 }
                 
-                btn.disabled = false;
-                btn.innerText = 'Guardar Ajustes';
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = 'Guardar Ajustes';
+                }
             });
         }
         
@@ -1874,6 +1883,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let chartIngresosInstance = null;
     let chartEstadosInstance = null;
 
+    function showGlobalLoader() {
+        const loader = document.getElementById('global-loader');
+        if (loader) {
+            loader.style.display = 'flex';
+            loader.style.opacity = '1';
+        }
+    }
+
+    function hideGlobalLoader() {
+        const loader = document.getElementById('global-loader');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 500);
+        }
+    }
+
     async function loadReportesData() {
         showGlobalLoader();
         try {
@@ -2102,8 +2127,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td class="p-4 text-slate-600 dark:text-slate-400">${ultima}</td>
                         <td class="p-4 text-right space-x-2">
                             ${waLink}
-                            <button class="inline-flex p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" title="Ver Historial Completo" onclick="alert('Historial en desarrollo')">
+                            <button class="inline-flex p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" title="Ver Historial Completo" onclick="window.openClienteHistorial('${c.id || c.nombre}', '${c.nombre || 'Cliente'}')">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>
+                            </button>
+                            <button class="inline-flex p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20" title="Restablecer Contraseña" onclick="window.resetClientePasswordAdmin('${c.id}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            </button>
+                            <button class="inline-flex p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20" title="Eliminar Cliente" onclick="window.deleteClienteAdmin('${c.id}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                             </button>
                         </td>
                     </tr>
@@ -2127,5 +2158,136 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500);
         });
     }
+
+    // ==========================================
+    // HISTORIAL DEL CLIENTE (MODAL)
+    // ==========================================
+    window.openClienteHistorial = async (clienteId, nombreCliente) => {
+        const modal = document.getElementById('modal-cliente-historial');
+        const loader = document.getElementById('modal-historial-loader');
+        const content = document.getElementById('modal-historial-content');
+        const tbody = document.getElementById('modal-historial-tbody');
+        const nameEl = document.getElementById('modal-historial-cliente-name');
+        
+        if (!modal || !tbody) return;
+        
+        nameEl.innerText = nombreCliente || 'Cliente';
+        modal.classList.remove('hidden');
+        loader.classList.remove('hidden');
+        content.classList.add('hidden');
+        tbody.innerHTML = '';
+        
+        try {
+            const reservas = await window.API.getReservasAdminByUser(clienteId);
+            
+            if (!reservas || reservas.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500 font-medium">Este cliente no tiene reservas registradas.</td></tr>`;
+            } else {
+                // Ordenar por fecha descendente
+                reservas.sort((a, b) => {
+                    const dateA = new Date(`${a.fecha}T${a.hora || '00:00'}`);
+                    const dateB = new Date(`${b.fecha}T${b.hora || '00:00'}`);
+                    return dateB - dateA;
+                });
+                
+                tbody.innerHTML = reservas.map(r => {
+                    const statusStyles = {
+                        'confirmada': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+                        'cancelada': 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
+                        'por confirmar': 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+                        'comprobante_enviado': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+                    };
+                    const badgeClass = statusStyles[r.estado] || 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400';
+                    const estadoLabel = r.estado.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    
+                    const fechaObj = new Date(`${r.fecha}T00:00:00`);
+                    const fechaStr = fechaObj.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    const horaStr = r.hora ? r.hora.substring(0,5) + ' hs' : '-';
+                    const idRes = r.id ? r.id.substring(0,6).toUpperCase() : '-';
+                    const precioStr = r.precio ? '$' + Number(r.precio).toLocaleString('es-AR') : '-';
+                    
+                    return `
+                        <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                            <td class="p-4 font-mono text-slate-500 font-medium">${idRes}</td>
+                            <td class="p-4">
+                                <p class="font-bold text-slate-900 dark:text-white">${fechaStr}</p>
+                                <p class="text-xs text-slate-500">${horaStr}</p>
+                            </td>
+                            <td class="p-4 font-bold text-slate-900 dark:text-white">${r.canchas?.nombre || r.canchaId || 'Cancha'}</td>
+                            <td class="p-4 font-bold text-emerald-600 dark:text-emerald-400">${precioStr}</td>
+                            <td class="p-4">
+                                <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${badgeClass}">
+                                    ${estadoLabel}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        } catch (error) {
+            console.error(error);
+            tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-rose-500 font-bold">Error al cargar el historial.</td></tr>`;
+        } finally {
+            loader.classList.add('hidden');
+            content.classList.remove('hidden');
+        }
+    };
+
+    document.getElementById('btn-close-historial')?.addEventListener('click', () => {
+        document.getElementById('modal-cliente-historial')?.classList.add('hidden');
+    });
+
+    // ==========================================
+    // ELIMINAR CLIENTE
+    // ==========================================
+    window.deleteClienteAdmin = (clienteId) => {
+        if (!clienteId) return;
+        
+        showConfirmModal('Eliminar Cliente', '¿Estás seguro de eliminar esta cuenta de cliente? Esta acción no se puede deshacer y el cliente ya no podrá iniciar sesión. (Sus reservas anteriores se mantendrán intactas en el sistema).', async () => {
+            try {
+                const res = await fetch(`/api/usuarios/admin/clientes/${clienteId}`, {
+                    method: 'DELETE',
+                    headers: window.API._getHeaders(false)
+                });
+                
+                if (!res.ok) throw new Error('Error al eliminar cliente');
+                
+                showAlertModal('Éxito', 'Cliente eliminado correctamente.', 'success');
+                
+                // Recargar tabla de clientes
+                const searchVal = document.getElementById('clientes-search-input')?.value || '';
+                loadClientesAdmin(searchVal);
+                
+            } catch (error) {
+                console.error(error);
+                showAlertModal('Error', 'No se pudo eliminar al cliente.', 'error');
+            }
+        });
+    };
+
+    // ==========================================
+    // RESTABLECER CONTRASEÑA
+    // ==========================================
+    window.resetClientePasswordAdmin = (clienteId) => {
+        if (!clienteId) return;
+        
+        showConfirmModal('Restablecer Contraseña', '¿Deseas generar una nueva contraseña temporal y enviársela al correo de este cliente?', async () => {
+            try {
+                const res = await fetch(`/api/usuarios/admin/clientes/${clienteId}/reset-password`, {
+                    method: 'POST',
+                    headers: window.API._getHeaders()
+                });
+                
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Error al restablecer contraseña');
+                
+                showAlertModal('Éxito', 'La nueva contraseña fue generada y enviada correctamente por correo.', 'success');
+                
+            } catch (error) {
+                console.error(error);
+                showAlertModal('Error', error.message || 'No se pudo restablecer la contraseña.', 'error');
+            }
+        });
+    };
 
 });

@@ -53,6 +53,9 @@ const sendPushToUser = async (tenantId, clienteId, adminId, payload) => {
             condition += ` AND cliente_id = ${clienteId}`;
         } else if (adminId) {
             condition += ` AND admin_id = ${adminId}`;
+        } else {
+            // Broadcast to all admins of this tenant if no specific user is passed
+            condition += ` AND admin_id IS NOT NULL`;
         }
 
         const query = `SELECT subscription FROM push_subscriptions WHERE ${condition} ORDER BY createdAt DESC LIMIT 5`;
@@ -77,7 +80,15 @@ const sendPushToUser = async (tenantId, clienteId, adminId, payload) => {
     }
 };
 
+const getPublicKey = (req, res) => {
+    if (!process.env.VAPID_PUBLIC_KEY) {
+        return res.status(500).json({ error: 'VAPID_PUBLIC_KEY no configurada' });
+    }
+    res.json({ publicKey: process.env.VAPID_PUBLIC_KEY });
+};
+
 module.exports = {
     subscribe,
-    sendPushToUser
+    sendPushToUser,
+    getPublicKey
 };

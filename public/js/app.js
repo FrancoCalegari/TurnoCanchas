@@ -230,6 +230,11 @@ document.addEventListener('DOMContentLoaded', () => {
         setupEventListeners();
         setupCarousel();
         await loadData();
+        
+        // Iniciar push notifications si está logueado
+        if (localStorage.getItem('clientToken') && window.API.initPushNotifications) {
+            window.API.initPushNotifications();
+        }
     }
 
     // Format helpers
@@ -1319,6 +1324,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.clientData = data.user;
                 window.closeLoginModal();
                 updateHeaderAuth();
+                
+                if (window.API.initPushNotifications) {
+                    window.API.initPushNotifications();
+                }
+
                 showAlertModal('¡Bienvenido!', `Hola ${data.user.nombre}, ya podés ver tus reservas.`, 'success');
             } catch (err) {
                 errEl.textContent = err.message || 'Error al iniciar sesión';
@@ -1357,6 +1367,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await window.API.clientLogin(emailInput, passInput);
                 state.clientData = data.user;
                 updateHeaderAuth();
+                
+                if (window.API.initPushNotifications) {
+                    window.API.initPushNotifications();
+                }
                 
                 window.closeRegisterModal();
                 showAlertModal('¡Cuenta creada!', 'Iniciaste sesión automáticamente. Ya podés confirmar tu reserva.', 'success');
